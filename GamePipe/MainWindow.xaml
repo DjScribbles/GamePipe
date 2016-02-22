@@ -67,9 +67,9 @@
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
                         <Label Content="IP Address:" ToolTip="The IP address of another computer Hosting with GamePipe"/>
-                        <TextBox Grid.Column="1" Text="{Binding NewFriendIp, UpdateSourceTrigger=PropertyChanged}" MinWidth="80" ToolTip="The IP address of another computer Hosting with GamePipe"/>
+                        <TextBox Grid.Column="1" x:Name="IP_TextBox" Text="{Binding NewFriendIp, UpdateSourceTrigger=PropertyChanged}" MinWidth="80" ToolTip="The IP address of another computer Hosting with GamePipe"/>
                         <Label Grid.Column="2" Content="Port:" ToolTip="The port should be 41650, it can't be changed right now."/>
-                        <TextBox Grid.Column="3" Text="{Binding NewFriendPort, UpdateSourceTrigger=PropertyChanged}" MinWidth="40" ToolTip="The port should be 41650, it can't be changed right now." IsReadOnly="True"/>
+                        <TextBox Grid.Column="3" x:Name="Port_TextBox" Text="{Binding NewFriendPort, UpdateSourceTrigger=PropertyChanged}" MinWidth="40" ToolTip="The port should be 41650, it can't be changed right now." IsReadOnly="True"/>
                         <Button Grid.Column="4" Command="{Binding AddFriendCommand}" Content="Add Friend" ToolTip="Connect to a hosting game pipe session at the specified IP and port. This connection will be remembered."/>
                         <Button Grid.Column="5" x:Name="TestHost"   Content="Host Service" ToolTip="Host a GamePipe service so other computers can connect to you and copy games from you. This is not neccessarily secure yet, should be fine for use, but don't leave it open 24/7."/>
                     </Grid>

@@ -47,7 +47,10 @@ namespace GamePipe
 
         private void NetworkTab_PreviewKeyDown(object sender, KeyEventArgs e)
         {
-            NetworkSearchTextBox.Focus();
+            if (!IP_TextBox.IsFocused && !Port_TextBox.IsFocused)
+            {
+                NetworkSearchTextBox.Focus();
+            }
             e.Handled = false;
         }
 
