@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "Game Pipe"
-#define MyAppVersion "0.5"
+#define MyAppVersion "0.1.0"
 #define MyAppPublisher "Joe Shaw"
 #define MyAppExeName "GamePipe.exe"
 
@@ -10,7 +10,7 @@
 ; NOTE: The value of AppId uniquely identifies this application.
 ; Do not use the same AppId value in installers for other applications.
 ; (To generate a new GUID, click Tools | Generate GUID inside the IDE.)
-AppId={{0EE49EDB-A6BC-4343-9B75-DD7C35BDAF1C}
+AppId={{160D770F-B51A-443A-B01B-D0E0128A0B31}
 AppName={#MyAppName}
 AppVersion={#MyAppVersion}
 ;AppVerName={#MyAppName} {#MyAppVersion}
