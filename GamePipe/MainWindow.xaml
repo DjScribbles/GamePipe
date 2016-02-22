@@ -1,0 +1,165 @@
+﻿<Window x:Class="GamePipe.MainWindow" x:Name="GamePipe_MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vw="clr-namespace:GamePipe.View"
+        xmlns:vm="clr-namespace:GamePipe.ViewModel" Background="{StaticResource WindowBackground}"
+        Title="Game Pipe" Width="1280" Height="720">
+    <Window.Resources>
+        <!--<vm:RootSteamViewModel x:Key="SteamVM"/>-->
+
+    </Window.Resources>
+    <Grid DataContext="{Binding SteamVM, ElementName=GamePipe_MainWindow}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="5"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <TabControl Grid.Row="0">
+            <TabItem x:Name="LocalLibsTab" Header="Local Libraries" Template="{DynamicResource TabItemControlTemplate1}">
+                <DockPanel>
+                    <Grid DockPanel.Dock="Top" >
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <Label  Content="Search:"/>
+                        <TextBox x:Name="LocalSearchTextBox" Grid.Column="1" Text="{Binding LocalListFilter, UpdateSourceTrigger=PropertyChanged}"/>
+
+                        <Button Grid.Column="2" Command="{Binding AddLibraryCommand}" Content="Add Library" Template="{DynamicResource ButtonControlTemplate1}" ToolTip="Adds a new Steam library, another location where Steam games can be played from"/>
+                        <Button Grid.Column="3" Command="{Binding AddArchiveCommand}" Content="Add Archive" Template="{DynamicResource ButtonControlTemplate1}" ToolTip="Adds a compressed game archive, games here won't show up in Steam anymore, and are compressed to take up less space."/>
+                    </Grid>
+                    <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" HorizontalAlignment="Right">
+                    </StackPanel>
+                    <ItemsControl ItemsSource="{Binding Libraries}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <UniformGrid Rows="1" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <vw:SteamLibraryView DataContext="{Binding}" />
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </DockPanel>
+            </TabItem>
+            <TabItem x:Name="NetworkTab" Header="LAN Libraries" Template="{DynamicResource TabItemControlTemplate1}">
+                <DockPanel>
+                    <Grid DockPanel.Dock="Top" >
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Label  Content="Search:"/>
+                        <TextBox x:Name="NetworkSearchTextBox" Grid.Column="1" Text="{Binding LanListFilter, UpdateSourceTrigger=PropertyChanged}"/>
+                    </Grid>
+                    <Grid DockPanel.Dock="Top" >
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <Label Content="IP Address:" ToolTip="The IP address of another computer Hosting with GamePipe"/>
+                        <TextBox Grid.Column="1" Text="{Binding NewFriendIp, UpdateSourceTrigger=PropertyChanged}" MinWidth="80" ToolTip="The IP address of another computer Hosting with GamePipe"/>
+                        <Label Grid.Column="2" Content="Port:" ToolTip="The port should be 41650, it can't be changed right now."/>
+                        <TextBox Grid.Column="3" Text="{Binding NewFriendPort, UpdateSourceTrigger=PropertyChanged}" MinWidth="40" ToolTip="The port should be 41650, it can't be changed right now." IsReadOnly="True"/>
+                        <Button Grid.Column="4" Command="{Binding AddFriendCommand}" Content="Add Friend" ToolTip="Connect to a hosting game pipe session at the specified IP and port. This connection will be remembered."/>
+                        <Button Grid.Column="5" x:Name="TestHost"   Content="Host Service" ToolTip="Host a GamePipe service so other computers can connect to you and copy games from you. This is not neccessarily secure yet, should be fine for use, but don't leave it open 24/7."/>
+                    </Grid>
+                    <ItemsControl ItemsSource="{Binding Libraries}" DockPanel.Dock="Left">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <StackPanel Orientation="Vertical"/>
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border BorderBrush="{StaticResource NormalBorder}" BorderThickness="1">
+                                    <vw:LibraryCardView DataContext="{Binding}"/>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                    <ItemsControl ItemsSource="{Binding Friends}" >
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <StackPanel Orientation="Horizontal"/>
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <vw:FriendView DataContext="{Binding}"/>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </DockPanel>
+            </TabItem>
+            <TabItem Header="Hack Test" Template="{DynamicResource TabItemControlTemplate1}" Visibility="Collapsed">
+                <DockPanel>
+                    <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" HorizontalAlignment="Left">
+                        <Button x:Name="CloseSteamButton"  Content="Close Steam" />
+                        <Button x:Name="ListGamesInAccountButton"   Content="List Account Apps"/>
+                        <Button x:Name="PrintActiveProcessesButton"   Content="PrintProcesses"/>
+                    </StackPanel>
+                    <TextBox x:Name="TestOutput" IsReadOnly="True" AcceptsReturn="True" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+                </DockPanel>
+            </TabItem>
+            <!--<TabItem Header="Bulk Copy">
+            <local:BulkCopyView DataContext="{StaticResource AppListVM}"/>
+        </TabItem>
+        <TabItem Header="Parsing Steam">
+            <local:SteamParseView />
+        </TabItem>-->
+        </TabControl>
+        <GridSplitter Grid.Row="1" HorizontalAlignment="Stretch" Height="5"/>
+        <Grid Grid.Row="2" DataContext="{Binding TransferVM, ElementName=GamePipe_MainWindow}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <ListView ItemsSource="{Binding Path=Manager.Transfers}"  MaxHeight="350" HorizontalContentAlignment="Stretch"/>
+            <!--<Button Grid.Column="1" Template="{DynamicResource PauseButtonControlTemplate1}"/>-->
+            <Button Grid.Column="1" Command="{Binding PauseCommand}" Visibility="{Binding  Path=IsEnabled, RelativeSource={RelativeSource Self}, Converter={StaticResource BooleanToVisibilityConverter}}" VerticalAlignment="Top"  >
+                <Path StrokeThickness="8" StrokeEndLineCap="Round" StrokeStartLineCap="Round" Stroke="{StaticResource TextColor}" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
+                      Data="M4,4 V 20 M 16,4 V 20"/>
+            </Button>
+            <Button Grid.Column="1" Command="{Binding ResumeCommand}" Visibility="{Binding  Path=IsEnabled, RelativeSource={RelativeSource Self}, Converter={StaticResource BooleanToVisibilityConverter}}" VerticalAlignment="Top">
+                <Path StrokeThickness="1" Stroke="{StaticResource TextColor}" Fill="{StaticResource TextColor}" StrokeStartLineCap="Triangle" StrokeEndLineCap="Triangle"
+                      Data="M 0,0 v 24 l 20,-12 l -20,-12"/>
+            </Button>
+            <!--<Button Grid.Column="2">
+                <Path StrokeThickness="1" Stroke="{StaticResource TextColor}" Fill="{StaticResource TextColor}" StrokeStartLineCap="Triangle" StrokeEndLineCap="Triangle"
+                      Data="M 0,0 h 24 l -12,20 l -12,-20"/>
+            </Button>
+            <Button Grid.Column="4">
+                <Path StrokeThickness="1" Stroke="{StaticResource TextColor}" Fill="{StaticResource TextColor}" StrokeStartLineCap="Triangle" StrokeEndLineCap="Triangle"
+                      Data="M 0,20 h 24 l -12,-20 l -12,20"/>
+            </Button>
+            <StackPanel  Grid.Column="5" Orientation="Vertical">
+
+                <Button Grid.Column="5">
+                    <Path StrokeThickness="3" Stroke="{StaticResource TextColor}"
+                      Data="M 0,8 l 8,-8 8,8 M 8,0 v 12"/>
+                </Button>
+                <Button Grid.Column="6">
+                    <Path StrokeThickness="3" Stroke="{StaticResource TextColor}" 
+                      Data="M 0,4 l 8,8 8,-8 M 8,0 v 12"/>
+                </Button>
+            </StackPanel>
+            <Button Grid.Column="6">
+                <Path StrokeThickness="8" StrokeEndLineCap="Flat" StrokeStartLineCap="Flat" Stroke="{StaticResource TextColor}"
+                      Data="M 4,4 l 20,20 M 24,4 l -20,20"/>
+            </Button>-->
+        </Grid>
+    </Grid>
+
+</Window>
