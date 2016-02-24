@@ -128,8 +128,10 @@ namespace GamePipe.ViewModel
             //if (_client._provider.CanCopy("31419"))
             //    Console.WriteLine("Success");
             //AvailableApplications = _client._provider.GetAvailableIds().Select(x => new RemoteSteamApp(x, _client._provider));
-            var a = new Action(() =>
+
+            Task.Run(() =>
             {
+
                 try
                 {
 
@@ -145,7 +147,6 @@ namespace GamePipe.ViewModel
                 }
 
             });
-            a.BeginInvoke(a.EndInvoke, null);
         }
 
         #endregion //RefreshCommand

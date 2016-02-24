@@ -32,7 +32,6 @@ namespace GamePipe
             CloseSteamButton.Click += CloseSteamButton_Click;
             ListGamesInAccountButton.Click += ListGamesInAccountButton_Click;
             PrintActiveProcessesButton.Click += PrintActiveProcessesButton_Click;
-            TestHost.Click += TestHost_Click;
             this.Closing += MainWindow_Closing;
             NetworkTab.PreviewKeyDown += NetworkTab_PreviewKeyDown;
             LocalLibsTab.PreviewKeyDown += LocalLibsTab_PreviewKeyDown;
@@ -66,7 +65,7 @@ namespace GamePipe
             var manager = GamePipeLib.Model.TransferManager.Instance;
             if (manager.Transfers.Any())
             {
-                var result = System.Windows.MessageBox.Show("There are still some transfers in progress, they will be aborted if you close.", "Transfers In Progress", System.Windows.MessageBoxButton.OKCancel, System.Windows.MessageBoxImage.Exclamation, System.Windows.MessageBoxResult.Yes);
+                var result = System.Windows.MessageBox.Show("There are still some transfers in progress, they will be aborted if you close.", "Transfers In Progress", System.Windows.MessageBoxButton.OKCancel, System.Windows.MessageBoxImage.Exclamation, System.Windows.MessageBoxResult.Cancel);
                 if (result == MessageBoxResult.OK)
                 {
                     manager.AbortAllTransfers();
@@ -167,30 +166,6 @@ namespace GamePipe
             }
             TestOutput.Text = sb.ToString();
         }
-
-        private static ServiceHost host = null;
-        private static bool hosting = false;
-        private void TestHost_Click(object sender, RoutedEventArgs e)
-        {
-            if (host == null)
-            {
-                Uri baseAddress = new Uri("net.tcp://localhost:41650/gamepipe");
-                host = new ServiceHost(typeof(GamePipeService.GameProviderService), baseAddress);
-            }
-            if (hosting == false)
-            {
-                host.Open();
-                hosting = true;
-                TestOutput.Text = "Hosted";
-            }
-            else
-            {
-                host.Close();
-                hosting = false;
-                TestOutput.Text = "Unhosted";
-            }
-        }
-
 
     }
 }

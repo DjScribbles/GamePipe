@@ -25,7 +25,9 @@ namespace GamePipe
             this.DispatcherUnhandledException += App_DispatcherUnhandledException;
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
             this.Exit += App_Exit;
-            GamePipeLib.Utils.Logging.Logger.Info("-----------------------GamePipe started---------------------------");
+            var version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
+
+            GamePipeLib.Utils.Logging.Logger.InfoFormat("-----------------------GamePipe started {0}-----------", version.ToString());
         }
 
         private void App_Exit(object sender, ExitEventArgs e)

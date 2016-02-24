@@ -31,6 +31,7 @@
                     <MenuItem Command="{Binding VerifyGameCommand}" Header="Verify Game Cache"/>
                     <MenuItem Command="{Binding OpenStorePageCommand}" Header="Open Store Page"/>
                     <MenuItem Command="{Binding RunGameCommand}" Header="Run Game"/>
+                    <MenuItem Command="{Binding ScanWithDefenderCommand}" Header="Scan w/ Windows Defender"/>
                     <Separator Background="{StaticResource NormalBorder}" BorderBrush="{StaticResource NormalBorder}" Margin="-30,8,0,8"/>
                     <!--<Separator Background="{StaticResource NormalBorder}" BorderBrush="{StaticResource NormalBorder}" Margin="-30,4,0,4"/>-->
                     <MenuItem Command="{Binding DeleteGameCommand}" Header="Delete Game"/>

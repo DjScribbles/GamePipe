@@ -35,6 +35,41 @@ namespace GamePipeLib.Model.Steam
 
         public bool SteamRestartRequired { get; set; }
 
+
+        public bool ScanAfterNetworkCopy
+        {
+            get
+            {
+                return Properties.Settings.Default.ScanAfterNetworkCopy;
+            }
+            set
+            {
+                if (Properties.Settings.Default.ScanAfterNetworkCopy != value)
+                {
+                    Properties.Settings.Default.ScanAfterNetworkCopy = value;
+                    NotifyPropertyChanged("ScanAfterNetworkCopy");
+                    Properties.Settings.Default.Save();
+                }
+            }
+        }
+
+        public bool OpenDirAfterNetworkCopy
+        {
+            get
+            {
+                return Properties.Settings.Default.OpenDirAfterNetworkCopy;
+            }
+            set
+            {
+                if (Properties.Settings.Default.OpenDirAfterNetworkCopy != value)
+                {
+                    Properties.Settings.Default.OpenDirAfterNetworkCopy = value;
+                    NotifyPropertyChanged("OpenDirAfterNetworkCopy");
+                    Properties.Settings.Default.Save();
+                }
+            }
+        }
+
         private ObservableCollection<SteamLibrary> _Libraries = null;
         public ObservableCollection<SteamLibrary> Libraries
         {
@@ -79,6 +114,7 @@ namespace GamePipeLib.Model.Steam
                     }
                 }
             }
+
             if (_ExternalLibraries != null) _ExternalLibraries.CollectionChanged -= OnExternalLibrariesChanged;
             if (File.Exists("externalLibraries.txt"))
             {
@@ -102,6 +138,8 @@ namespace GamePipeLib.Model.Steam
             }
             return result;
         }
+
+
 
         private void OnExternalLibrariesChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
@@ -158,6 +196,36 @@ namespace GamePipeLib.Model.Steam
                 GamePipeLib.Utils.SteamDirParsingUtils.SetupNewSteamLibrary(path);
                 _Libraries.Add(new SteamLibrary(Path.Combine(path, "steamapps")));
                 NotifyPropertyChanged("Libraries");
+            }
+        }
+
+        public void ScanWithDefender(string gameDir, string appId)
+        {
+            if (gameDir == null)
+                throw new ArgumentNullException("gameDir");
+            if (!Directory.Exists(gameDir))
+                throw new ArgumentException("gameDir doesn't exist: " + gameDir);
+            string tempFile;
+            int i = 0;
+            do
+            {
+                tempFile = Environment.ExpandEnvironmentVariables(string.Format("%TEMP%\\scan_{0}_{1}.bat", appId, (i == 0 ? "" : i.ToString())));
+            } while (File.Exists(tempFile));
+
+            var command = Environment.ExpandEnvironmentVariables("%comspec%");
+            var args = "/K " + Path.GetFullPath(tempFile) + " & del " + tempFile;
+            try
+            {
+                File.WriteAllText(tempFile, "echo Press Ctrl+C to cancel the scan...\n" + Environment.ExpandEnvironmentVariables(Properties.Settings.Default.DefaultScanner).Replace("{game}", gameDir));
+
+                var proc = System.Diagnostics.Process.Start(command, args);
+            }
+            catch (Exception ex)
+            {
+                Utils.Logging.Logger.Error(string.Format("Virus Scan failed due to exception: {0} {1}.", command, args), ex);
+                System.Windows.MessageBox.Show("Virus Scan failed due to exception:\n" + ex.Message, "", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Exclamation, System.Windows.MessageBoxResult.OK);
+                if (File.Exists(tempFile))
+                    File.Delete(tempFile);
             }
         }
     }

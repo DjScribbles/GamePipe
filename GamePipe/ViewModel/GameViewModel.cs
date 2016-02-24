@@ -59,10 +59,10 @@ namespace GamePipe.ViewModel
         {
             get
             {
-                return string.Format("~{0}",GamePipeLib.Utils.FileUtils.GetReadableFileSize(DiskSize));
+                return string.Format("~{0}", GamePipeLib.Utils.FileUtils.GetReadableFileSize(DiskSize));
             }
         }
-        
+
         #region "Commands"
         #region "OpenGameDirCommand"
         private RelayCommand _OpenGameDirCommand = null;
@@ -164,6 +164,23 @@ namespace GamePipe.ViewModel
             Process.Start(string.Format("steam://run/{0}", AppId));
         }
         #endregion //RunGameCommand
+        #region "ScanWithDefenderCommand"
+        private RelayCommand _ScanWithDefenderCommand = null;
+        public RelayCommand ScanWithDefenderCommand
+        {
+            get
+            {
+                if (_ScanWithDefenderCommand == null)
+                    _ScanWithDefenderCommand = new RelayCommand(x => ScanWithDefender());
+                return _ScanWithDefenderCommand;
+            }
+        }
+
+        public void ScanWithDefender()
+        {
+            SteamRoot.Instance.ScanWithDefender(GameDir, AppId);
+        }
+        #endregion //ScanWithDefenderCommand
         #endregion //Commands
     }
 }

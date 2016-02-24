@@ -14,108 +14,16 @@ using System.Collections.ObjectModel;
 using GamePipeLib.Model.Steam;
 using System.Collections.Specialized;
 using System.Linq;
+using System.ServiceModel;
 
 namespace GamePipe.ViewModel
 {
     public class RootSteamViewModel : ViewModelBase
     {
 
-        //public string SteamDirectory { get { return SteamBase.SteamDirectory; } }
-
-
-        //private ObservableCollection<SteamLibraryViewModel> _Libraries = null;
-        //public IEnumerable<SteamLibraryViewModel> Libraries
-        //{
-        //    get
-        //    {
-        //        if (_Libraries == null)
-        //        {
-        //            _Libraries = new ObservableCollection<SteamLibraryViewModel>(DiscoverLibraries());
-        //        }
-        //        return _Libraries;
-        //    }
-        //}
-        //private ObservableCollection<string> _ExternalLibraries = null;
-
-        //private IEnumerable<SteamLibraryViewModel> DiscoverLibraries()
-        //{
-
-        //    var steamApps = Path.Combine(SteamDirectory, "SteamApps");
-        //    Regex libraryRegex = new Regex("^\\s*\"\\d+\"\\s*\"(?'path'.*)\"\\s*$", RegexOptions.Multiline);
-        //    var libraryFile = Path.Combine(steamApps, "libraryfolders.vdf");
-        //    List<SteamLibraryViewModel> result = new List<SteamLibraryViewModel>();
-
-        //    if (Directory.Exists(steamApps) == false)
-        //    {
-        //        return result;
-        //    }
-        //    result.Add(new SteamLibraryViewModel(steamApps));
-
-        //    if (File.Exists(libraryFile))
-        //    {
-        //        var contents = File.ReadAllText(libraryFile);
-        //        var matches = libraryRegex.Matches(contents);
-        //        foreach (Match match in matches)
-        //        {
-        //            dynamic path = Path.Combine(match.Groups["path"].Value.Replace("\\\\", "\\"), "SteamApps");
-        //            if (Directory.Exists(path))
-        //            {
-        //                result.Add(new SteamLibraryViewModel(path));
-        //            }
-        //        }
-        //    }
-        //    if (_ExternalLibraries != null) _ExternalLibraries.CollectionChanged -= OnExternalLibrariesChanged;
-        //    if (File.Exists("externalLibraries.txt"))
-        //    {
-        //        var lines = File.ReadAllLines("externalLibraries.txt");
-        //        _ExternalLibraries = new ObservableCollection<string>(lines);
-        //        _ExternalLibraries.CollectionChanged += OnExternalLibrariesChanged;
-        //        foreach (var line in lines)
-        //        {
-        //            if (Directory.Exists(line))
-        //            {
-        //                result.Add(new SteamLibraryViewModel(line, true));
-        //            }
-
-        //        }
-
-        //    }
-        //    else
-        //    {
-        //        _ExternalLibraries = new ObservableCollection<string>();
-        //        _ExternalLibraries.CollectionChanged += OnExternalLibrariesChanged;
-        //    }
-        //    return result;
-        //}
-
-        //private void OnExternalLibrariesChanged(object sender, NotifyCollectionChangedEventArgs e)
-        //{
-        //    var sb = new System.Text.StringBuilder();
-        //    foreach (string line in _ExternalLibraries)
-        //    {
-        //        sb.AppendLine(line);
-        //    }
-        //    File.WriteAllText("externalLibraries.txt", sb.ToString());
-        //}
-
-        //public SteamApp GetGame(string appId)
-        //{
-        //    foreach (var lib in Libraries)
-        //    {
-        //        var game = lib.Games.Find(x => x.AppId == appId);
-        //        if ((game != null) && (game.AppId == appId))
-        //            return game;
-        //    }
-        //    return null;
-        //}
-        //public IEnumerable<SteamApp> GetAllGames()
-        //{
-        //    return Libraries.SelectMany(x => x.Games);
-        //}
-
-
-
+        private static bool _hosting = false;
         private SteamRoot _root;
+
         public RootSteamViewModel()
         {
             _root = SteamRoot.Instance;
@@ -162,9 +70,25 @@ namespace GamePipe.ViewModel
                 }
             }
         }
+        public SteamRoot Model { get { return _root; } }
+
 
         public string NewFriendIp { get; set; }
         public ushort NewFriendPort { get; set; }
+
+        private static ServiceHost _Host = null;
+        private ServiceHost Host
+        {
+            get
+            {
+                if (_Host == null)
+                {
+                    Uri baseAddress = new Uri("net.tcp://localhost:41650/gamepipe");
+                    _Host = new ServiceHost(typeof(GamePipeService.GameProviderService), baseAddress);
+                }
+                return _Host;
+            }
+        }
 
         public ObservableCollection<FriendViewModel> _Friends = new ObservableCollection<FriendViewModel>();
         public ObservableCollection<FriendViewModel> Friends { get { return _Friends; } }
@@ -283,13 +207,11 @@ namespace GamePipe.ViewModel
                 }
                 catch (Exception ex)
                 {
-                    System.Windows.MessageBox.Show("Library Addition failed due to exception:\n" + ex.Message, "", System.Windows.MessageBoxButton.OKCancel, System.Windows.MessageBoxImage.Exclamation, System.Windows.MessageBoxResult.OK);
+                    System.Windows.MessageBox.Show("Library Addition failed due to exception:\n" + ex.Message, "", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Exclamation, System.Windows.MessageBoxResult.OK);
                 }
             }
         }
         #endregion //AddLibraryCommand
-
-
 
         #region "AddFriendCommand"
         private RelayCommand _AddFriendCommand = null;
@@ -313,7 +235,78 @@ namespace GamePipe.ViewModel
 
 
         #endregion //AddFriendCommand
+
+
+        #region "OpenHostCommand"
+        private RelayCommand _OpenHostCommand = null;
+        public RelayCommand OpenHostCommand
+        {
+            get
+            {
+                if (_OpenHostCommand == null)
+                {
+                    _OpenHostCommand = new RelayCommand(x => OpenHost(), x => !_hosting);
+
+                }
+                return _OpenHostCommand;
+            }
+        }
+
+        public void OpenHost()
+        {
+
+            if (_hosting == false)
+            {
+                try
+                {
+                    Host.Open();
+                    _hosting = true;
+                }
+                catch (Exception ex)
+                {
+                    GamePipeLib.Utils.Logging.Logger.Error("Open Host failed due to exception:", ex);
+                    System.Windows.MessageBox.Show("Open Host failed due to exception:\n" + ex.Message, "", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Exclamation, System.Windows.MessageBoxResult.OK);
+                }
+            }
+        }
+        #endregion //OpenHostCommand
+
+        #region "CloseHostCommand"
+        private RelayCommand _CloseHostCommand = null;
+        public RelayCommand CloseHostCommand
+        {
+            get
+            {
+                if (_CloseHostCommand == null)
+                {
+                    _CloseHostCommand = new RelayCommand(x => CloseHost(), x => _hosting);
+
+                }
+                return _CloseHostCommand;
+            }
+        }
+
+        public void CloseHost()
+        {
+            if (_hosting == true)
+            {
+                try
+                {
+                    Host.Close();
+                    _hosting = false;
+                }
+                catch (Exception ex)
+                {
+                    GamePipeLib.Utils.Logging.Logger.Error("Close Host failed due to exception:", ex);
+                    System.Windows.MessageBox.Show("Close Host failed due to exception:\n" + ex.Message, "", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Exclamation, System.Windows.MessageBoxResult.OK);
+
+                }
+            }
+        }
+        #endregion //CloseHostCommand
         #endregion //Commands
+
+
         public void AddFriend(string ipAndPort)
         {
             try
@@ -349,6 +342,103 @@ namespace GamePipe.ViewModel
                 friend.Remembered = true;
             }
         }
+
+
+
+
+        //public string SteamDirectory { get { return SteamBase.SteamDirectory; } }
+
+
+        //private ObservableCollection<SteamLibraryViewModel> _Libraries = null;
+        //public IEnumerable<SteamLibraryViewModel> Libraries
+        //{
+        //    get
+        //    {
+        //        if (_Libraries == null)
+        //        {
+        //            _Libraries = new ObservableCollection<SteamLibraryViewModel>(DiscoverLibraries());
+        //        }
+        //        return _Libraries;
+        //    }
+        //}
+        //private ObservableCollection<string> _ExternalLibraries = null;
+
+        //private IEnumerable<SteamLibraryViewModel> DiscoverLibraries()
+        //{
+
+        //    var steamApps = Path.Combine(SteamDirectory, "SteamApps");
+        //    Regex libraryRegex = new Regex("^\\s*\"\\d+\"\\s*\"(?'path'.*)\"\\s*$", RegexOptions.Multiline);
+        //    var libraryFile = Path.Combine(steamApps, "libraryfolders.vdf");
+        //    List<SteamLibraryViewModel> result = new List<SteamLibraryViewModel>();
+
+        //    if (Directory.Exists(steamApps) == false)
+        //    {
+        //        return result;
+        //    }
+        //    result.Add(new SteamLibraryViewModel(steamApps));
+
+        //    if (File.Exists(libraryFile))
+        //    {
+        //        var contents = File.ReadAllText(libraryFile);
+        //        var matches = libraryRegex.Matches(contents);
+        //        foreach (Match match in matches)
+        //        {
+        //            dynamic path = Path.Combine(match.Groups["path"].Value.Replace("\\\\", "\\"), "SteamApps");
+        //            if (Directory.Exists(path))
+        //            {
+        //                result.Add(new SteamLibraryViewModel(path));
+        //            }
+        //        }
+        //    }
+        //    if (_ExternalLibraries != null) _ExternalLibraries.CollectionChanged -= OnExternalLibrariesChanged;
+        //    if (File.Exists("externalLibraries.txt"))
+        //    {
+        //        var lines = File.ReadAllLines("externalLibraries.txt");
+        //        _ExternalLibraries = new ObservableCollection<string>(lines);
+        //        _ExternalLibraries.CollectionChanged += OnExternalLibrariesChanged;
+        //        foreach (var line in lines)
+        //        {
+        //            if (Directory.Exists(line))
+        //            {
+        //                result.Add(new SteamLibraryViewModel(line, true));
+        //            }
+
+        //        }
+
+        //    }
+        //    else
+        //    {
+        //        _ExternalLibraries = new ObservableCollection<string>();
+        //        _ExternalLibraries.CollectionChanged += OnExternalLibrariesChanged;
+        //    }
+        //    return result;
+        //}
+
+        //private void OnExternalLibrariesChanged(object sender, NotifyCollectionChangedEventArgs e)
+        //{
+        //    var sb = new System.Text.StringBuilder();
+        //    foreach (string line in _ExternalLibraries)
+        //    {
+        //        sb.AppendLine(line);
+        //    }
+        //    File.WriteAllText("externalLibraries.txt", sb.ToString());
+        //}
+
+        //public SteamApp GetGame(string appId)
+        //{
+        //    foreach (var lib in Libraries)
+        //    {
+        //        var game = lib.Games.Find(x => x.AppId == appId);
+        //        if ((game != null) && (game.AppId == appId))
+        //            return game;
+        //    }
+        //    return null;
+        //}
+        //public IEnumerable<SteamApp> GetAllGames()
+        //{
+        //    return Libraries.SelectMany(x => x.Games);
+        //}
+
     }
 
 }

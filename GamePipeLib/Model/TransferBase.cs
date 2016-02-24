@@ -62,7 +62,7 @@ namespace GamePipeLib.Model
                     //Don't show the dialog immediately after the mouse button gets released, that's just asking for trouble.
                     System.Threading.Thread.Sleep(1000);    //TODO this is a little lazy, replace this if I get a proper scheduler. 
                     var result = System.Windows.MessageBox.Show(string.Format("A directory already exists at the transfer destination {0}.\nHow would you like to handle it?\n\nYes = Backup the directory, then delete it upon successful copy.\nNo = Backup the directory, then open it upon a successful copy, and I will decide what to do.\nCancel = Just abort the transfer.\n\n", Application.InstallDir),
-                                                                "Transfer failed", System.Windows.MessageBoxButton.YesNoCancel, System.Windows.MessageBoxImage.Exclamation, System.Windows.MessageBoxResult.Cancel);
+                                                                "Directory Already Exists", System.Windows.MessageBoxButton.YesNoCancel, System.Windows.MessageBoxImage.Exclamation, System.Windows.MessageBoxResult.Cancel);
                     switch (result)
                     {
                         case System.Windows.MessageBoxResult.Yes:

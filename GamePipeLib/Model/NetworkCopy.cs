@@ -28,6 +28,15 @@ namespace GamePipeLib.Model
         {
             string appId = Application.AppId;
             _target.WriteAcfFile(appId, _source.GetAcfFileContent(appId));
+
+            if (Properties.Settings.Default.OpenDirAfterNetworkCopy && _target is Steam.SteamLibrary)
+            {
+                (_target as Steam.SteamLibrary).OpenGameDir(Application.InstallDir);
+            }
+            if (Properties.Settings.Default.ScanAfterNetworkCopy && _target is Steam.SteamLibrary)
+            {
+                (_target as Steam.SteamLibrary).ScanWithDefender(Application.InstallDir, Application.AppId);
+            }
         }
 
         protected override void DoPreProcess()

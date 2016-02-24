@@ -324,8 +324,11 @@ namespace GamePipeLib.Model.Steam
         {
             var game = GetGameById(appId);
             if (game == null) throw new ArgumentException(string.Format("App ID {0} not found in {1}", appId, SteamDirectory));
+            var gameDir = Path.GetFullPath(game.GameDir);
+            var fullPath = Path.GetFullPath(Path.Combine(gameDir, file));
 
-            var fullPath = Path.GetFullPath(Path.Combine(game.GameDir, file));
+            if (fullPath.StartsWith(gameDir, StringComparison.OrdinalIgnoreCase) == false)
+                throw new ArgumentException(string.Format("The file request is outside the game directory for {0}. File: {1}", game.GameName, file));
 
             return FileUtils.OpenReadStream(fullPath);
         }
@@ -501,6 +504,12 @@ namespace GamePipeLib.Model.Steam
         public long GetFreeSpace()
         {
             return Drive.AvailableFreeSpace;
+        }
+
+        internal void ScanWithDefender(string installDir, string appId)
+        {
+            string path = Path.Combine(SteamDirectory, "common", installDir);
+            SteamRoot.Instance.ScanWithDefender(path, appId);
         }
     }
 }
