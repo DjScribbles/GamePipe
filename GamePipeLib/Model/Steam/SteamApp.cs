@@ -42,6 +42,7 @@ namespace GamePipeLib.Model.Steam
     public class SteamApp : GamePipeLib.Model.NotifyPropertyChangedBase, ISteamApplication
     {
         private System.IO.FileSystemWatcher _watcher;
+        private long _acfDiskSize;
         public SteamApp(string acfFilePath)
         {
             _AcfFile = acfFilePath;
@@ -56,8 +57,13 @@ namespace GamePipeLib.Model.Steam
         {
             if (!_isMeasured)
             {
-                var info = new DirectoryInfo(GameDir);
-                DiskSize = info.EnumerateFiles("*", SearchOption.AllDirectories).Sum(x => x.Length);
+                if (Directory.Exists(GameDir))
+                {
+                    var info = new DirectoryInfo(GameDir);
+                    DiskSize = info.EnumerateFiles("*", SearchOption.AllDirectories).Sum(x => x.Length);
+                }
+                else
+                    DiskSize = 0;
                 _isMeasured = true;
             }
         }
@@ -134,7 +140,12 @@ namespace GamePipeLib.Model.Steam
             int count = 0;
             foreach (var pair in pairs)
             {
-                if (count >= 5) return;  //return once we've got what we're looking for
+                if (count >= 5)
+                {
+                    if (!Directory.Exists(GameDir))
+                        DiskSize = 0;
+                    return;  //return once we've got what we're looking for
+                }
                 switch (pair.Item1.ToLower())   //Compare in lower case
                 {
                     case "appid":
@@ -147,6 +158,7 @@ namespace GamePipeLib.Model.Steam
                         break;
                     case "sizeondisk":
                         DiskSize = long.Parse(pair.Item2);
+                        _acfDiskSize = DiskSize;
                         count++;
                         break;
                     case "name":
@@ -187,7 +199,13 @@ namespace GamePipeLib.Model.Steam
                         count++;
                         break;
                     case "sizeondisk":
-                        DiskSize = long.Parse(pair.Item2);
+                        var newDiskSize = long.Parse(pair.Item2);
+                        if (newDiskSize != _acfDiskSize)
+                        {
+                            DiskSize = newDiskSize;
+                            _acfDiskSize = DiskSize;
+                            _isMeasured = false;
+                        }
                         count++;
                         break;
                 }
