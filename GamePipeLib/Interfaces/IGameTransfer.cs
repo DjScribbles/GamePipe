@@ -20,7 +20,8 @@ namespace GamePipeLib.Interfaces
         WaitingToFinish,
         Finished,
         Aborting,
-        Aborted
+        Aborted,
+        Blocked
     }
 
     public interface IGameTransfer

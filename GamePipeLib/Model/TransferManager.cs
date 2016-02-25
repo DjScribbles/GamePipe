@@ -116,7 +116,7 @@ namespace GamePipeLib.Model
                     bool workToDo = false;
                     lock (_transferLock)    //Acquire the transfer lock
                     {
-                        workToDo = Transfers.Any();
+                        workToDo = Transfers.Any(x => (x.Status != Interfaces.TransferStatus.Blocked) || (x.CanCopy));
                     }
                     if (workToDo)
                     {
@@ -146,17 +146,27 @@ namespace GamePipeLib.Model
                 }
                 else
                 {
+                    //TODO instead of rearranging transfers, maybe just don't always use first transfer?
 
-                    TransferBase firstTransfer = null;
+                    TransferBase nextTransfer = null;
                     lock (_transferLock)    //Acquire the transfer lock
                     {
+                        var readyTransfers = Transfers.Where(x => (x.Status != Interfaces.TransferStatus.Blocked) || (x.CanCopy));
                         //If there are no transfers to do, then return
-                        if (Transfers.Any() == false)
+                        if (readyTransfers.Any() == false)
                             return;
-                        firstTransfer = Transfers.FirstOrDefault();
+
+                        nextTransfer = readyTransfers.FirstOrDefault();
                     }
-                    if (firstTransfer != null)
-                        TransferFiles(firstTransfer);
+
+                    if (nextTransfer != null && nextTransfer.CanCopy == false)
+                    {
+                        nextTransfer.Status = Interfaces.TransferStatus.Blocked;
+                        nextTransfer = null;
+                    }
+
+                    if (nextTransfer != null)
+                        TransferFiles(nextTransfer);
                 }
             }
         }
@@ -178,7 +188,6 @@ namespace GamePipeLib.Model
             IAsyncResult readState = null;
             do
             {
-                transfer.Status = Interfaces.TransferStatus.Preparing;
                 if (!readStarted) transfer.GetNextFile(out file, out sourceStream, out destStream, out finishMethod, out updateMethod, out totalBytesRead);
                 if (file != null)
                 {
@@ -223,7 +232,7 @@ namespace GamePipeLib.Model
                                     abortStream = true;
                                 }
                                 //If the streams can be paused, and the manager is being paused or this transfer isn't first anymore, then pause the streams and return.
-                                else if (transfer.CanPauseMidStream() && (_IsPaused || (transfer != GetFirstTransfer())))
+                                else if (transfer.CanPauseMidStream() && (_IsPaused || (transfer != GetFirstTransfer(preferCurrentTransfer:!transfer.CanCopy))))    //If this transfer became locked, mark it preferred because we should probably close the streams before pausing
                                 {
                                     //Flag the stream for pausing
                                     pauseStream = true;
@@ -298,11 +307,14 @@ namespace GamePipeLib.Model
 
         }
 
-        private TransferBase GetFirstTransfer()
+        private TransferBase GetFirstTransfer(bool preferCurrentTransfer = false)
         {
             lock (_transferLock)    //Acquire the transfer lock
             {
-                return Transfers.FirstOrDefault();
+                if (preferCurrentTransfer)
+                    return Transfers.Where(x => (x.Status != Interfaces.TransferStatus.Blocked)).FirstOrDefault();
+                else
+                    return Transfers.Where(x => (x.Status != Interfaces.TransferStatus.Blocked) || (x.CanCopy)).FirstOrDefault();
             }
         }
         private bool ShouldAbortTransfer(TransferBase transfer)

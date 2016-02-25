@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using GamePipeLib.Model;
+using GamePipeLib.Interfaces;
 
 namespace GamePipe.ViewModel
 {
@@ -26,8 +27,16 @@ namespace GamePipe.ViewModel
         {
             if (e.PropertyName == "Progress")
                 NotifyPropertyChanged("Progress");
+
+            if (e.PropertyName == "Status")
+            {
+                NotifyPropertyChanged("Status");
+                NotifyPropertyChanged("IsBlocked");
+            }
         }
 
+        public TransferStatus Status { get { return _model.Status; } }
+        public bool IsBlocked { get { return _model.Status == TransferStatus.Blocked; } }
         public double Progress { get { return _model.Progress; } }
         public string TransferType { get { return _model.TransferType; } }
         public string ImageUrl { get { return _model.Application?.ImageUrl; } }

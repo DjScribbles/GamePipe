@@ -231,6 +231,8 @@
                 </Grid>
                 <ci:Image Grid.Column="1" Grid.RowSpan="5" ImageUrl="{Binding ImageUrl}" Height="61" Width="162"/>
                 <TextBlock Grid.Row="0" Grid.Column="2" Text="{Binding TransferType}" Style="{StaticResource Detail}" VerticalAlignment="Top" Margin="4,-4,4,-8"/>
+                <TextBlock Grid.Row="0" Grid.Column="3" Text="This game cannot be moved right now, it is currently locked by Steam" 
+                           Visibility="{Binding IsBlocked, Converter={StaticResource BooleanToVisibilityConverter}}" Style="{StaticResource Detail}" VerticalAlignment="Top" Margin="4,-4,4,-8"/>
                 <TextBlock Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="3" Text="{Binding GameName}" Style="{StaticResource Title}" Margin="4,-4,4,4" HorizontalAlignment="Left"/>
 
                 <Button Grid.Row="0"  Grid.Column="5" Grid.RowSpan="2"  Command="{Binding AbortCommand}">
