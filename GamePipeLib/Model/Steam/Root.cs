@@ -85,8 +85,6 @@ namespace GamePipeLib.Model.Steam
 
         public string SteamDirectory { get { return Utils.SteamDirParsingUtils.SteamDirectory; } }
 
-        private ObservableCollection<string> _ExternalLibraries = null;
-
         private IEnumerable<SteamLibrary> DiscoverLibraries()
         {
 
@@ -115,41 +113,20 @@ namespace GamePipeLib.Model.Steam
                 }
             }
 
-            if (_ExternalLibraries != null) _ExternalLibraries.CollectionChanged -= OnExternalLibrariesChanged;
-            if (File.Exists("externalLibraries.txt"))
+            if (Properties.Settings.Default.Archives == null)
+                Properties.Settings.Default.Archives = new StringCollection();
+
+            foreach (var item in Properties.Settings.Default.Archives)
             {
-                var lines = File.ReadAllLines("externalLibraries.txt");
-                _ExternalLibraries = new ObservableCollection<string>(lines);
-                _ExternalLibraries.CollectionChanged += OnExternalLibrariesChanged;
-                foreach (var line in lines)
+                if (Directory.Exists(item))
                 {
-                    if (Directory.Exists(line))
-                    {
-                        result.Add(new SteamArchive(line));
-                    }
-
+                    result.Add(new SteamArchive(item));
                 }
+            }
 
-            }
-            else
-            {
-                _ExternalLibraries = new ObservableCollection<string>();
-                _ExternalLibraries.CollectionChanged += OnExternalLibrariesChanged;
-            }
             return result;
         }
 
-
-
-        private void OnExternalLibrariesChanged(object sender, NotifyCollectionChangedEventArgs e)
-        {
-            var sb = new System.Text.StringBuilder();
-            foreach (string line in _ExternalLibraries)
-            {
-                sb.AppendLine(line);
-            }
-            File.WriteAllText("externalLibraries.txt", sb.ToString());
-        }
 
         public SteamApp GetGame(string appId)
         {
@@ -180,21 +157,23 @@ namespace GamePipeLib.Model.Steam
 
         public void AddArchive(string path)
         {
-            if (Directory.Exists(path) && !_ExternalLibraries.Contains(path))
-            {
-                _ExternalLibraries.Add(path);
 
+            if (Directory.Exists(path) && !Properties.Settings.Default.Archives.Contains(path))
+            {
                 _Libraries.Add(new SteamArchive(path));
-                NotifyPropertyChanged("Libraries");
+                Properties.Settings.Default.Archives.Add(path);
+                Properties.Settings.Default.Save();
             }
         }
 
         public void AddLibrary(string path)
         {
-            if (Directory.Exists(path) && !_ExternalLibraries.Contains(path))
+            if (Directory.Exists(path) && !Properties.Settings.Default.Archives.Contains(path))
             {
                 GamePipeLib.Utils.SteamDirParsingUtils.SetupNewSteamLibrary(path);
-                _Libraries.Add(new SteamLibrary(Path.Combine(path, "steamapps")));
+                var libraryDirectory = Path.Combine(path, "SteamApps");
+                if (!Directory.Exists(libraryDirectory)) Directory.CreateDirectory(libraryDirectory);
+                _Libraries.Add(new SteamLibrary(libraryDirectory));
                 NotifyPropertyChanged("Libraries");
             }
         }
@@ -210,6 +189,7 @@ namespace GamePipeLib.Model.Steam
             do
             {
                 tempFile = Environment.ExpandEnvironmentVariables(string.Format("%TEMP%\\scan_{0}_{1}.bat", appId, (i == 0 ? "" : i.ToString())));
+                i++;
             } while (File.Exists(tempFile));
 
             var command = Environment.ExpandEnvironmentVariables("%comspec%");

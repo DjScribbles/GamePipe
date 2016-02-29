@@ -153,14 +153,14 @@ namespace GamePipeLib.Utils
             if (File.Exists(libraryVdfPath))
             {
                 var content = File.ReadAllText(libraryVdfPath);
-                //Figure out how many steam libraries are there now:
-                int count = 3;
+                //Determine the next count to prevent reparses of the libraryfolders.vdf, which deletes any directories that don't exist (such as external drives)
+                int count = 1;
+                while (content.Contains(string.Format("\"{0}\"", count.ToString())))
+                    count++;
+
                 var formattedPath = path.Replace(@"\", @"\\");
-                //string newLine = string.Format("\"{0}\"     \"{1}\"\n}", count.ToString(), formattedPath);
-                //string newLine = string.Format("\"{0}\"     \"{1}\"\n}", count.ToString(), formattedPath);
-                string newLine = "\t\"" + count.ToString() + "\" \t\"" + formattedPath + "\"\n}";
-                //Now splice ours in 
-                //newLine = string.Format("\"{0}\"     \"{1}\"\n}",count.ToString(), formattedPath);
+                string newLine = "\t\"" + count.ToString() + "\"\t\t\"" + formattedPath + "\"\n}";
+                //Now splice in our new line
                 content = content.Replace("}", newLine);
                 File.WriteAllText(libraryVdfPath, content);
             }

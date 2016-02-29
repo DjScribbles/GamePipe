@@ -38,6 +38,9 @@ Source: "..\GamePipe\bin\Release\GamePipeService.dll"; DestDir: "{app}"; Flags: 
 Source: "..\GamePipe\bin\Release\log4net.dll"; DestDir: "{app}"; Flags: ignoreversion
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
+[Dirs]
+Name: "{app}\logs"; Permissions: everyone-modify
+
 [Icons]
 Name: "{commonprograms}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
 Name: "{commondesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon
