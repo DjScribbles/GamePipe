@@ -63,20 +63,26 @@ namespace GamePipeLib.Model.Steam
         {
             _LibraryDirectory = libraryDirectory;
             _isArchive = false;
-            _watcher = new FileSystemWatcher(libraryDirectory, "*.acf") { EnableRaisingEvents = true, IncludeSubdirectories = false };
-            _watcher.Created += _watcher_Created;
-            _watcher.Deleted += _watcher_Deleted;
-            _watcher.Changed += _watcher_Changed;
+            if (Directory.Exists(_LibraryDirectory))
+            {
+                _watcher = new FileSystemWatcher(libraryDirectory, "*.acf") { EnableRaisingEvents = true, IncludeSubdirectories = false };
+                _watcher.Created += _watcher_Created;
+                _watcher.Deleted += _watcher_Deleted;
+                _watcher.Changed += _watcher_Changed;
+            }
         }
 
         protected SteamLibrary(string libraryDirectory, bool isArchive)
         {
             _LibraryDirectory = libraryDirectory;
             _isArchive = isArchive;
-            _watcher = new FileSystemWatcher(libraryDirectory, "*.acf") { EnableRaisingEvents = true, IncludeSubdirectories = false };
-            _watcher.Created += _watcher_Created;
-            _watcher.Deleted += _watcher_Deleted;
-            _watcher.Changed += _watcher_Changed;
+            if (Directory.Exists(_LibraryDirectory))
+            {
+                _watcher = new FileSystemWatcher(libraryDirectory, "*.acf") { EnableRaisingEvents = true, IncludeSubdirectories = false };
+                _watcher.Created += _watcher_Created;
+                _watcher.Deleted += _watcher_Deleted;
+                _watcher.Changed += _watcher_Changed;
+            }
         }
 
         private void _watcher_Changed(object sender, FileSystemEventArgs e)
@@ -349,6 +355,13 @@ namespace GamePipeLib.Model.Steam
                 Directory.CreateDirectory(path);
             }
 
+            if (_watcher == null && Directory.Exists(_LibraryDirectory))
+            {
+                _watcher = new FileSystemWatcher(_LibraryDirectory, "*.acf") { EnableRaisingEvents = true, IncludeSubdirectories = false };
+                _watcher.Created += _watcher_Created;
+                _watcher.Deleted += _watcher_Deleted;
+                _watcher.Changed += _watcher_Changed;
+            }
         }
 
 
