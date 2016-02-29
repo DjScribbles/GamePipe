@@ -66,5 +66,17 @@ namespace GamePipeLib.Properties {
                 this["OpenDirAfterNetworkCopy"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string ManualSteamDir {
+            get {
+                return ((string)(this["ManualSteamDir"]));
+            }
+            set {
+                this["ManualSteamDir"] = value;
+            }
+        }
     }
 }

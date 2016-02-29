@@ -22,13 +22,55 @@ namespace GamePipeLib.Utils
             {
                 if (string.IsNullOrWhiteSpace(_SteamDirectory))
                 {
-                    if (Environment.Is64BitOperatingSystem)
+                    try
                     {
-                        _SteamDirectory = Microsoft.Win32.Registry.GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Valve\Steam\", "InstallPath", @"C:\Program Files (x86)\Steam")?.ToString();
+                        if (Environment.Is64BitOperatingSystem)
+                        {
+                            _SteamDirectory = Microsoft.Win32.Registry.GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Valve\Steam\", "InstallPath", @"C:\Program Files (x86)\Steam")?.ToString();
+                        }
+                        else
+                        {
+                            _SteamDirectory = Microsoft.Win32.Registry.GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Valve\Steam\", "InstallPath", @"C:\Program Files (x86)\Steam")?.ToString();
+                        }
                     }
-                    else
+                    catch (Exception ex)
                     {
-                        _SteamDirectory = Microsoft.Win32.Registry.GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Valve\Steam\", "InstallPath", @"C:\Program Files (x86)\Steam")?.ToString();
+                        Logging.Logger.Fatal("Failed to load Steam registry keys due to exception:", ex);
+                    }
+                    //If the registry keys failed, try Steams usual location
+                    if (string.IsNullOrWhiteSpace(_SteamDirectory) || Directory.Exists(_SteamDirectory) == false)
+                        _SteamDirectory = Environment.ExpandEnvironmentVariables(@"%ProgramFiles%\Steam");
+
+                    //If that also failed, try loading from our application settings
+                    if (string.IsNullOrWhiteSpace(_SteamDirectory) || Directory.Exists(_SteamDirectory) == false || File.Exists(Path.Combine(_SteamDirectory, "steam.exe")) == false)
+                        _SteamDirectory = GamePipeLib.Properties.Settings.Default.ManualSteamDir;
+
+                    //If there was no application setting, then make one
+                    if (string.IsNullOrWhiteSpace(_SteamDirectory))
+                    {
+                        System.Windows.MessageBox.Show("Unable to find Steam, please manually select the Steam executable.", "Can't find Steam", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Exclamation, System.Windows.MessageBoxResult.OK);
+
+                        var dialog = new System.Windows.Forms.OpenFileDialog()
+                        {
+                            InitialDirectory = Environment.ExpandEnvironmentVariables("%ProgramFiles%"),
+                            CheckFileExists = true,
+                            DereferenceLinks = true,
+                            AutoUpgradeEnabled = true,
+                            Filter = "Executables (*.exe;*.lnk)|*.exe;*.lnk|All files (*.*)|*.*",
+                            Title = "Find Steam.exe"
+                        };
+                        dialog.ShowDialog();
+                        _SteamDirectory = Path.GetDirectoryName(dialog.FileName);
+                        dialog.Dispose();
+                        if (string.IsNullOrWhiteSpace(_SteamDirectory) || Directory.Exists(_SteamDirectory) == false || File.Exists(Path.Combine(_SteamDirectory, "steam.exe")) == false)
+                        {
+                            _SteamDirectory = Environment.ExpandEnvironmentVariables(@"%ProgramFiles%\Steam");  //If the user goofed, just set the directory to something to prevent issues
+                        }
+                        else
+                        {
+                            GamePipeLib.Properties.Settings.Default.ManualSteamDir = _SteamDirectory;
+                            GamePipeLib.Properties.Settings.Default.Save();
+                        }
                     }
                 }
                 return _SteamDirectory;
