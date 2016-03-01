@@ -44,7 +44,14 @@
 
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
         <conv:TransferBaseToViewModelConverter x:Key="TransferBaseToViewModelConverter"/>
+        <conv:EqualityToBooleanConverter x:Key="EqualityToBooleanConverter"/>
 
+        <Style TargetType="RadioButton" x:Key="SimpleTextRadioButtonStyle">
+            <Setter Property="Template" Value="{DynamicResource SimpleTextRadioButtonTemplate}"/>
+            <Setter Property="Background" Value="{StaticResource Background}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource FeintBorder}"/>
+            <Setter Property="Padding" Value="4"/>
+        </Style>
 
         <Style TargetType="Grid">
             <Setter Property="Background" Value="{StaticResource Background}"/>
@@ -874,6 +881,23 @@
             </ControlTemplate.Triggers>
         </ControlTemplate>
 
+
+        <ControlTemplate x:Key="SimpleTextRadioButtonTemplate" TargetType="{x:Type RadioButton}">
+            <Border x:Name="templateRoot" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Margin="1,1,2,1" VerticalAlignment="{TemplateBinding VerticalContentAlignment}">
+                <TextBlock x:Name="contentPresenter" Text="{TemplateBinding Content}" Focusable="False" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Margin="{TemplateBinding Padding}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+            </Border>
+            <ControlTemplate.Triggers>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Foreground" TargetName="contentPresenter" Value="{StaticResource TextDisabled}"/>
+                </Trigger>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Foreground" TargetName="contentPresenter" Value="{StaticResource TextHover}"/>
+                </Trigger>
+                <Trigger Property="IsChecked" Value="True">
+                    <Setter Property="Foreground" TargetName="contentPresenter" Value="{StaticResource TextSelected}"/>
+                </Trigger>
+            </ControlTemplate.Triggers>
+        </ControlTemplate>
 
     </Application.Resources>
 </Application>

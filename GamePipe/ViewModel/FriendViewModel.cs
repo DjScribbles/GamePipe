@@ -21,8 +21,8 @@ namespace GamePipe.ViewModel
 
         public FriendViewModel(string ip, ushort port)
         {
-            Ip = ip;
             Port = port;
+            Ip = ip;
             Uri baseUri = new Uri(string.Format("net.tcp://{0}:{1}/gamepipe", ip, port));
             //Uri fileSenderUri = new Uri(string.Format("net.tcp://{0}:{1}/gamepipe/file", ip.ToString(), port));
             //Uri infoProviderUri = new Uri(string.Format("net.tcp://{0}:{1}/gamepipe/apps", ip.ToString(), port));
@@ -73,7 +73,8 @@ namespace GamePipe.ViewModel
                     if (Settings.Default.Friends == null) Settings.Default.Friends = new System.Collections.Specialized.StringCollection();
                     if (value)
                     {
-                        Settings.Default.Friends.Add(FriendName);
+                        if (!Settings.Default.Friends.Contains(FriendName))
+                            Settings.Default.Friends.Add(FriendName);
                     }
                     else
                     {
@@ -86,11 +87,21 @@ namespace GamePipe.ViewModel
         }
         private string _listFilter = "";
 
+        private bool _filterUpdateQueued = false;
         public void UpdateFilter(string filter)
         {
             _listFilter = filter;
-            NotifyPropertyChanged("FilteredGames");
+            if (_filterUpdateQueued == false && SteamBase.UiDispatcher != null)
+            {
+                _filterUpdateQueued = true;
+                SteamBase.UiDispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Background, (Action)(() =>
+                {
+                    _filterUpdateQueued = false;
+                    NotifyPropertyChanged("FilteredGames");
+                }));
+            }
         }
+
         private IEnumerable<RemoteSteamApp> _AvailableApplications;
         public IEnumerable<RemoteSteamApp> AvailableApplications
         {

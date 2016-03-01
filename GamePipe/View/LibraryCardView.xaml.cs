@@ -30,6 +30,14 @@ namespace GamePipe.View
             InitializeComponent();
             this.DragEnter += LibraryCardView_DragEnter;
             this.Drop += LibraryCardView_Drop;
+            LibraryMenuButton.Click += LibraryMenuButton_Click;
+        }
+
+        private void LibraryMenuButton_Click(object sender, RoutedEventArgs e)
+        {
+            LibraryMenuButton.ContextMenu.Placement = System.Windows.Controls.Primitives.PlacementMode.Left;
+            LibraryMenuButton.ContextMenu.PlacementTarget = LibraryMenuButton;
+            LibraryMenuButton.ContextMenu.IsOpen = true;
         }
 
         private void LibraryCardView_MouseDoubleClick(object sender, MouseButtonEventArgs e)

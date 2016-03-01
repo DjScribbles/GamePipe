@@ -17,10 +17,10 @@
 
         <TabControl Grid.Row="0">
             <TabItem x:Name="LocalLibsTab" Header="Local Libraries" Template="{DynamicResource TabItemControlTemplate1}">
-                <DockPanel>
+                <DockPanel Grid.IsSharedSizeScope="True">
                     <Grid DockPanel.Dock="Top" >
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition SharedSizeGroup="labels" />
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="Auto"/>
                             <ColumnDefinition Width="Auto"/>
@@ -31,8 +31,24 @@
                         <Button Grid.Column="2" Command="{Binding AddLibraryCommand}" Content="Add Library" Template="{DynamicResource ButtonControlTemplate1}" ToolTip="Adds a new Steam library, another location where Steam games can be played from"/>
                         <Button Grid.Column="3" Command="{Binding AddArchiveCommand}" Content="Add Archive" Template="{DynamicResource ButtonControlTemplate1}" ToolTip="Adds a compressed game archive, games here won't show up in Steam anymore, and are compressed to take up less space."/>
                     </Grid>
-                    <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" HorizontalAlignment="Right">
-                    </StackPanel>
+                    <Grid DockPanel.Dock="Top"  HorizontalAlignment="Left"  Margin="4,-12,4,4">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition SharedSizeGroup="labels" />
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <Label Content="Sort:" VerticalAlignment="Center"/>
+                        <RadioButton Grid.Column="1" Command="{Binding SetSortModeCommand}" CommandParameter="{x:Static vm:GameSortMode.AtoZ}" HorizontalAlignment="Stretch"
+                                     Content="A to Z" VerticalAlignment="Center" IsChecked="True" Style="{StaticResource SimpleTextRadioButtonStyle}"/>
+                        <RadioButton Grid.Column="2" Command="{Binding SetSortModeCommand}" CommandParameter="{x:Static vm:GameSortMode.ZtoA}" HorizontalAlignment="Stretch"
+                                     Content="Z to A" VerticalAlignment="Center"  Style="{StaticResource SimpleTextRadioButtonStyle}"/>
+                        <RadioButton Grid.Column="3" Command="{Binding SetSortModeCommand}" CommandParameter="{x:Static vm:GameSortMode.BiggestToSmallest}" HorizontalAlignment="Stretch"
+                                     Content="Big to Small" VerticalAlignment="Center"  Style="{StaticResource SimpleTextRadioButtonStyle}"/>
+                        <RadioButton Grid.Column="4" Command="{Binding SetSortModeCommand}" CommandParameter="{x:Static vm:GameSortMode.SmallestToBiggest}" HorizontalAlignment="Stretch"
+                                     Content="Small to Big" VerticalAlignment="Center" Style="{StaticResource SimpleTextRadioButtonStyle}"/>
+                    </Grid>
                     <ItemsControl ItemsSource="{Binding Libraries}">
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>

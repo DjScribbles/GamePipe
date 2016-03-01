@@ -35,7 +35,16 @@ namespace GamePipe.ViewModel
             {
                 foreach (var friend in GamePipe.Properties.Settings.Default.Friends)
                 {
-                    AddFriend(friend);
+                    try
+                    {
+                        AddFriend(friend);
+
+                    }
+                    catch (Exception ex)
+                    {
+                        GamePipeLib.Utils.Logging.Logger.Error("Failed to restore friend: " + friend, ex);
+
+                    }
                 }
             }
         }
@@ -120,6 +129,24 @@ namespace GamePipe.ViewModel
                 NotifyPropertyChanged("LocalListFilter");
             }
         }
+        private GameSortMode _LocalSortMode = GameSortMode.AtoZ;
+        public GameSortMode LocalSortMode
+        {
+            get { return _LocalSortMode; }
+            set
+            {
+                if (_LocalSortMode != value)
+                {
+                    _LocalSortMode = value;
+                    foreach (var item in Libraries)
+                    {
+                        item.UpdateSortMode(value);
+                    }
+                }
+                NotifyPropertyChanged("LocalSortMode");
+            }
+        }
+
         private string _LanListFilter;
         public string LanListFilter
         {
@@ -159,14 +186,15 @@ namespace GamePipe.ViewModel
             if (result == System.Windows.Forms.DialogResult.OK)
             {
                 var path = Path.GetFullPath(dialog.SelectedPath);
-                _root.AddArchive(path);
-                //if (Directory.Exists(path) && !_ExternalLibraries.Contains(path))
-                //{
-                //    _ExternalLibraries.Add(path);
-
-                //    _Libraries.Add(new SteamLibraryViewModel(path, true));
-                //    NotifyPropertyChanged("Libraries");
-                //}
+                try
+                {
+                    _root.AddArchive(path);
+                }
+                catch (Exception ex)
+                {
+                    GamePipeLib.Utils.Logging.Logger.Error("Archive Addition failed due to exception:", ex);
+                    System.Windows.MessageBox.Show("Archive Addition failed due to exception:\n" + ex.Message, "", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Exclamation, System.Windows.MessageBoxResult.OK);
+                }
             }
         }
 
@@ -207,6 +235,7 @@ namespace GamePipe.ViewModel
                 }
                 catch (Exception ex)
                 {
+                    GamePipeLib.Utils.Logging.Logger.Error("Library Addition failed due to exception:", ex);
                     System.Windows.MessageBox.Show("Library Addition failed due to exception:\n" + ex.Message, "", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Exclamation, System.Windows.MessageBoxResult.OK);
                 }
             }
@@ -304,6 +333,32 @@ namespace GamePipe.ViewModel
             }
         }
         #endregion //CloseHostCommand
+        #region "SetSortModeCommand"
+        private RelayCommand _SetSortModeCommand = null;
+        public RelayCommand SetSortModeCommand
+        {
+            get
+            {
+                if (_SetSortModeCommand == null)
+                {
+                    _SetSortModeCommand = new RelayCommand(x => SetSortMode(x));
+
+                }
+                return _SetSortModeCommand;
+            }
+        }
+
+        public void SetSortMode(object param)
+        {
+            try
+            {
+                LocalSortMode = (GameSortMode)param;
+            }
+            catch (InvalidCastException) { return; }
+        }
+
+
+        #endregion //SetSortModeCommand
         #endregion //Commands
 
 

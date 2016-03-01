@@ -11,15 +11,29 @@
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto"/>
             <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="Auto"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
+
+        <Button x:Name="LibraryMenuButton" Grid.Column="2" Grid.RowSpan="2" Background="{StaticResource Background}" BorderBrush="{StaticResource FeintBorder}" MinWidth="24" 
+                        ContextMenuService.Placement="Left"    >
+            <Path StrokeThickness="4" Stroke="{StaticResource TextColor}"  StrokeStartLineCap="Round" StrokeEndLineCap="Round"
+                      Data="M 2,4 l 0,0 m 0,6 l 0,0 m 0,6 l 0,0"/>
+            <Button.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Command="{Binding OpenLibraryCommand}" Header="Open Dir" Icon="{x:Null}"/>
+                    <Separator Background="{StaticResource NormalBorder}" BorderBrush="{StaticResource NormalBorder}" Margin="-30,8,0,8"/>
+                    <MenuItem Command="{Binding RemoveCommand}" Header="Remove"/>
+                </ContextMenu>
+            </Button.ContextMenu>
+        </Button>
         <TextBlock Grid.RowSpan="3" Text="{Binding Path=Drive.RootDirectory}"  FontSize="38" VerticalAlignment="Top" Margin="6,-2,-2,-2"/>
         <TextBlock Grid.Row="0" Grid.Column="1"  Text="{Binding SteamDirectoryShortened}" HorizontalAlignment="Left" Margin="0,8,4,0" />
         <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Path=DriveAvailableSpace, StringFormat=Available: {0}}" HorizontalAlignment="Right" Margin="8,0"/>
-        <ProgressBar Grid.Row="2" Grid.Column="1" Value="{Binding DrivePercentFull, Mode=OneWay}" Margin="8,0,8,8" Height="4" />
+        <ProgressBar Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" Value="{Binding DrivePercentFull, Mode=OneWay}" Margin="8,0,8,8" Height="4" />
     </Grid>
 </UserControl>

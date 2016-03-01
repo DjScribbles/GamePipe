@@ -205,12 +205,6 @@ namespace GamePipeLib.Model.Steam
                     select game).ToList();
         }
 
-        public void Refresh()
-        {
-            _Games = null;
-            NotifyPropertyChanged("Games");
-        }
-
         public SteamApp GetGameById(string id)
         {
             return Games.Where(x => x.AppId == id).FirstOrDefault();

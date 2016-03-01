@@ -146,6 +146,22 @@ namespace GamePipeLib.Utils
 
         }
 
+        public static void RemoveSteamLibrary(string path)
+        {
+            string libraryVdfPath = Path.Combine(SteamDirectory, @"steamapps\libraryfolders.vdf");
+            if (File.Exists(libraryVdfPath))
+            {
+                var lines = File.ReadAllLines(libraryVdfPath).ToList();
+                string searchString = string.Format("\"{0}\"", path).Replace(@"\",@"\\");
+                foreach (string line in lines.ToArray())
+                {
+                    if (line.TrimEnd().EndsWith(searchString, StringComparison.OrdinalIgnoreCase))
+                        lines.Remove(line);
+                }
+                File.WriteAllLines(libraryVdfPath, lines);
+            }
+        }
+
         public static void SetupNewSteamLibrary(string path)
         {
             //C:\Program Files (x86)\Steam\steamapps\libraryfolders.vdf may not exist

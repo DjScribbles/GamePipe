@@ -17,6 +17,7 @@ namespace GamePipe.ViewModel
     public class SteamLibraryViewModel : ViewModelBase
     {
         private string _listFilter = "";
+        private GameSortMode _sortMode = GameSortMode.AtoZ;
         public readonly bool _isArchive;
 
         private SteamLibrary _model;
@@ -25,11 +26,12 @@ namespace GamePipe.ViewModel
             _model = model;
             UpdateDriveInfo();
             model.Games.CollectionChanged += Games_CollectionChanged;
+            Refresh();
         }
 
         private void Games_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            NotifyPropertyChanged("FilteredGames");
+            Refresh();
             UpdateDriveInfo();
         }
 
@@ -70,29 +72,58 @@ namespace GamePipe.ViewModel
         {
             get
             {
-                if (string.IsNullOrWhiteSpace(_listFilter))
+                IEnumerable<GameViewModel> result;
+                bool reverse = (_sortMode == GameSortMode.ZtoA) || (_sortMode == GameSortMode.BiggestToSmallest);
+                switch (_sortMode)
                 {
-                    return _model.Games.Select(x => new GameViewModel(x));
+                    default:
+                        result = _gamesByName;
+                        break;
+
+                    case GameSortMode.BiggestToSmallest:
+                    case GameSortMode.SmallestToBiggest:
+                        result = _gamesBySize;
+                        break;
                 }
 
-                return (from game in _model.Games
-                        where game.GameName.ToLower().Contains(_listFilter.ToLower())
-                        select new GameViewModel(game));
+                if (!string.IsNullOrWhiteSpace(_listFilter))
+                {
+                    result = result.Where(x => x.GameName.ToLower().Contains(_listFilter.ToLower()));
+                }
+
+                return (reverse ? result.Reverse() : result);
             }
         }
 
+        private GameViewModel[] _gamesByName;
+        private GameViewModel[] _gamesBySize;
         public void Refresh()
         {
-            _model.Refresh();
+            _gamesByName = _model.Games.OrderBy(x => x.GameName).Select(x => new GameViewModel(x)).ToArray();
+            _gamesBySize = _gamesByName.OrderBy(x => x.DiskSize).ToArray();
             NotifyPropertyChanged("FilteredGames");
         }
 
+        private bool _filterUpdateQueued = false;
         public void UpdateFilter(string filter)
         {
             _listFilter = filter;
-            NotifyPropertyChanged("FilteredGames");
+            if (_filterUpdateQueued == false && SteamBase.UiDispatcher != null)
+            {
+                _filterUpdateQueued = true;
+                SteamBase.UiDispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Background, (Action)(() =>
+                {
+                    _filterUpdateQueued = false;
+                    NotifyPropertyChanged("FilteredGames");
+                }));
+            }
         }
 
+        public void UpdateSortMode(GameSortMode mode)
+        {
+            _sortMode = mode;
+            NotifyPropertyChanged("FilteredGames");
+        }
 
         #region "Commands"
         #region "OpenLibraryCommand"
@@ -118,6 +149,48 @@ namespace GamePipe.ViewModel
 
 
         #endregion //OpenLibraryCommand
+        #region "RemoveCommand"
+        private RelayCommand _RemoveCommand = null;
+        public RelayCommand RemoveCommand
+        {
+            get
+            {
+                if (_RemoveCommand == null)
+                    _RemoveCommand = new RelayCommand(x => Remove());
+                return _RemoveCommand;
+            }
+        }
+
+        public void Remove()
+        {
+            try
+            {
+                if (Model is SteamArchive)
+                {
+                    var result = System.Windows.MessageBox.Show("Are you sure you want to remove this archive from Game Pipe?\n\nNo files will be deleted, and it may be readded at any time.", "Remove Library?", System.Windows.MessageBoxButton.YesNo, System.Windows.MessageBoxImage.Exclamation, System.Windows.MessageBoxResult.No);
+                    if (result == System.Windows.MessageBoxResult.Yes)
+                    {
+                        SteamRoot.Instance.RemoveArchive(Model as SteamArchive);
+                    }
+                }
+                else
+                {
+                    var result = System.Windows.MessageBox.Show("Are you sure you want to remove this library from Game Pipe and Steam?\n\nNo files will be deleted, but any games it contains will no longer be playable.", "Remove Library?", System.Windows.MessageBoxButton.YesNo, System.Windows.MessageBoxImage.Exclamation, System.Windows.MessageBoxResult.No);
+                    if (result == System.Windows.MessageBoxResult.Yes)
+                    {
+                        SteamRoot.Instance.RemoveLibrary(Model);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Logging.Logger.Error("Library removal failed due to exception:", ex);
+                System.Windows.MessageBox.Show("Library removal failed due to exception:\n" + ex.Message, "", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Exclamation, System.Windows.MessageBoxResult.OK);
+            }
+        }
+
+
+        #endregion //RemoveCommand
         #endregion //Commands
     }
 }
