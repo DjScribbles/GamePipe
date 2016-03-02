@@ -3,7 +3,7 @@
 #include <idp.iss>
 
 #define MyAppName "Game Pipe"
-#define MyAppVersion "0.1.3"
+#define MyAppVersion "0.1.4"
 #define MyAppPublisher "Joe Shaw"
 #define MyAppExeName "GamePipe.exe"
 
