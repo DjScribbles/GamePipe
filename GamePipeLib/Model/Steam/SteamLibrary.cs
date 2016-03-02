@@ -90,7 +90,7 @@ namespace GamePipeLib.Model.Steam
             Action onChange = new Action(() =>
             {
                 var appId = e.Name.ToLower().Replace(".acf", "").Replace("appmanifest_", "");
-                var game = GetGameById(appId);
+                var game = GetGameOrBundleById(appId);
                 if (game != null)
                 {
                     game.RefreshFromAcf();
@@ -127,10 +127,21 @@ namespace GamePipeLib.Model.Steam
         {
             Action onChange = new Action(() =>
             {
-
                 var appId = e.Name.ToLower().Replace(".acf", "").Replace("appmanifest_", "");
                 var game = GetGameById(appId);
                 _Games.Remove(game);
+
+                var bundles = _Games.OfType<SteamBundle>().ToArray();
+                foreach (var bundle in bundles)
+                {
+
+                    if (bundle.AppId.Contains(appId))
+                    {
+                        bundle.MarkAppIdRemoved(appId);
+                        if (bundle.ShouldRemove())
+                            _Games.Remove(bundle);
+                    }
+                }
             });
             if (SteamBase.UiDispatcher != null)
             {
@@ -146,19 +157,34 @@ namespace GamePipeLib.Model.Steam
         {
             Action onChange = new Action(() =>
             {
-                SteamApp game;
+                SteamApp newGame;
                 try
                 {
-                    game = new SteamApp(e.FullPath);
+                    newGame = new SteamApp(e.FullPath);
 
                 }
                 catch (Exception)
                 {
                     return;
                 }
-                if (GetGameById(game.AppId) == null)
+                if (GetGameById(newGame.AppId) == null)
                 {
-                    _Games.Insert(0, game);
+                    var matches = (from game in _Games
+                                   where game.InstallDir.ToLower() == newGame.InstallDir.ToLower()
+                                   select game).ToList();
+
+                    if (matches.Any())
+                    {
+                        matches.Add(newGame);
+                        var bundle = new SteamBundle(matches);
+                        _Games.Insert(0, bundle);
+                        foreach (var match in matches)
+                        {
+                            _Games.Remove(match);
+                        }
+                    }
+                    else
+                        _Games.Insert(0, newGame);
                 }
             });
             if (SteamBase.UiDispatcher != null)
@@ -169,6 +195,8 @@ namespace GamePipeLib.Model.Steam
             {
                 onChange();
             }
+
+
         }
 
         private readonly string _LibraryDirectory;
@@ -177,39 +205,57 @@ namespace GamePipeLib.Model.Steam
             get { return _LibraryDirectory; }
         }
 
-        private ObservableCollection<SteamApp> _Games;
-        public ObservableCollection<SteamApp> Games
+        private ObservableCollection<ILocalSteamApplication> _Games;
+        public ObservableCollection<ILocalSteamApplication> Games
         {
             get
             {
                 if ((_Games == null))
                 {
-                    _Games = new ObservableCollection<SteamApp>(GenerateGames());
+                    _Games = new ObservableCollection<ILocalSteamApplication>(GenerateGames());
                 }
                 return _Games;
             }
         }
 
-        private IEnumerable<SteamApp> GenerateGames()
+        private IEnumerable<ILocalSteamApplication> GenerateGames()
         {
             if (string.IsNullOrWhiteSpace(SteamDirectory) || Directory.Exists(SteamDirectory) == false)
             {
                 return null;
             }
             var files = Directory.EnumerateFiles(SteamDirectory, "*.acf");
-            return (from file in files
-                    let game = new SteamApp(file)
-                    where string.IsNullOrWhiteSpace(game.GameName) == false
-                    where string.IsNullOrWhiteSpace(game.AppId) == false
-                    orderby game.GameName
-                    select game).ToList();
+            var apps = (from file in files
+                        let game = (ILocalSteamApplication)new SteamApp(file)
+                        where string.IsNullOrWhiteSpace(game.GameName) == false
+                        where string.IsNullOrWhiteSpace(game.AppId) == false
+                        orderby game.GameName
+                        group game by game.InstallDir.ToLower() into groups
+                        select (groups.Count() > 1
+                            ? (ILocalSteamApplication)new SteamBundle(groups)
+                            : groups.First())).ToList();
+
+
+            return apps;
         }
 
-        public SteamApp GetGameById(string id)
+        public ILocalSteamApplication GetGameById(string id)
         {
+
             return Games.Where(x => x.AppId == id).FirstOrDefault();
         }
 
+        public ILocalSteamApplication GetGameOrBundleById(string id)
+        {
+            var found = GetGameById(id);
+            if (found == null)
+            {
+                found = (from bundle in Games.OfType<SteamBundle>()
+                         where bundle.AppsInBundle.Any(app => app.AppId == id)
+                         select bundle).FirstOrDefault();
+            }
+            return found;
+        }
         public IEnumerable<BasicSteamApp> GetAvailableIds()
         {
             return Games.Select(x => new BasicSteamApp(x));
@@ -261,10 +307,12 @@ namespace GamePipeLib.Model.Steam
 
         public string GetAcfFileContent(string appId)
         {
-            var game = GetGameById(appId);
-            if (game == null) throw new ArgumentException(string.Format("App ID {0} not found in {1}", appId, SteamDirectory));
+            string acfFileName = string.Format("appmanifest_{0}.acf", appId);
+            string acfPath = Path.Combine(SteamDirectory, acfFileName);
+            if (File.Exists(acfPath))
+                return File.ReadAllText(acfPath);
 
-            return File.ReadAllText(game.AcfFile);
+            return null;
         }
 
         CrcStream ITransferTarget.GetFileStream(string installDir, string file)

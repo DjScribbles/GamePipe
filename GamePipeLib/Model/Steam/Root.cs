@@ -11,6 +11,7 @@ using System.IO;
 using System.Text.RegularExpressions;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using GamePipeLib.Interfaces;
 
 namespace GamePipeLib.Model.Steam
 {
@@ -128,12 +129,12 @@ namespace GamePipeLib.Model.Steam
         }
 
 
-        public SteamApp GetGame(string appId)
+        public ILocalSteamApplication GetGame(string appId)
         {
             foreach (var lib in Libraries)
             {
-                var game = lib.Games.Where(x => x.AppId == appId).FirstOrDefault();
-                if ((game != null) && (game.AppId == appId))
+                var game = lib.GetGameOrBundleById(appId);
+                if (game != null)
                     return game;
             }
             return null;
@@ -143,14 +144,14 @@ namespace GamePipeLib.Model.Steam
         {
             foreach (var lib in Libraries)
             {
-                var game = lib.Games.Where(x => x.AppId == appId).FirstOrDefault();
-                if ((game != null) && (game.AppId == appId))
+                var game = lib.GetGameOrBundleById(appId);
+                if (game != null)
                     return lib;
             }
             return null;
         }
 
-        public IEnumerable<SteamApp> GetAllGames()
+        public IEnumerable<ILocalSteamApplication> GetAllGames()
         {
             return Libraries.SelectMany(x => x.Games);
         }

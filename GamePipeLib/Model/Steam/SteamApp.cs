@@ -39,7 +39,7 @@ namespace GamePipeLib.Model.Steam
         StateUpdateStopping = 0x800000
     }
 
-    public class SteamApp : GamePipeLib.Model.NotifyPropertyChangedBase, ISteamApplication
+    public class SteamApp : GamePipeLib.Model.NotifyPropertyChangedBase, ILocalSteamApplication
     {
         private System.IO.FileSystemWatcher _watcher;
         private long _acfDiskSize;
@@ -53,6 +53,7 @@ namespace GamePipeLib.Model.Steam
         }
 
         private bool _isMeasured = false;
+        public bool SizeIsMeasured { get { return _isMeasured; } }
         public void MeasureDiskSize()
         {
             if (!_isMeasured)

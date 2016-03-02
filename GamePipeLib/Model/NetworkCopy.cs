@@ -27,7 +27,20 @@ namespace GamePipeLib.Model
         protected override void DoPostProcess()
         {
             string appId = Application.AppId;
-            _target.WriteAcfFile(appId, _source.GetAcfFileContent(appId));
+
+            if (appId.Contains(","))
+            {
+                var ids = appId.Split(new char[1] { ',' });
+                foreach (string id in ids)
+                {
+                    _target.WriteAcfFile(id, _source.GetAcfFileContent(id));
+                }
+            }
+            else
+            {
+                _target.WriteAcfFile(appId, _source.GetAcfFileContent(appId));
+            }
+
 
             if (Properties.Settings.Default.OpenDirAfterNetworkCopy && _target is Steam.SteamLibrary)
             {

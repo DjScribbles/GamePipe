@@ -29,7 +29,11 @@ namespace GamePipeLib.Interfaces
     {
         public static string GetSteamImageUrl(this ISteamApplication app)
         {
-            return string.Format("https://steamcdn-a.akamaihd.net/steam/apps/{0}/capsule_{1}.jpg?{2}", app.AppId, "sm_120", DateTime.Now.ToString("yyyy-MM-dd"));
+            var id = app.AppId;
+            if (id.Contains(","))
+                id = id.Split(new char[1] { ',' })[0];
+
+            return string.Format("https://steamcdn-a.akamaihd.net/steam/apps/{0}/capsule_{1}.jpg?{2}", id, "sm_120", DateTime.Now.ToString("yyyy-MM-dd"));
         }
     }
 }

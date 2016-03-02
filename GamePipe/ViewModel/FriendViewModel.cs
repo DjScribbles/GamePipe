@@ -207,7 +207,7 @@ namespace GamePipe.ViewModel
         {
             get
             {
-                return _appInfo.GetSteamImageUrl();
+                return _appInfo.ImageUrl;
             }
         }
         public bool CanCopy()

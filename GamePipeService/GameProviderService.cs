@@ -67,11 +67,11 @@ namespace GamePipeService
 
         public string GetAcfFileContent(string appId)
         {
-            var gameInfo = _rootSteam.GetGame(appId);
-            if (gameInfo == null)
-                throw new ArgumentException("appId not found");
+            var library = _rootSteam.GetLibraryForGame(appId);
+            if (library == null)
+                throw new ArgumentException("library for appId not found");
 
-            return File.ReadAllText(gameInfo.AcfFile);
+            return library.GetAcfFileContent(appId);
         }
 
         public IEnumerable<BasicSteamApp> GetAvailableIds()

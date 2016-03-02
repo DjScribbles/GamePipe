@@ -99,7 +99,14 @@ namespace GamePipe.ViewModel
         private GameViewModel[] _gamesBySize;
         public void Refresh()
         {
-            _gamesByName = _model.Games.OrderBy(x => x.GameName).Select(x => new GameViewModel(x)).ToArray();
+            _gamesByName = _model.Games.OrderBy(x => x.GameName).Select(x =>
+            {
+                if (x is SteamBundle)
+                    return new BundleViewModel((SteamBundle)x);
+                else
+                    return new GameViewModel((SteamApp)x);
+            }
+            ).ToArray();
             _gamesBySize = _gamesByName.OrderBy(x => x.DiskSize).ToArray();
             NotifyPropertyChanged("FilteredGames");
         }

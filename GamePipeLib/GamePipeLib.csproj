@@ -52,6 +52,7 @@
   <ItemGroup>
     <Compile Include="Interfaces\IAppProvider.cs" />
     <Compile Include="Interfaces\IGameTransfer.cs" />
+    <Compile Include="Interfaces\ILocalSteamApplication.cs" />
     <Compile Include="Interfaces\ITransferTarget.cs" />
     <Compile Include="Model\LocalCopy.cs" />
     <Compile Include="Model\LocalMove.cs" />
@@ -62,6 +63,7 @@
     <Compile Include="Model\Steam\SteamApp.cs" />
     <Compile Include="Model\Steam\SteamArchive.cs" />
     <Compile Include="Model\Steam\SteamBase.cs" />
+    <Compile Include="Model\Steam\SteamBundle.cs" />
     <Compile Include="Model\Steam\SteamLibrary.cs" />
     <Compile Include="Model\Steam\SteamUserInfo.cs" />
     <Compile Include="Model\TransferBase.cs" />

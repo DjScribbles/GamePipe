@@ -16,18 +16,25 @@ using GamePipeLib.Interfaces;
 
 namespace GamePipe.ViewModel
 {
+    public class BundleViewModel : GameViewModel
+    {
+        //TODO implement this class to provide a unique view for bundles, showing all app names and app ids.
+        public BundleViewModel(ILocalSteamApplication model) : base(model)
+        {
+        }
+    }
     public class GameViewModel : ViewModelBase, ISteamApplication
     {
-        private SteamApp _model;
-        public SteamApp Model { get { return _model; } }
-        public GameViewModel(SteamApp model)
+        private ILocalSteamApplication _model;
+        public ILocalSteamApplication Model { get { return _model; } }
+        public GameViewModel(ILocalSteamApplication model)
         {
             _model = model;
         }
 
-        public string AcfFile { get { return _model.AcfFile; } }
+        //public string AcfFile { get { return _model.AcfFile; } }
         public string AppId { get { return _model.AppId; } }
-        public AppStateFlags AppState { get { return _model.AppState; } }
+        //public AppStateFlags AppState { get { return _model.AppState; } }
         public string GameName { get { return _model.GameName; } }
         public string GameDir { get { return _model.GameDir; } }
 
@@ -51,10 +58,10 @@ namespace GamePipe.ViewModel
         {
             get
             {
-                return ((ISteamApplication)Model).InstallDir;
+                return Model.InstallDir;
             }
         }
-        public string ImageUrl { get { return _model.GetSteamImageUrl(); } }
+        public string ImageUrl { get { return Model.ImageUrl; } }
         public string ReadableFileSize
         {
             get
