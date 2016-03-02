@@ -196,6 +196,9 @@ namespace GamePipeLib.Model.Steam
 
         public void ScanWithDefender(string gameDir, string appId)
         {
+            if (appId.Contains(","))
+                appId = appId.Split(new char[1] { ',' })[0];
+
             if (gameDir == null)
                 throw new ArgumentNullException("gameDir");
             if (!Directory.Exists(gameDir))
