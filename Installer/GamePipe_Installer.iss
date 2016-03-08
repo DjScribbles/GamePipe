@@ -3,7 +3,7 @@
 #include <idp.iss>
 
 #define MyAppName "Game Pipe"
-#define MyAppVersion "0.1.4"
+#define MyAppVersion "0.1.5"
 #define MyAppPublisher "Joe Shaw"
 #define MyAppExeName "GamePipe.exe"
 
@@ -32,11 +32,7 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 
 [Files]
 Source: "..\GamePipe\bin\Release\GamePipe.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\GamePipe\bin\Release\CachedImage.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\GamePipe\bin\Release\GamePipe.exe.config"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\GamePipe\bin\Release\GamePipeLib.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\GamePipe\bin\Release\GamePipeService.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\GamePipe\bin\Release\log4net.dll"; DestDir: "{app}"; Flags: ignoreversion
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Dirs]
