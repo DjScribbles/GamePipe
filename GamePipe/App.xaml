@@ -154,6 +154,11 @@
             <Setter Property="Margin" Value="4"/>
         </Style>
 
+        <Style TargetType="CheckBox">
+            <Setter Property="Margin" Value="4"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
         <Style TargetType="TextBox">
             <Setter Property="Margin" Value="4"/>
             <Setter Property="Foreground" Value="{StaticResource TextColor}"/>

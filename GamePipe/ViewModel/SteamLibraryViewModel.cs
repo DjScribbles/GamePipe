@@ -18,7 +18,6 @@ namespace GamePipe.ViewModel
     {
         private string _listFilter = "";
         private GameSortMode _sortMode = GameSortMode.AtoZ;
-        public readonly bool _isArchive;
 
         private SteamLibrary _model;
         public SteamLibraryViewModel(SteamLibrary model)
@@ -57,6 +56,7 @@ namespace GamePipe.ViewModel
         public double DrivePercentFull { get; private set; }
         public string DriveAvailableSpace { get; private set; }
         public string DriveTotalSpace { get; private set; }
+        public bool IsArchive { get { return Model is SteamArchive; } }
 
         public string SteamDirectoryShortened
         {
