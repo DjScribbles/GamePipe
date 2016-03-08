@@ -86,7 +86,7 @@
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
                         <TextBlock HorizontalAlignment="Center" Grid.ColumnSpan="5" Text="Games acquired over the network may contain malware if the source is infected. It is strongly recommended that you scan the games with a virus scanner before running them." />
-                        <CheckBox Grid.Row="1" Grid.Column="1" Content="Scan with Windows Defender after network copy" IsChecked="{Binding Path=Model.ScanAfterNetworkCopy}" VerticalContentAlignment="Center" />
+                        <CheckBox Grid.Row="1" Grid.Column="1" Content="Scan with Windows Defender after network copy" IsChecked="{Binding Path=Model.ScanAfterNetworkCopy}" VerticalContentAlignment="Center" IsEnabled="{Binding Model.IsDefenderPresent}"/>
                         <CheckBox Grid.Row="1" Grid.Column="3" Content="Open the directory so I can scan manually" IsChecked="{Binding Path=Model.OpenDirAfterNetworkCopy}" VerticalContentAlignment="Center"/>
                     </Grid>
                     <Grid DockPanel.Dock="Top" >

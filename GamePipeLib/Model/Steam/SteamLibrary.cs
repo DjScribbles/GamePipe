@@ -565,8 +565,11 @@ namespace GamePipeLib.Model.Steam
 
         internal void ScanWithDefender(string installDir, string appId)
         {
-            string path = Path.Combine(SteamDirectory, "common", installDir);
-            SteamRoot.Instance.ScanWithDefender(path, appId);
+            if (SteamRoot.Instance.IsDefenderPresent)
+            {
+                string path = Path.Combine(SteamDirectory, "common", installDir);
+                SteamRoot.Instance.ScanWithDefender(path, appId);
+            }
         }
     }
 }

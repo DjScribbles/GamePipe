@@ -41,7 +41,7 @@ namespace GamePipeLib.Model.Steam
         {
             get
             {
-                return Properties.Settings.Default.ScanAfterNetworkCopy;
+                return  Properties.Settings.Default.ScanAfterNetworkCopy && IsDefenderPresent;
             }
             set
             {
@@ -229,11 +229,15 @@ namespace GamePipeLib.Model.Steam
         }
 
         private bool? _isDefenderPresent = null;
-        public bool IsDefenderPresent()
+        public bool IsDefenderPresent
         {
-            if (_isDefenderPresent == null)
-                _isDefenderPresent = File.Exists(Environment.ExpandEnvironmentVariables("%ProgramW6432%\\Windows Defender\\MpCmdRun.exe"));
-            return (bool)_isDefenderPresent;
+            get
+            {
+                if (_isDefenderPresent == null)
+                    _isDefenderPresent = File.Exists(Environment.ExpandEnvironmentVariables("%ProgramW6432%\\Windows Defender\\MpCmdRun.exe"));
+                return (bool)_isDefenderPresent;
+
+            }
         }
     }
 }
