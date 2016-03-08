@@ -100,17 +100,22 @@ namespace GamePipe
             //}
             if ((e.Cancel == false) && (GamePipeLib.Model.Steam.SteamRoot.Instance.SteamRestartRequired))
             {
-                var result = System.Windows.MessageBox.Show("You moved some steam games, you must restart Steam.\n\nRestart steam now?", "Steam needs to restart", System.Windows.MessageBoxButton.YesNo, System.Windows.MessageBoxImage.Exclamation, System.Windows.MessageBoxResult.Yes);
-                if (result != MessageBoxResult.Yes)
+                var steamRestarted = false;
+                if (GamePipeLib.Utils.SteamDirParsingUtils.IsSteamOpen())
                 {
-                    e.Cancel = true;
-                    return;
-                }
 
-                GamePipeLib.Utils.SteamDirParsingUtils.CloseSteam();
-                GamePipeLib.Utils.Logging.Logger.Info("Closing Steam to update app data...");
-                while (GamePipeLib.Utils.SteamDirParsingUtils.IsSteamOpen())
-                    System.Threading.Thread.Sleep(500);
+                    var result = System.Windows.MessageBox.Show("You moved some steam games, you must restart Steam.\n\nRestart steam now?", "Steam needs to restart", System.Windows.MessageBoxButton.YesNo, System.Windows.MessageBoxImage.Exclamation, System.Windows.MessageBoxResult.Yes);
+                    if (result != MessageBoxResult.Yes)
+                    {
+                        e.Cancel = true;
+                        return;
+                    }
+                    steamRestarted = true;
+                    GamePipeLib.Utils.SteamDirParsingUtils.CloseSteam();
+                    GamePipeLib.Utils.Logging.Logger.Info("Closing Steam to update app data...");
+                    while (GamePipeLib.Utils.SteamDirParsingUtils.IsSteamOpen())
+                        System.Threading.Thread.Sleep(500);
+                }
 
                 //Need to do this because steam is a jackass and writes these files without looking...
                 foreach (string watchedAcf in manager.AcfFileWatchList)
@@ -122,7 +127,8 @@ namespace GamePipe
                     }
                 }
 
-                Process.Start(@"steam://open/games");
+                if (steamRestarted)
+                    Process.Start(@"steam://open/games");
 
             }
 
