@@ -46,6 +46,9 @@
         <conv:TransferBaseToViewModelConverter x:Key="TransferBaseToViewModelConverter"/>
         <conv:EqualityToBooleanConverter x:Key="EqualityToBooleanConverter"/>
 
+        <Style TargetType="BitmapImage">
+            <Setter Property="CreateOptions" Value="IgnoreColorProfile"/>
+        </Style>
         <Style TargetType="RadioButton" x:Key="SimpleTextRadioButtonStyle">
             <Setter Property="Template" Value="{DynamicResource SimpleTextRadioButtonTemplate}"/>
             <Setter Property="Background" Value="{StaticResource Background}"/>

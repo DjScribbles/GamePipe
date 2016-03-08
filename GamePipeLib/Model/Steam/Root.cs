@@ -227,5 +227,13 @@ namespace GamePipeLib.Model.Steam
                     File.Delete(tempFile);
             }
         }
+
+        private bool? _isDefenderPresent = null;
+        public bool IsDefenderPresent()
+        {
+            if (_isDefenderPresent == null)
+                _isDefenderPresent = File.Exists(Environment.ExpandEnvironmentVariables("%ProgramW6432%\\Windows Defender\\MpCmdRun.exe"));
+            return (bool)_isDefenderPresent;
+        }
     }
 }
