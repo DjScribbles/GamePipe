@@ -3,11 +3,7 @@
 * Distributed under the GNU GPL v2. For full terms see the file LICENSE.txt
 */
 
-using Microsoft.VisualBasic;
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Data;
 using System.Diagnostics;
 using System.ComponentModel;
 

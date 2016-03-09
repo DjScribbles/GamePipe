@@ -5,12 +5,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.IO;
 using GamePipeLib.Utils;
 using System.IO.Compression;
 using System.Text.RegularExpressions;
+using System.Text;
 
 namespace GamePipeLib.Model.Steam
 {

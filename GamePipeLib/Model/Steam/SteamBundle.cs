@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using GamePipeLib.Interfaces;
 
 namespace GamePipeLib.Model.Steam

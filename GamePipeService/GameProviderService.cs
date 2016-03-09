@@ -5,9 +5,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Threading;
 using System.IO;
 using GamePipeLib.Utils;
 using GamePipeLib.Model.Steam;
