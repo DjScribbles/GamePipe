@@ -24,6 +24,12 @@ SetupIconFile=..\GamePipe\Resources\GamePipe.ico
 Compression=lzma
 SolidCompression=yes
 
+[InstallDelete]      
+Type: files; Name: {app}\CachedImage.dll
+Type: files; Name: {app}\GamePipeLib.dll
+Type: files; Name: {app}\GamePipeService.dll
+Type: files; Name: {app}\log4net.dll
+
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
 
