@@ -39,7 +39,7 @@ namespace GamePipeLib.Model.Steam
         {
             get
             {
-                return Properties.Settings.Default.ScanAfterNetworkCopy;
+                return  Properties.Settings.Default.ScanAfterNetworkCopy && IsDefenderPresent;
             }
             set
             {
@@ -223,6 +223,18 @@ namespace GamePipeLib.Model.Steam
                 System.Windows.MessageBox.Show("Virus Scan failed due to exception:\n" + ex.Message, "", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Exclamation, System.Windows.MessageBoxResult.OK);
                 if (File.Exists(tempFile))
                     File.Delete(tempFile);
+            }
+        }
+
+        private bool? _isDefenderPresent = null;
+        public bool IsDefenderPresent
+        {
+            get
+            {
+                if (_isDefenderPresent == null)
+                    _isDefenderPresent = File.Exists(Environment.ExpandEnvironmentVariables("%ProgramW6432%\\Windows Defender\\MpCmdRun.exe"));
+                return (bool)_isDefenderPresent;
+
             }
         }
     }

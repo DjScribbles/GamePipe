@@ -32,7 +32,5 @@
                 </ItemsPanelTemplate>
             </ListView.ItemsPanel>
         </ListView>
-
-
     </Grid>
 </UserControl>

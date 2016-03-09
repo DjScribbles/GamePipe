@@ -5,6 +5,7 @@
 
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media.Imaging;
 
 namespace GamePipe.View
 {
@@ -24,6 +25,17 @@ namespace GamePipe.View
             GameMenuButton.ContextMenu.Placement = System.Windows.Controls.Primitives.PlacementMode.Left;
             GameMenuButton.ContextMenu.PlacementTarget = GameMenuButton;
             GameMenuButton.ContextMenu.IsOpen = true;
+        }
+
+        private void Image_ImageFailed(object sender, ExceptionRoutedEventArgs e)
+        {
+            e.Handled = true;
+
+            var img = sender as BitmapImage;
+            string source = "";
+            if (sender is CachedImage.Image)
+                source = ((CachedImage.Image)sender).ImageUrl;
+            GamePipeLib.Utils.Logging.Logger.Error($"Image {source} failed due to exception:", e.ErrorException);
         }
     }
 }

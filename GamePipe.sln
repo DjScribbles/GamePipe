@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GamePipeService", "GamePipe
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GamePipeLib", "GamePipeLib\GamePipeLib.csproj", "{AE9F3619-870B-4BBE-9D34-421537E21451}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CachedImage", "CachedImage\source\CachedImage.csproj", "{6743EE2A-981B-4CC1-BD29-1D7490BC71E4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{AE9F3619-870B-4BBE-9D34-421537E21451}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AE9F3619-870B-4BBE-9D34-421537E21451}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AE9F3619-870B-4BBE-9D34-421537E21451}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6743EE2A-981B-4CC1-BD29-1D7490BC71E4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6743EE2A-981B-4CC1-BD29-1D7490BC71E4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6743EE2A-981B-4CC1-BD29-1D7490BC71E4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6743EE2A-981B-4CC1-BD29-1D7490BC71E4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

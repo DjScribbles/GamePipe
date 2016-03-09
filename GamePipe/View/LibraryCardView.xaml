@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:GamePipe.View"
              mc:Ignorable="d"
-             AllowDrop="True" MouseDoubleClick="LibraryCardView_MouseDoubleClick"
+             AllowDrop="True"
              d:DesignHeight="300" d:DesignWidth="300">
     <Grid>
         <Grid.ColumnDefinitions>
@@ -17,10 +17,11 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
         <Button x:Name="LibraryMenuButton" Grid.Column="2" Grid.RowSpan="2" Background="{StaticResource Background}" BorderBrush="{StaticResource FeintBorder}" MinWidth="24" 
-                        ContextMenuService.Placement="Left"    >
+                        ContextMenuService.Placement="Left">
             <Path StrokeThickness="4" Stroke="{StaticResource TextColor}"  StrokeStartLineCap="Round" StrokeEndLineCap="Round"
                       Data="M 2,4 l 0,0 m 0,6 l 0,0 m 0,6 l 0,0"/>
             <Button.ContextMenu>
@@ -35,5 +36,13 @@
         <TextBlock Grid.Row="0" Grid.Column="1"  Text="{Binding SteamDirectoryShortened}" HorizontalAlignment="Left" Margin="0,8,4,0" />
         <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Path=DriveAvailableSpace, StringFormat=Available: {0}}" HorizontalAlignment="Right" Margin="8,0"/>
         <ProgressBar Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" Value="{Binding DrivePercentFull, Mode=OneWay}" Margin="8,0,8,8" Height="4" />
+        <Grid Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3" Visibility="{Binding IsArchive, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <CheckBox IsChecked="{Binding CompressNewGames}" Content="Compress New" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+            <CheckBox Grid.Column="1" IsChecked="{Binding CopyInOut}" Content="Copy In/Out" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+        </Grid>
     </Grid>
 </UserControl>

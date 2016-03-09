@@ -172,7 +172,7 @@ namespace GamePipe.ViewModel
             get
             {
                 if (_ScanWithDefenderCommand == null)
-                    _ScanWithDefenderCommand = new RelayCommand(x => ScanWithDefender());
+                    _ScanWithDefenderCommand = new RelayCommand(x => ScanWithDefender(),x=> SteamRoot.Instance.IsDefenderPresent);
                 return _ScanWithDefenderCommand;
             }
         }

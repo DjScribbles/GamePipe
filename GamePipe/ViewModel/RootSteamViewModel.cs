@@ -50,7 +50,9 @@ namespace GamePipe.ViewModel
             {
                 foreach (SteamLibrary addition in e.NewItems)
                 {
-                    var newLib = new SteamLibraryViewModel(addition);
+                    var newLib = (addition is SteamArchive)
+                                ? new SteamArchiveViewModel(addition as SteamArchive)
+                                : new SteamLibraryViewModel(addition);
                     newLib.UpdateFilter(LocalListFilter);
                     Libraries.Add(newLib);
                 }
@@ -104,7 +106,9 @@ namespace GamePipe.ViewModel
             {
                 if (_Libraries == null)
                 {
-                    _Libraries = new ObservableCollection<SteamLibraryViewModel>(_root.Libraries.Select(x => new SteamLibraryViewModel(x)));
+                    _Libraries = new ObservableCollection<SteamLibraryViewModel>(_root.Libraries.Select(x => (x is SteamArchive)
+                                                                                                              ? new SteamArchiveViewModel(x as SteamArchive)
+                                                                                                              : new SteamLibraryViewModel(x)));
                 }
                 return _Libraries;
             }

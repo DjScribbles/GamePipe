@@ -46,6 +46,15 @@
         <conv:TransferBaseToViewModelConverter x:Key="TransferBaseToViewModelConverter"/>
         <conv:EqualityToBooleanConverter x:Key="EqualityToBooleanConverter"/>
 
+        <Style TargetType="BitmapImage">
+            <Setter Property="CreateOptions" Value="IgnoreColorProfile"/>
+        </Style>
+
+        <Style TargetType="ci:Image">
+            <Setter Property="CreateOptions" Value="IgnoreColorProfile"/>
+            <Setter Property="Height" Value="61"/>
+            <Setter Property="Width" Value="162"/>
+        </Style>
         <Style TargetType="RadioButton" x:Key="SimpleTextRadioButtonStyle">
             <Setter Property="Template" Value="{DynamicResource SimpleTextRadioButtonTemplate}"/>
             <Setter Property="Background" Value="{StaticResource Background}"/>
@@ -151,6 +160,11 @@
             <Setter Property="Margin" Value="4"/>
         </Style>
 
+        <Style TargetType="CheckBox">
+            <Setter Property="Margin" Value="4"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
         <Style TargetType="TextBox">
             <Setter Property="Margin" Value="4"/>
             <Setter Property="Foreground" Value="{StaticResource TextColor}"/>

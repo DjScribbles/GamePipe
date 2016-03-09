@@ -534,7 +534,7 @@ namespace GamePipeLib.Model.Steam
             get
             {
                 if (_Drive == null)
-                    _Drive = DriveInfo.GetDrives().Where(x => Path.GetFullPath(SteamDirectory).StartsWith(x.Name)).FirstOrDefault();
+                    _Drive = DriveInfo.GetDrives().Where(x => Path.GetFullPath(SteamDirectory).StartsWith(x.Name, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
                 return _Drive;
             }
         }
@@ -557,13 +557,18 @@ namespace GamePipeLib.Model.Steam
 
         public long GetFreeSpace()
         {
+            if (Drive == null)
+                return long.MaxValue;   //If we couldn't get drive info, then report that there is plenty of space
             return Drive.AvailableFreeSpace;
         }
 
         internal void ScanWithDefender(string installDir, string appId)
         {
-            string path = Path.Combine(SteamDirectory, "common", installDir);
-            SteamRoot.Instance.ScanWithDefender(path, appId);
+            if (SteamRoot.Instance.IsDefenderPresent)
+            {
+                string path = Path.Combine(SteamDirectory, "common", installDir);
+                SteamRoot.Instance.ScanWithDefender(path, appId);
+            }
         }
     }
 }

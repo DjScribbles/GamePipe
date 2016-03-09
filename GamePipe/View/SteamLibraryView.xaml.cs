@@ -45,7 +45,7 @@ namespace GamePipe.View
         }
 
 
-        private void DisplayList_PreviewMouseMove(object sender, MouseEventArgs e) 
+        private void DisplayList_PreviewMouseMove(object sender, MouseEventArgs e)
         {
             //if the left mouse button is not pressed, then we can't be dragging anything
             if (e.LeftButton != MouseButtonState.Pressed || !(sender is ListBox) || !(_mousePressOrigSource is DependencyObject))
@@ -94,9 +94,16 @@ namespace GamePipe.View
         {
             var destination = (sender as FrameworkElement)?.DataContext as SteamLibraryViewModel;
             var sourceInfo = e.Data.GetData(DRAG_DATA_NAME) as Transfer;
-            if (!object.ReferenceEquals(sourceInfo.SourceLibrary, destination))
+            var source = sourceInfo.SourceLibrary;
+            if (!object.ReferenceEquals(source, destination))
             {
-                var transfer = new GamePipeLib.Model.LocalMove(sourceInfo.SourceLibrary.Model, destination.Model, sourceInfo.SourceGame.Model);
+                var shouldCopy = ((source is SteamArchiveViewModel && ((SteamArchiveViewModel)source).CopyInOut) ||
+                                  (destination is SteamArchiveViewModel && ((SteamArchiveViewModel)destination).CopyInOut));
+
+                var transfer = shouldCopy
+                                ? new GamePipeLib.Model.LocalCopy(source.Model, destination.Model, sourceInfo.SourceGame.Model)
+                                : new GamePipeLib.Model.LocalMove(source.Model, destination.Model, sourceInfo.SourceGame.Model);
+
                 transfer.QueueTransfer();
             }
         }

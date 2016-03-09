@@ -1,0 +1,3 @@
+[submodule "CachedImage"]
+	path = CachedImage
+	url = https://github.com/DjScribbles/CachedImage

@@ -18,7 +18,8 @@
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="Auto"/>
         </Grid.ColumnDefinitions>
-        <ci:Image Grid.Column="0" Grid.RowSpan="5" ImageUrl="{Binding ImageUrl}" Margin="4" Height="61" Width="162"/>
+        <ci:Image Grid.Column="0" Grid.RowSpan="5" ImageUrl="{Binding ImageUrl}" ImageFailed="Image_ImageFailed"/>
+
         <TextBlock Grid.Column="1" Text="{Binding GameName}" Margin="4" HorizontalAlignment="Left" TextTrimming="CharacterEllipsis" />
 
         <Button x:Name="GameMenuButton" Grid.Column="2" Grid.RowSpan="2" Background="{StaticResource Background}" BorderBrush="{StaticResource FeintBorder}" MinWidth="24" 

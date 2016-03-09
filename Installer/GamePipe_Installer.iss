@@ -3,7 +3,7 @@
 #include <idp.iss>
 
 #define MyAppName "Game Pipe"
-#define MyAppVersion "0.1.4"
+#define MyAppVersion "0.1.5"
 #define MyAppPublisher "Joe Shaw"
 #define MyAppExeName "GamePipe.exe"
 
@@ -24,6 +24,12 @@ SetupIconFile=..\GamePipe\Resources\GamePipe.ico
 Compression=lzma
 SolidCompression=yes
 
+[InstallDelete]      
+Type: files; Name: {app}\CachedImage.dll
+Type: files; Name: {app}\GamePipeLib.dll
+Type: files; Name: {app}\GamePipeService.dll
+Type: files; Name: {app}\log4net.dll
+
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
 
@@ -32,11 +38,7 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 
 [Files]
 Source: "..\GamePipe\bin\Release\GamePipe.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\GamePipe\bin\Release\CachedImage.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\GamePipe\bin\Release\GamePipe.exe.config"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\GamePipe\bin\Release\GamePipeLib.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\GamePipe\bin\Release\GamePipeService.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\GamePipe\bin\Release\log4net.dll"; DestDir: "{app}"; Flags: ignoreversion
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Dirs]
