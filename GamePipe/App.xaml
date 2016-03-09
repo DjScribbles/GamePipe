@@ -49,6 +49,12 @@
         <Style TargetType="BitmapImage">
             <Setter Property="CreateOptions" Value="IgnoreColorProfile"/>
         </Style>
+
+        <Style TargetType="ci:Image">
+            <Setter Property="CreateOptions" Value="IgnoreColorProfile"/>
+            <Setter Property="Height" Value="61"/>
+            <Setter Property="Width" Value="162"/>
+        </Style>
         <Style TargetType="RadioButton" x:Key="SimpleTextRadioButtonStyle">
             <Setter Property="Template" Value="{DynamicResource SimpleTextRadioButtonTemplate}"/>
             <Setter Property="Background" Value="{StaticResource Background}"/>

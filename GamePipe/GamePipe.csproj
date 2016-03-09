@@ -40,10 +40,6 @@
     <ApplicationIcon>Resources\GamePipe.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="CachedImage, Version=0.1.7.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\CachedImage.0.1.7.0\lib\net45\CachedImage.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="log4net, Version=1.2.15.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
       <HintPath>..\packages\log4net.2.0.5\lib\net45-full\log4net.dll</HintPath>
       <Private>True</Private>
@@ -159,6 +155,10 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\CachedImage\source\CachedImage.csproj">
+      <Project>{6743ee2a-981b-4cc1-bd29-1d7490bc71e4}</Project>
+      <Name>CachedImage</Name>
+    </ProjectReference>
     <ProjectReference Include="..\GamePipeLib\GamePipeLib.csproj">
       <Project>{ae9f3619-870b-4bbe-9d34-421537e21451}</Project>
       <Name>GamePipeLib</Name>
