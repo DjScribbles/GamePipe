@@ -52,7 +52,7 @@ Name: "{commondesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: 
 Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
              
 ;Awesome guide for .net 4.5 auto-downloading: http://blogs.msdn.com/b/davidrickard/archive/2015/07/17/installing-net-framework-4-5-automatically-with-inno-setup.aspx
-;The following is pretty much verbatim, but I updated the regVersion number
+;The following is pretty much verbatim, but I updated the regVersion number to 4.5.2, per this article: https://msdn.microsoft.com/en-us/library/hh925568%28v=vs.110%29.aspx#net_b
 [Code]
 function Framework45IsNotInstalled(): Boolean;
 var
@@ -62,7 +62,7 @@ begin
   Result := True;
 
   bSuccess := RegQueryDWordValue(HKLM, 'Software\Microsoft\NET Framework Setup\NDP\v4\Full', 'Release', regVersion);
-  if (True = bSuccess) and (regVersion >= 394254) then begin
+  if (True = bSuccess) and (regVersion >= 379893) then begin
     Result := False;
   end;
 end; 
