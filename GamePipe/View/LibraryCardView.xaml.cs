@@ -30,22 +30,14 @@ namespace GamePipe.View
             LibraryMenuButton.ContextMenu.IsOpen = true;
         }
 
-        private void LibraryCardView_MouseDoubleClick(object sender, MouseButtonEventArgs e)
-        {
-            var vm = (SteamLibraryViewModel)DataContext;
-            vm.OpenLibraryCommand.Execute(null);
-        }
-
         private void LibraryCardView_DragEnter(object sender, DragEventArgs e)
         {
             if (e.Data.GetDataPresent(FriendView.DRAG_DATA_NAME))
             {
                 e.Effects = DragDropEffects.Move;
-                //DirectCast(sender,ListView).AllowDrop=True
             }
             else
             {
-                //DirectCast(sender, ListView).AllowDrop = False
                 e.Effects = DragDropEffects.None;
             }
         }
@@ -59,11 +51,11 @@ namespace GamePipe.View
                 var sourceInfo = e.Data.GetData(FriendView.DRAG_DATA_NAME) as FriendView.FriendTransfer;
                 if (!object.ReferenceEquals(sourceInfo.SourceLibrary, destination))
                 {
-                    //var transferViewModel = new StreamCopyViewModel(sourceInfo.SourceLibrary.Client, destination, sourceInfo.SourceGame, this.Dispatcher);
-                    //RootSteamViewModel.Transfers.Add(transferViewModel);
-                    //transferViewModel.StartTransfer();
-                    var transfer = new GamePipeLib.Model.NetworkCopy(sourceInfo.SourceLibrary._provider, destination.Model, sourceInfo.SourceGame);
-                    transfer.QueueTransfer();
+                    foreach (var game in sourceInfo.SourceGames)
+                    {
+                        var transfer = new GamePipeLib.Model.NetworkCopy(sourceInfo.SourceLibrary._provider, destination.Model, game);
+                        transfer.QueueTransfer();
+                    }
                 }
             }
         }

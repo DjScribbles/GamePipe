@@ -26,21 +26,32 @@ namespace GamePipe
             NetworkTab.PreviewKeyDown += NetworkTab_PreviewKeyDown;
             LocalLibsTab.PreviewKeyDown += LocalLibsTab_PreviewKeyDown;
             GamePipeLib.Model.Steam.SteamBase.UiDispatcher = this.Dispatcher;
+            var version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
+            Title = $"Game Pipe {version}";
         }
+
+        private Key[] _ignoredKeys =
+            { Key.LeftShift, Key.RightShift,
+            Key.RightAlt, Key.LeftAlt,
+            Key.LeftCtrl, Key.RightCtrl,
+            Key.LWin, Key.RWin };
 
         private void LocalLibsTab_PreviewKeyDown(object sender, KeyEventArgs e)
         {
-            LocalSearchTextBox.Focus();
             e.Handled = false;
+            if (_ignoredKeys.Contains(e.Key)) return;
+
+            LocalSearchTextBox.Focus();
         }
 
         private void NetworkTab_PreviewKeyDown(object sender, KeyEventArgs e)
         {
+            e.Handled = false;
+            if (_ignoredKeys.Contains(e.Key)) return;
             if (!IP_TextBox.IsFocused && !Port_TextBox.IsFocused)
             {
                 NetworkSearchTextBox.Focus();
             }
-            e.Handled = false;
         }
 
         private static readonly ViewModel.RootSteamViewModel _rootSteamVm = new ViewModel.RootSteamViewModel();

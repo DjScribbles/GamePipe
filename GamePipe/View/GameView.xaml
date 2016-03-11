@@ -23,7 +23,8 @@
         <TextBlock Grid.Column="1" Text="{Binding GameName}" Margin="4" HorizontalAlignment="Left" TextTrimming="CharacterEllipsis" />
 
         <Button x:Name="GameMenuButton" Grid.Column="2" Grid.RowSpan="2" Background="{StaticResource Background}" BorderBrush="{StaticResource FeintBorder}" MinWidth="24" 
-                        ContextMenuService.Placement="Left"    >
+                        ContextMenuService.Placement="Left" Tag="{Binding RelativeSource={RelativeSource AncestorType=ListView, Mode=FindAncestor}}">
+            <!--Store a reference to the list view in Tag, so it can be used in the context menu-->
             <Path StrokeThickness="4" Stroke="{StaticResource TextColor}"  StrokeStartLineCap="Round" StrokeEndLineCap="Round"
                       Data="M 2,4 l 0,0 m 0,6 l 0,0 m 0,6 l 0,0"/>
             <Button.ContextMenu>
@@ -36,7 +37,17 @@
                     <Separator Background="{StaticResource NormalBorder}" BorderBrush="{StaticResource NormalBorder}" Margin="-30,8,0,8"/>
                     <!--<Separator Background="{StaticResource NormalBorder}" BorderBrush="{StaticResource NormalBorder}" Margin="-30,4,0,4"/>-->
                     <MenuItem Command="{Binding DeleteGameCommand}" Header="Delete Game"/>
+                    <MenuItem x:Name="DeleteSelectedCommand" DataContext="{Binding PlacementTarget.Tag, RelativeSource={RelativeSource AncestorType=ContextMenu,Mode=FindAncestor}}" 
+                              Command="{Binding DataContext.DeleteSelectedGamesCommand}" CommandParameter="{Binding SelectedItems}"
+                              Visibility="{Binding RelativeSource={RelativeSource Self},Path=IsEnabled,Converter={StaticResource BooleanToVisibilityConverter}}">
+                        <MenuItem.Header>
+                            <Run Text="{Binding Path=SelectedItems.Count, StringFormat=Delete {0} Selected Games, Mode=OneWay}"/>
+                        </MenuItem.Header>
+                    </MenuItem>
                 </ContextMenu>
+                <!--Header="{Binding Path=SelectedItems.Count, StringFormat=Delete {0} Selected Games}"
+                Visibility="{Binding RelativeSource={RelativeSource Self},Path=IsEnabled,Converter={StaticResource BooleanToVisibilityConverter}}"
+                Header="Delete Selected Games"-->
             </Button.ContextMenu>
             <!--<Button.Style>
                 <Style TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Type Button}}">

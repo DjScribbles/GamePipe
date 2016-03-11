@@ -169,7 +169,7 @@ namespace GamePipeLib.Model.Steam
                         var installDir = pair.Item2.Replace("\\\\", "\\").Trim();//Convert "\\" to "\", double slashes for escape charcters
                         string[] splitString = { "\\" };
                         InstallDir = installDir.Split(splitString, StringSplitOptions.RemoveEmptyEntries).Last();
-                        GameDir = Path.Combine(commonFolder, installDir);
+                        GameDir = Path.Combine(commonFolder, InstallDir);
                         count++;
                         break;
 

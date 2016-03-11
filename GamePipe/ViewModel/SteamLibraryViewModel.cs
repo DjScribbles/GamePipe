@@ -50,19 +50,26 @@ namespace GamePipe.ViewModel
             }
         }
 
-        public double DriveLetter { get; private set; }
         public double DrivePercentFull { get; private set; }
         public string DriveAvailableSpace { get; private set; }
         public string DriveTotalSpace { get; private set; }
         public bool IsArchive { get { return Model is SteamArchive; } }
 
+
         public string SteamDirectoryShortened
         {
             get
             {
+                var shortPath = SteamDirectory;
                 if (Drive != null)
-                    return SteamDirectory.Replace(Drive.RootDirectory.ToString(), "").Replace("SteamApps", "");
-                return SteamDirectory.Replace("SteamApps", "");
+                {
+                    shortPath = shortPath.Substring(Drive.RootDirectory.ToString().Length);
+                }
+                if (shortPath.EndsWith("SteamApps", StringComparison.OrdinalIgnoreCase))
+                {
+                    shortPath = shortPath.Substring(0, shortPath.Length - "SteamApps".Length);
+                }
+                return shortPath;
             }
         }
 
@@ -154,6 +161,60 @@ namespace GamePipe.ViewModel
 
 
         #endregion //OpenLibraryCommand
+        #region "DeleteSelectedGamesCommand"
+        private RelayCommand _DeleteSelectedGamesCommand = null;
+        public RelayCommand DeleteSelectedGamesCommand
+        {
+            get
+            {
+                if (_DeleteSelectedGamesCommand == null)
+                    _DeleteSelectedGamesCommand = new RelayCommand(DeleteSelectedGames, CanDeleteSelectedGames);
+                return _DeleteSelectedGamesCommand;
+            }
+        }
+
+        public void DeleteSelectedGames(object param)
+        {
+            if (!CanDeleteSelectedGames(param)) return;
+            var list = param as System.Collections.IList;
+            if (list != null)
+            {
+                //var items = list.OfType<System.Windows.Controls.ListViewItem>().Select(x => x.DataContext as GameViewModel).Where(x => x != null).ToArray();
+                var items = list.OfType<GameViewModel>();
+                var sb = new System.Text.StringBuilder();
+                var count = items.Count();
+                sb.AppendLine($"Are you sure you want to delete the following {count} games:");
+                int i = 0;
+                foreach (var game in items)
+                {
+                    if (i < 10 || count < 15)
+                        sb.AppendLine(game.GameName);
+                    else if (i == 10)
+                        sb.AppendLine($"and {count - 9} more...");
+                    i++;
+                }
+                var result = System.Windows.MessageBox.Show(sb.ToString(), $"Delete {count} Games?", System.Windows.MessageBoxButton.YesNo, System.Windows.MessageBoxImage.Exclamation, System.Windows.MessageBoxResult.No);
+                if (result == System.Windows.MessageBoxResult.Yes)
+                {
+                    foreach (var game in items)
+                    {
+                        game.Model.DeleteGameData();
+                    }
+                }
+            }
+        }
+
+        public bool CanDeleteSelectedGames(object param)
+        {
+            var list = param as System.Collections.IList;
+            if (list != null)
+            {
+                var items = list.OfType<GameViewModel>();
+                return items.Count() > 1;
+            }
+            return false;
+        }
+        #endregion //DeleteSelectedGamesCommand
         #region "RemoveCommand"
         private RelayCommand _RemoveCommand = null;
         public RelayCommand RemoveCommand

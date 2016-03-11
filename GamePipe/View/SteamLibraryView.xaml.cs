@@ -4,7 +4,9 @@
 */
 using System;
 using System.Windows;
+using System.Linq;
 using System.Windows.Controls;
+using System.Collections.Generic;
 using System.Windows.Input;
 using GamePipe.ViewModel;
 
@@ -19,36 +21,62 @@ namespace GamePipe.View
         {
             InitializeComponent();
             DisplayList.PreviewMouseLeftButtonDown += DisplayList_PreviewMouseLeftButtonDown;
+            DisplayList.PreviewMouseLeftButtonUp += DisplayList_PreviewMouseLeftButtonUp;
             DisplayList.PreviewMouseMove += DisplayList_PreviewMouseMove;
-
+            DisplayList.SelectionChanged += DisplayList_SelectionChanged;
             this.DragEnter += DisplayList_DragEnter;
             this.Drop += DisplayList_Drop;
         }
-        private class Transfer
-        {
-            public readonly SteamLibraryViewModel SourceLibrary;
-            public readonly GameViewModel SourceGame;
-            public Transfer(SteamLibraryViewModel list, GameViewModel item)
-            {
-                SourceLibrary = list;
-                SourceGame = item;
-            }
-        }
+
 
         public const string DRAG_DATA_NAME = "LocalGame";
         private Point _startPoint;
-        private object _mousePressOrigSource;
+        private List<object> _selItems = new List<object>();
+        private GameViewModel _clickedGame = null;
         private void DisplayList_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             _startPoint = e.GetPosition(null);
-            _mousePressOrigSource = e.OriginalSource;
+            _clickedGame = FindAncestor<ListBoxItem>((DependencyObject)e.OriginalSource)?.DataContext as GameViewModel;
+            if (_selItems.Any() && ((Keyboard.Modifiers & (ModifierKeys.Control | ModifierKeys.Shift)) == 0))
+            {
+                if (!_selItems.Contains(_clickedGame))
+                    _selItems.Clear();
+            }
         }
 
+        private void DisplayList_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            _clickedGame = null;
+            _selItems.Clear();
+            _selItems.AddRange(DisplayList.SelectedItems.Cast<object>());
+        }
 
+        private void DisplayList_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+
+            if (_clickedGame != null)
+            {
+                if (e.AddedItems.Count > 0)
+                {
+                    var removals = new List<object>();
+                    foreach (var item in e.AddedItems)
+                    {
+                        if (item != _clickedGame)
+                        {
+                            removals.Add(item);
+                        }
+                    }
+                    foreach (var item in removals)
+                        DisplayList.SelectedItems.Remove(item);
+                }
+                if (e.RemovedItems.Contains(_clickedGame))
+                    DisplayList.SelectedItems.Add(_clickedGame); 
+            }
+        }
         private void DisplayList_PreviewMouseMove(object sender, MouseEventArgs e)
         {
             //if the left mouse button is not pressed, then we can't be dragging anything
-            if (e.LeftButton != MouseButtonState.Pressed || !(sender is ListBox) || !(_mousePressOrigSource is DependencyObject))
+            if (e.LeftButton != MouseButtonState.Pressed || !(sender is ListBox))
             {
                 return;
             }
@@ -59,22 +87,21 @@ namespace GamePipe.View
             //If we travel far enough, begin the drag
             if (Math.Abs(diff.X) > SystemParameters.MinimumHorizontalDragDistance || Math.Abs(diff.Y) > SystemParameters.MinimumVerticalDragDistance)
             {
+                _clickedGame = null;
+                foreach (object selItem in _selItems)
+                {
+                    if (!DisplayList.SelectedItems.Contains(selItem))
+                        DisplayList.SelectedItems.Add(selItem);
+                }
                 //The sender is always the list box
                 var listBox = (ListBox)sender;
+                var items = listBox.SelectedItems.OfType<GameViewModel>().ToArray();
 
-                //Find a ListBoxItem ancestor of the mouse press original source (the top hit-detection item, not the item that handled the event)
-                var listBoxItem = FindAncestor<ListBoxItem>((DependencyObject)_mousePressOrigSource);
-                if (listBoxItem != null && listBoxItem.DataContext is GameViewModel)
-                {
-                    var item = listBoxItem.DataContext;
-                    Transfer transferData = new Transfer((SteamLibraryViewModel)listBox.DataContext, (GameViewModel)listBoxItem.DataContext);
-                    DataObject dragData = new DataObject(DRAG_DATA_NAME, transferData);
+                Transfer transferData = new Transfer((SteamLibraryViewModel)listBox.DataContext, items);
+                DataObject dragData = new DataObject(DRAG_DATA_NAME, transferData);
 
-                    DragDrop.DoDragDrop(this, dragData, DragDropEffects.Move);
-
-                }
+                DragDrop.DoDragDrop(this, dragData, DragDropEffects.Move);
             }
-
         }
 
 
@@ -100,11 +127,14 @@ namespace GamePipe.View
                 var shouldCopy = ((source is SteamArchiveViewModel && ((SteamArchiveViewModel)source).CopyInOut) ||
                                   (destination is SteamArchiveViewModel && ((SteamArchiveViewModel)destination).CopyInOut));
 
-                var transfer = shouldCopy
-                                ? new GamePipeLib.Model.LocalCopy(source.Model, destination.Model, sourceInfo.SourceGame.Model)
-                                : new GamePipeLib.Model.LocalMove(source.Model, destination.Model, sourceInfo.SourceGame.Model);
+                foreach (var game in sourceInfo.SourceGames)
+                {
+                    var transfer = shouldCopy
+                                    ? new GamePipeLib.Model.LocalCopy(source.Model, destination.Model, game.Model)
+                                    : new GamePipeLib.Model.LocalMove(source.Model, destination.Model, game.Model);
+                    transfer.QueueTransfer();
+                }
 
-                transfer.QueueTransfer();
             }
         }
 
@@ -123,6 +153,17 @@ namespace GamePipe.View
                 } while (current != null);
             }
             return null;
+        }
+
+        private class Transfer
+        {
+            public readonly SteamLibraryViewModel SourceLibrary;
+            public readonly GameViewModel[] SourceGames;
+            public Transfer(SteamLibraryViewModel list, GameViewModel[] items)
+            {
+                SourceLibrary = list;
+                SourceGames = items;
+            }
         }
     }
 }

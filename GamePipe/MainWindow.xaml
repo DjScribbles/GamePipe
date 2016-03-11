@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vw="clr-namespace:GamePipe.View"
         xmlns:vm="clr-namespace:GamePipe.ViewModel" Background="{StaticResource WindowBackground}"
-        Title="Game Pipe" Width="1280" Height="720">
+        Width="1280" Height="720">
     <Window.Resources>
         <!--<vm:RootSteamViewModel x:Key="SteamVM"/>-->
 
