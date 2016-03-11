@@ -70,7 +70,7 @@
                             <ColumnDefinition Width="Auto"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
-                        <Label  Content="Search:"/>
+                        <Label  Content="Game Search:"/>
                         <TextBox x:Name="NetworkSearchTextBox" Grid.Column="1" Text="{Binding LanListFilter, UpdateSourceTrigger=PropertyChanged}"/>
                     </Grid>
                     <Grid DockPanel.Dock="Top" HorizontalAlignment="Stretch">
@@ -103,40 +103,42 @@
                         <TextBox Grid.Column="1" x:Name="IP_TextBox" Text="{Binding NewFriendIp, UpdateSourceTrigger=PropertyChanged}" MinWidth="80" ToolTip="The IP address of another computer Hosting with GamePipe"/>
                         <Label Grid.Column="2" Content="Port:" ToolTip="The port should be 41650, it can't be changed right now."/>
                         <TextBox Grid.Column="3" x:Name="Port_TextBox" Text="{Binding NewFriendPort, UpdateSourceTrigger=PropertyChanged}" MinWidth="40" ToolTip="The port should be 41650, it can't be changed right now." IsReadOnly="True"/>
-                        <Button Grid.Column="4" Command="{Binding AddFriendCommand}" Content="Add Friend" ToolTip="Connect to a hosting game pipe session at the specified IP and port. This connection will be remembered."/>
+                        <Button Grid.Column="4" Command="{Binding AddFriendCommand}" Content="Connect to Host" ToolTip="Connect to another computer that is hosting a Game Pipe session at the specified IP and port. This connection will be remembered."/>
                         <Button Grid.Column="5" Command="{Binding OpenHostCommand}"  Content="Start Hosting" Visibility="{Binding IsEnabled, RelativeSource={RelativeSource Self}, Converter={StaticResource BooleanToVisibilityConverter}}"
-                                ToolTip="Host a GamePipe service so other computers can connect to you and copy games from you. This is not neccessarily secure yet, should be fine for use, but don't leave it open 24/7."/>
+                                ToolTip="Host a GamePipe service so other computers can connect to you and copy games from you. This is not neccessarily secure yet, should be fine for use, but don't leave it open 24/7." Margin="32,4,4,4"/>
                         <Button Grid.Column="6" Command="{Binding CloseHostCommand}"  Content="Stop Hosting" Visibility="{Binding IsEnabled, RelativeSource={RelativeSource Self}, Converter={StaticResource BooleanToVisibilityConverter}}"
-                                ToolTip="Host a GamePipe service so other computers can connect to you and copy games from you. This is not neccessarily secure yet, should be fine for use, but don't leave it open 24/7."/>
+                                ToolTip="Closes the network service. Anyone transferring games from you will be interrupted." Margin="32,4,4,4"/>
                     </Grid>
-
-                    <ItemsControl ItemsSource="{Binding Libraries}" DockPanel.Dock="Left">
-                        <ItemsControl.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <StackPanel Orientation="Vertical"/>
-                            </ItemsPanelTemplate>
-                        </ItemsControl.ItemsPanel>
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <Border BorderBrush="{StaticResource NormalBorder}" BorderThickness="1">
-                                    <vw:LibraryCardView DataContext="{Binding}"/>
-                                </Border>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-
-                    <ItemsControl ItemsSource="{Binding Friends}" >
-                        <ItemsControl.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <StackPanel Orientation="Horizontal"/>
-                            </ItemsPanelTemplate>
-                        </ItemsControl.ItemsPanel>
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <vw:FriendView DataContext="{Binding}"/>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
+                    <ScrollViewer DockPanel.Dock="Left" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"> 
+                        <ItemsControl ItemsSource="{Binding Libraries}" DockPanel.Dock="Left" >
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <StackPanel Orientation="Vertical"/>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border BorderBrush="{StaticResource NormalBorder}" BorderThickness="1">
+                                        <vw:LibraryCardView DataContext="{Binding}"/>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+                    <!--<ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">-->
+                        <ItemsControl ItemsSource="{Binding Friends}" >
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <StackPanel Orientation="Horizontal"/>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <vw:FriendView DataContext="{Binding}"/>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    <!--</ScrollViewer>-->
                 </DockPanel>
             </TabItem>
             <TabItem Header="Hack Test" Template="{DynamicResource TabItemControlTemplate1}" Visibility="Collapsed">
