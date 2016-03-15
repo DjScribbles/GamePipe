@@ -327,8 +327,7 @@ namespace GamePipeLib.Model.Steam
 
             SteamDirParsingUtils.GetAndReplaceDirectoryNameFromAcf(ref contents);   //This will strip any absolute pathing on the install dir, absolute paths cause issues when moving things around, and are uneccessary.
 
-            TransferManager.Instance.AcfFileWatchList.Remove(acfPath.ToLower());
-
+            WingmanServer.SendSignal_RemoveAcfFileFromHitList(acfPath);
             File.WriteAllText(acfPath, contents);
         }
 

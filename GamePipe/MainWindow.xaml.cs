@@ -77,64 +77,26 @@ namespace GamePipe
                 }
             }
 
-            //if ((e.Cancel == false) && (GamePipeLib.Model.Steam.SteamRoot.Instance.SteamRestartRequired))
-            //{
-            //    var result = System.Windows.MessageBox.Show("You moved some steam games, they won't be playable unless you restart Steam.\n\nRestart steam now?", "Steam needs to restart", System.Windows.MessageBoxButton.YesNoCancel, System.Windows.MessageBoxImage.Exclamation, System.Windows.MessageBoxResult.Yes);
-            //    switch (result)
-            //    {
-            //        case MessageBoxResult.Yes:
-            //            GamePipeLib.Utils.SteamDirParsingUtils.CloseSteam();
-            //            try
-            //            {
-            //                System.Diagnostics.Process.Start(@"DelayedStartSteam.bat"); //TODO replace this with something invisible.
-            //            }
-            //            catch (Exception) { }
-            //            break;
-            //        case MessageBoxResult.No:
-            //            System.Windows.MessageBox.Show("Make sure you restart Steam soon.\nUntil then, any moved games won't be playable and if they are updated they may redownload to the old location.", "Steam needs to close", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Exclamation, System.Windows.MessageBoxResult.OK);
-            //            break;
-            //        default:
-            //        case MessageBoxResult.Cancel:
-            //            e.Cancel = true;
-            //            break;
-            //    }
-            //}
             if ((e.Cancel == false) && (GamePipeLib.Model.Steam.SteamRoot.Instance.SteamRestartRequired))
             {
-                var steamRestarted = false;
-                if (GamePipeLib.Utils.SteamDirParsingUtils.IsSteamOpen())
+                var result = System.Windows.MessageBox.Show("You moved some steam games, they won't be playable unless you restart Steam.\n\nRestart Steam now?", "Restart Steam?", System.Windows.MessageBoxButton.YesNo, System.Windows.MessageBoxImage.Exclamation, System.Windows.MessageBoxResult.No);
+                if (result == MessageBoxResult.Yes)
                 {
-
-                    var result = System.Windows.MessageBox.Show("You moved some steam games, you must restart Steam.\n\nRestart steam now?", "Steam needs to restart", System.Windows.MessageBoxButton.YesNo, System.Windows.MessageBoxImage.Exclamation, System.Windows.MessageBoxResult.Yes);
-                    if (result != MessageBoxResult.Yes)
-                    {
-                        e.Cancel = true;
-                        return;
-                    }
-                    steamRestarted = true;
+                    GamePipeLib.Utils.WingmanServer.SendSignal_RestartSteamWhenDone(true);
                     GamePipeLib.Utils.SteamDirParsingUtils.CloseSteam();
                     GamePipeLib.Utils.Logging.Logger.Info("Closing Steam to update app data...");
-                    while (GamePipeLib.Utils.SteamDirParsingUtils.IsSteamOpen())
-                        System.Threading.Thread.Sleep(500);
                 }
-
-                //Need to do this because steam is a jackass and writes these files without looking...
-                foreach (string watchedAcf in manager.AcfFileWatchList)
+                else
                 {
-                    if (System.IO.File.Exists(watchedAcf) && watchedAcf.EndsWith(".acf"))
-                    {
-                        System.IO.File.Delete(watchedAcf);
-                        GamePipeLib.Utils.Logging.Logger.InfoFormat("Re-Deleted {0} which was restored during Steam shutdown...", watchedAcf);
-                    }
+                    GamePipeLib.Utils.WingmanServer.SendSignal_RestartSteamWhenDone(false);
+                    GamePipeLib.Utils.Logging.Logger.Info("Skipped Steam restart.");
                 }
-
-                if (steamRestarted)
-                    Process.Start(@"steam://open/games");
-
             }
-
+        
             if (e.Cancel == false)
+            {
                 manager.RequestShutdown();
+            }
         }
 
 
@@ -173,7 +135,6 @@ namespace GamePipe
             }
             TestOutput.Text = sb.ToString();
         }
-
     }
 }
 

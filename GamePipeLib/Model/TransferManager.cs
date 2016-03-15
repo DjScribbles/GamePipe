@@ -65,9 +65,6 @@ namespace GamePipeLib.Model
             set { _IsPaused = value; }
         }
 
-        private List<string> _AcfFileWatchList = new List<string>();
-        public List<string> AcfFileWatchList { get { return _AcfFileWatchList; } }
-
         public void AddTransfer(TransferBase transfer)
         {
             lock (_transferLock)

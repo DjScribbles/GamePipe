@@ -1,0 +1,95 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:wsap="http://schemas.xmlsoap.org/ws/2004/08/addressing/policy" xmlns:wsa10="http://www.w3.org/2005/08/addressing" xmlns:tns="http://tempuri.org/" xmlns:msc="http://schemas.microsoft.com/ws/2005/12/wsdl/contract" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy" xmlns:wsam="http://www.w3.org/2007/05/addressing/metadata" xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="WingmanService" targetNamespace="http://tempuri.org/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+    <xsd:schema targetNamespace="http://tempuri.org/Imports">
+      <xsd:import namespace="http://tempuri.org/" />
+      <xsd:import namespace="http://schemas.microsoft.com/2003/10/Serialization/" />
+    </xsd:schema>
+  </wsdl:types>
+  <wsdl:message name="IWingmanService_AddAcfFileToHitList_InputMessage">
+    <wsdl:part name="parameters" element="tns:AddAcfFileToHitList" />
+  </wsdl:message>
+  <wsdl:message name="IWingmanService_AddAcfFileToHitList_OutputMessage">
+    <wsdl:part name="parameters" element="tns:AddAcfFileToHitListResponse" />
+  </wsdl:message>
+  <wsdl:message name="IWingmanService_RemoveAcfFileFromHitList_InputMessage">
+    <wsdl:part name="parameters" element="tns:RemoveAcfFileFromHitList" />
+  </wsdl:message>
+  <wsdl:message name="IWingmanService_RemoveAcfFileFromHitList_OutputMessage">
+    <wsdl:part name="parameters" element="tns:RemoveAcfFileFromHitListResponse" />
+  </wsdl:message>
+  <wsdl:message name="IWingmanService_SetRestartSteamOnExit_InputMessage">
+    <wsdl:part name="parameters" element="tns:SetRestartSteamOnExit" />
+  </wsdl:message>
+  <wsdl:message name="IWingmanService_SetRestartSteamOnExit_OutputMessage">
+    <wsdl:part name="parameters" element="tns:SetRestartSteamOnExitResponse" />
+  </wsdl:message>
+  <wsdl:message name="IWingmanService_HitListHasItems_InputMessage">
+    <wsdl:part name="parameters" element="tns:HitListHasItems" />
+  </wsdl:message>
+  <wsdl:message name="IWingmanService_HitListHasItems_OutputMessage">
+    <wsdl:part name="parameters" element="tns:HitListHasItemsResponse" />
+  </wsdl:message>
+  <wsdl:portType name="IWingmanService">
+    <wsdl:operation name="AddAcfFileToHitList">
+      <wsdl:input wsaw:Action="http://tempuri.org/IWingmanService/AddAcfFileToHitList" message="tns:IWingmanService_AddAcfFileToHitList_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IWingmanService/AddAcfFileToHitListResponse" message="tns:IWingmanService_AddAcfFileToHitList_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="RemoveAcfFileFromHitList">
+      <wsdl:input wsaw:Action="http://tempuri.org/IWingmanService/RemoveAcfFileFromHitList" message="tns:IWingmanService_RemoveAcfFileFromHitList_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IWingmanService/RemoveAcfFileFromHitListResponse" message="tns:IWingmanService_RemoveAcfFileFromHitList_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="SetRestartSteamOnExit">
+      <wsdl:input wsaw:Action="http://tempuri.org/IWingmanService/SetRestartSteamOnExit" message="tns:IWingmanService_SetRestartSteamOnExit_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IWingmanService/SetRestartSteamOnExitResponse" message="tns:IWingmanService_SetRestartSteamOnExit_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="HitListHasItems">
+      <wsdl:input wsaw:Action="http://tempuri.org/IWingmanService/HitListHasItems" message="tns:IWingmanService_HitListHasItems_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IWingmanService/HitListHasItemsResponse" message="tns:IWingmanService_HitListHasItems_OutputMessage" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="BasicHttpBinding_IWingmanService" type="tns:IWingmanService">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="AddAcfFileToHitList">
+      <soap:operation soapAction="http://tempuri.org/IWingmanService/AddAcfFileToHitList" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="RemoveAcfFileFromHitList">
+      <soap:operation soapAction="http://tempuri.org/IWingmanService/RemoveAcfFileFromHitList" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="SetRestartSteamOnExit">
+      <soap:operation soapAction="http://tempuri.org/IWingmanService/SetRestartSteamOnExit" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="HitListHasItems">
+      <soap:operation soapAction="http://tempuri.org/IWingmanService/HitListHasItems" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="WingmanService">
+    <wsdl:port name="BasicHttpBinding_IWingmanService" binding="tns:BasicHttpBinding_IWingmanService">
+      <soap:address location="http://localhost:8733/Design_Time_Addresses/WingmanLib/Service1/" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

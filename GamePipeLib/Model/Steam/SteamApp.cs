@@ -214,7 +214,7 @@ namespace GamePipeLib.Model.Steam
         {
 
             File.Delete(AcfFile);
-            TransferManager.Instance.AcfFileWatchList.Add(AcfFile.ToLower());
+            Utils.WingmanServer.SendSignal_AddAcfFileToHitList(AcfFile);
 
             try
             {

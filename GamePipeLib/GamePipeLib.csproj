@@ -43,6 +43,7 @@
     <Reference Include="System.ServiceModel" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Xml" />
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
@@ -70,11 +71,17 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
+    <Compile Include="Service References\WingmanService\Reference.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </Compile>
     <Compile Include="Utils\CrcStream.cs" />
     <Compile Include="Utils\FileUtils.cs" />
     <Compile Include="Utils\Logging.cs" />
     <Compile Include="Utils\SteamDirParsingUtils.cs" />
     <Compile Include="Utils\SteamWebUtils.cs" />
+    <Compile Include="Utils\WingmanServer.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config">
@@ -84,6 +91,31 @@
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="Service References\WingmanService\service.wsdl" />
+    <None Include="Service References\WingmanService\service.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\WingmanService\service1.xsd">
+      <SubType>Designer</SubType>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadataStorage Include="Service References\WingmanService\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Service References\WingmanService\configuration91.svcinfo" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Service References\WingmanService\configuration.svcinfo" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Service References\WingmanService\Reference.svcmap">
+      <Generator>WCF Proxy Generator</Generator>
+      <LastGenOutput>Reference.cs</LastGenOutput>
     </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
