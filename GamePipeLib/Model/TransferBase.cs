@@ -20,11 +20,26 @@ namespace GamePipeLib.Model
         private bool _preProcessComplete = false;
         private bool _postProcessComplete = false;
         private long _actualDiskSize;
+        private long _validatedBytesTransferred = 0;
+        private long _lastReportedBytesTransferred = 0;
+
+
         private Queue<string> _workQueue;
         private BackupDisposalProcedure _desiredBackupBehavior = BackupDisposalProcedure.BackupThenOpen;
         private DateTime _startTime = DateTime.MinValue;
         private TimeSpan _timeSoFar = TimeSpan.Zero;
         private long _fileCount = 0;
+        private Stream _pausedSourceStream;
+        private Stream _pausedTargetStream;
+        private string _pausedFile;
+        private long _pausedBytesRead;
+        /// <summary>
+        /// This only tracks if the transfer is paused mid-file, all other state control is handled by the TransferManager.
+        /// </summary>
+        private bool _isPausedMidStream = false;
+        private List<string> _retriedList = new List<string>();
+        private int _lastRetriedListLength = 0;
+
         protected TransferBase(IAppProvider source, ITransferTarget target, ISteamApplication app)
         {
             _source = source;
@@ -32,6 +47,15 @@ namespace GamePipeLib.Model
             _Application = app;
             _Status = TransferStatus.Queued;
         }
+        public long ActualDiskSize { get { return _actualDiskSize; } }
+        public long BytesTransfered { get { return _lastReportedBytesTransferred; } }
+        public bool CanCopy { get { return _source.CanCopy(Application.AppId); } }
+
+        protected abstract void DoPostProcess();
+        protected abstract void DoAbortProcess();
+        protected abstract void DoPreProcess();
+        protected abstract bool ValidateFile(string file, Stream source, Stream target);
+        public abstract bool CanPauseMidStream();
 
         public void QueueTransfer()
         {
@@ -85,7 +109,6 @@ namespace GamePipeLib.Model
             }
         }
 
-        public bool CanCopy { get { return _source.CanCopy(Application.AppId);} }
         #region "IGameTransfer Implementation"
         private readonly ISteamApplication _Application;
         public ISteamApplication Application { get { return _Application; } }
@@ -209,13 +232,7 @@ namespace GamePipeLib.Model
             Status = TransferStatus.Aborting;
             RunPostProcessing();
         }
-        protected abstract void DoPostProcess();
-        protected abstract void DoAbortProcess();
-        protected abstract void DoPreProcess();
-        protected abstract bool ValidateFile(string file, Stream source, Stream target);
 
-        private long _validatedBytesTransferred = 0;
-        private long _lastReportedBytesTransferred = 0;
         private void ValidateAndCloseFile(string file, Stream source, Stream target)
         {
             bool result = false;
@@ -241,17 +258,6 @@ namespace GamePipeLib.Model
             }
         }
 
-        public abstract bool CanPauseMidStream();
-
-
-        private Stream _pausedSourceStream;
-        private Stream _pausedTargetStream;
-        private string _pausedFile;
-        private long _pausedBytesRead;
-        /// <summary>
-        /// This only tracks if the transfer is paused mid-file, all other state control is handled by the TransferManager.
-        /// </summary>
-        private bool _isPausedMidStream = false;
 
         public void PauseStreaming(string file, Stream source, Stream target, long totalRead)
         {
@@ -271,9 +277,6 @@ namespace GamePipeLib.Model
                 _startTime = DateTime.MinValue;
             }
         }
-
-        private List<string> _retriedList = new List<string>();
-        private int _lastRetriedListLength = 0;
 
         public void GetNextFile(out string file, out Stream source, out Stream target, out Action<string, Stream, Stream> finishMethod, out Action<long> updateMethod, out long totalBytesRead)
         {

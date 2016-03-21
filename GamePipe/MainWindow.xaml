@@ -8,6 +8,10 @@
         <!--<vm:RootSteamViewModel x:Key="SteamVM"/>-->
 
     </Window.Resources>
+    <Window.TaskbarItemInfo>
+        <TaskbarItemInfo ProgressState="{Binding TransferVM.State, ElementName=GamePipe_MainWindow}" 
+                         ProgressValue="{Binding TransferVM.OverallProgress, ElementName=GamePipe_MainWindow}"/>
+    </Window.TaskbarItemInfo>
     <Grid DataContext="{Binding SteamVM, ElementName=GamePipe_MainWindow}">
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
@@ -109,7 +113,7 @@
                         <Button Grid.Column="6" Command="{Binding CloseHostCommand}"  Content="Stop Hosting" Visibility="{Binding IsEnabled, RelativeSource={RelativeSource Self}, Converter={StaticResource BooleanToVisibilityConverter}}"
                                 ToolTip="Closes the network service. Anyone transferring games from you will be interrupted." Margin="32,4,4,4"/>
                     </Grid>
-                    <ScrollViewer DockPanel.Dock="Left" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"> 
+                    <ScrollViewer DockPanel.Dock="Left" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
                         <ItemsControl ItemsSource="{Binding Libraries}" DockPanel.Dock="Left" >
                             <ItemsControl.ItemsPanel>
                                 <ItemsPanelTemplate>
@@ -126,22 +130,22 @@
                         </ItemsControl>
                     </ScrollViewer>
                     <!--<ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">-->
-                        <ItemsControl ItemsSource="{Binding Friends}" >
-                            <ItemsControl.ItemsPanel>
-                                <ItemsPanelTemplate>
-                                    <StackPanel Orientation="Horizontal"/>
-                                </ItemsPanelTemplate>
-                            </ItemsControl.ItemsPanel>
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <vw:FriendView DataContext="{Binding}"/>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
+                    <ItemsControl ItemsSource="{Binding Friends}" >
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <StackPanel Orientation="Horizontal"/>
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <vw:FriendView DataContext="{Binding}"/>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
                     <!--</ScrollViewer>-->
                 </DockPanel>
             </TabItem>
-            <TabItem Header="Hack Test" Template="{DynamicResource TabItemControlTemplate1}" Visibility="Collapsed">
+            <TabItem Header="Hack Test" Template="{DynamicResource TabItemControlTemplate1}" Visibility="Visible">
                 <DockPanel>
                     <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" HorizontalAlignment="Left">
                         <Button x:Name="CloseSteamButton"  Content="Close Steam" />

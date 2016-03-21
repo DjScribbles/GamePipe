@@ -4,11 +4,26 @@
 */
 
 using GamePipeLib.Model;
+using System;
+using System.Timers;
+using System.Windows.Shell;
 
 namespace GamePipe.ViewModel
 {
     public class TransferManagerViewModel : ViewModelBase
     {
+        private Timer _updateTimer = new Timer(500) { AutoReset = true };
+        public TransferManagerViewModel()
+        {
+            _updateTimer.Elapsed += _updateTimer_Elapsed;
+            _updateTimer.Enabled = true;
+        }
+
+        private void _updateTimer_Elapsed(object sender, ElapsedEventArgs e)
+        {
+            UpdateProgress();
+        }
+
         public TransferManager Manager { get { return TransferManager.Instance; } }
 
         #region "Commands"
@@ -56,5 +71,52 @@ namespace GamePipe.ViewModel
 
         #endregion //ResumeCommand
         #endregion //Commands
+
+        private double _OverallProgress;
+        public double OverallProgress
+        {
+            get { return _OverallProgress; }
+            private set
+            {
+                if (_OverallProgress != value)
+                {
+                    _OverallProgress = value;
+                    GamePipeLib.Model.Steam.SteamBase.UiDispatcher.BeginInvoke((Action)(() => NotifyPropertyChanged("OverallProgress")));
+                }
+            }
+        }
+        private TaskbarItemProgressState _State = TaskbarItemProgressState.None;
+        public TaskbarItemProgressState State
+        {
+            get { return _State; }
+            set
+            {
+                if (_State != value)
+                {
+                    _State = value;
+                    GamePipeLib.Model.Steam.SteamBase.UiDispatcher.BeginInvoke((Action)(() => NotifyPropertyChanged("State")));
+                }
+            }
+        }
+
+        private void UpdateProgress()
+        {
+            OverallProgress = Manager.GetOverallProgress();
+            if (Manager.Transfers.Count > 0)
+            {
+                if (Manager.IsPaused)
+                {
+                    State = TaskbarItemProgressState.Paused;
+                }
+                else
+                {
+                    State = TaskbarItemProgressState.Normal;
+                }
+            }
+            else
+            {
+                State = TaskbarItemProgressState.None;
+            }
+        }
     }
 }

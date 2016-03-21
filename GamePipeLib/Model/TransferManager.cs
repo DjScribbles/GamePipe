@@ -65,6 +65,9 @@ namespace GamePipeLib.Model
             set { _IsPaused = value; }
         }
 
+        private List<string> _AcfFileWatchList = new List<string>();
+        public List<string> AcfFileWatchList { get { return _AcfFileWatchList; } }
+
         public void AddTransfer(TransferBase transfer)
         {
             lock (_transferLock)
@@ -227,7 +230,7 @@ namespace GamePipeLib.Model
                                     abortStream = true;
                                 }
                                 //If the streams can be paused, and the manager is being paused or this transfer isn't first anymore, then pause the streams and return.
-                                else if (transfer.CanPauseMidStream() && (_IsPaused || (transfer != GetFirstTransfer(preferCurrentTransfer:!transfer.CanCopy))))    //If this transfer became locked, mark it preferred because we should probably close the streams before pausing
+                                else if (transfer.CanPauseMidStream() && (_IsPaused || (transfer != GetFirstTransfer(preferCurrentTransfer: !transfer.CanCopy))))    //If this transfer became locked, mark it preferred because we should probably close the streams before pausing
                                 {
                                     //Flag the stream for pausing
                                     pauseStream = true;
@@ -318,6 +321,44 @@ namespace GamePipeLib.Model
             {
                 return !Transfers.Contains(transfer);
             }
+        }
+
+        private long _totalTransferSize = 0;
+        public double GetOverallProgress()
+        {
+
+            long bytesToTransfer = 0;
+            long totalSize = 0;
+
+            lock (_transferLock)    //Acquire the transfer lock
+            {
+                if (Transfers.Any())
+                {
+
+                    try
+                    {
+                        totalSize = Transfers.Sum(x => x.ActualDiskSize);
+                    }
+                    catch (OverflowException)
+                    {
+                        totalSize = long.MaxValue;
+                    }
+                    bytesToTransfer = totalSize - Transfers.Sum(x => x.BytesTransfered);
+                    _totalTransferSize = Math.Max(_totalTransferSize, totalSize);
+                }
+                else if (_totalTransferSize == 0)
+                {
+                    return 0.0;
+                }
+                else
+                {
+                    _totalTransferSize = 1;
+                    return 1.0;
+                }
+            }
+
+            //Represent progress as remaining bytes to tranfer from the largest observed size of all transfers. This should better reflect % complete with a large queue, and prevent jumping as items are finished
+            return Convert.ToDouble(_totalTransferSize - bytesToTransfer) / Convert.ToDouble(_totalTransferSize);
         }
     }
 }
