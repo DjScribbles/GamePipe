@@ -7,6 +7,7 @@
         void MeasureDiskSize();
         void DeleteGameData();
         bool CanCopy();
+        bool CanCopyIfForced();
         void RefreshFromAcf();
     }
 }

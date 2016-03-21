@@ -251,9 +251,21 @@
                     </Button>
                 </Grid>
                 <ci:Image Grid.Column="1" Grid.RowSpan="5" ImageUrl="{Binding ImageUrl}" Height="61" Width="162"/>
-                <TextBlock Grid.Row="0" Grid.Column="2" Text="{Binding TransferType}" Style="{StaticResource Detail}" VerticalAlignment="Top" Margin="4,-4,4,-8"/>
-                <TextBlock Grid.Row="0" Grid.Column="3" Text="This game cannot be moved right now, it is currently locked by Steam" 
-                           Visibility="{Binding IsBlocked, Converter={StaticResource BooleanToVisibilityConverter}}" Style="{StaticResource Detail}" VerticalAlignment="Top" Margin="4,-4,4,-8"/>
+                <TextBlock Grid.Row="0" Grid.Column="2" Text="{Binding TransferType}" Style="{StaticResource Detail}" VerticalAlignment="Center" Margin="4,-4"/>
+                <StackPanel Grid.Row="0" Grid.Column="3" Orientation="Horizontal" Visibility="{Binding IsBlocked, Converter={StaticResource BooleanToVisibilityConverter}}" >
+                    <TextBlock Text="This game cannot be moved right now, it is currently locked by Steam." 
+                           Style="{StaticResource Detail}" VerticalAlignment="Center" Margin="4,-4"/>
+                    <TextBlock Text="Unable to Force. You must close Steam to proceed." 
+                           Style="{StaticResource Detail}" VerticalAlignment="Center" Margin="4,-4"  Visibility="{Binding IsForced, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                    <TextBlock Text="If this application is not running or being updated by Steam, you can..." 
+                           Style="{StaticResource Detail}" VerticalAlignment="Center" Margin="4,-4"  Visibility="{Binding IsNotForced, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                    <Button Command="{Binding ForceTransferCommand}" Visibility="{Binding IsNotForced, Converter={StaticResource BooleanToVisibilityConverter}}" Margin="4,0" >
+                        <Button.Content>
+                            <TextBlock Text="Try to Force This Transfer" 
+                                       Style="{StaticResource Detail}" VerticalAlignment="Center" Margin="4,-8" />
+                        </Button.Content>
+                    </Button>
+                </StackPanel>
                 <TextBlock Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="3" Text="{Binding GameName}" Style="{StaticResource Title}" Margin="4,-4,4,4" HorizontalAlignment="Left"/>
 
                 <Button Grid.Row="0"  Grid.Column="5" Grid.RowSpan="2"  Command="{Binding AbortCommand}">

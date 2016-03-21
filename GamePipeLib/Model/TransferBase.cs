@@ -49,8 +49,16 @@ namespace GamePipeLib.Model
         }
         public long ActualDiskSize { get { return _actualDiskSize; } }
         public long BytesTransfered { get { return _lastReportedBytesTransferred; } }
-        public bool CanCopy { get { return _source.CanCopy(Application.AppId); } }
-
+        public bool ForceTransfer { get; set; }
+        public bool CanCopy
+        {
+            get
+            {
+                return (ForceTransfer
+                        ? _source.CanCopyIfForced(Application.AppId)
+                        : _source.CanCopy(Application.AppId));
+            }
+        }
         protected abstract void DoPostProcess();
         protected abstract void DoAbortProcess();
         protected abstract void DoPreProcess();

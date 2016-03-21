@@ -22,6 +22,8 @@ namespace GamePipeLib.Interfaces
         IEnumerable<string> GetDirectoriesForApp(string appId);
         [OperationContract]
         bool CanCopy(string appId);
+        [OperationContract]
+        bool CanCopyIfForced(string appId);
 
 
         [OperationContract]
