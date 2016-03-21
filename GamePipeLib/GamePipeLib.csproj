@@ -51,6 +51,7 @@
     <Compile Include="Interfaces\IGameTransfer.cs" />
     <Compile Include="Interfaces\ILocalSteamApplication.cs" />
     <Compile Include="Interfaces\ITransferTarget.cs" />
+    <Compile Include="Model\GenericLibraryFolder.cs" />
     <Compile Include="Model\LocalCopy.cs" />
     <Compile Include="Model\LocalMove.cs" />
     <Compile Include="Model\NotifyPropertyChangedBase.cs" />
@@ -78,6 +79,7 @@
     </Compile>
     <Compile Include="Utils\CrcStream.cs" />
     <Compile Include="Utils\FileUtils.cs" />
+    <Compile Include="Utils\JunctionPoint.cs" />
     <Compile Include="Utils\Logging.cs" />
     <Compile Include="Utils\SteamDirParsingUtils.cs" />
     <Compile Include="Utils\SteamWebUtils.cs" />
