@@ -7,6 +7,7 @@ using System.IO.Pipes;
 using System.Diagnostics;
 using System.IO;
 using GamePipeLib.WingmanService;
+using GamePipeLib.Model;
 
 namespace GamePipeLib.Utils
 {
@@ -19,17 +20,39 @@ namespace GamePipeLib.Utils
 
         public static void SendSignal_AddAcfFileToHitList(string filePath)
         {
-            GetService().AddAcfFileToHitList(filePath);
+            try
+            {
+                GetService().AddAcfFileToHitList(filePath);
+            }
+            catch (Exception)
+            {
+                filePath = Path.GetFullPath(filePath).ToLower();
+                TransferManager.Instance.AcfFileWatchList.Add(filePath);
+            }
         }
 
         public static void SendSignal_RestartSteamWhenDone(bool restartRequested)
         {
-            GetService().SetRestartSteamOnExit(restartRequested);
+            try
+            {
+                GetService().SetRestartSteamOnExit(restartRequested);
+            }
+            catch (Exception) { }
         }
 
         public static void SendSignal_RemoveAcfFileFromHitList(string filePath)
         {
-            GetService().RemoveAcfFileFromHitList(filePath);
+            try
+            {
+                GetService().RemoveAcfFileFromHitList(filePath);
+                filePath = Path.GetFullPath(filePath).ToLower();
+                TransferManager.Instance.AcfFileWatchList.Remove(filePath);
+            }
+            catch (Exception)
+            {
+                filePath = Path.GetFullPath(filePath).ToLower();
+                TransferManager.Instance.AcfFileWatchList.Remove(filePath);
+            }
         }
 
         private static IWingmanService _wingmanService;
@@ -37,26 +60,44 @@ namespace GamePipeLib.Utils
         {
             if (!WingmanIsRunning())
             {
-                //var wingmanPath = Path.GetFullPath(CLIENT_NAME);
-                //var tempFile = Environment.ExpandEnvironmentVariables("%TEMP%\\LaunchWingman.bat");
-                //var command = $"start start start start start start start start start start start start {wingmanPath}";
-                //File.WriteAllText(tempFile, command);
-                //Process.Start(tempFile);
-                //using (Process wingmanProcess = new Process())
-                //{
-                //    wingmanProcess.StartInfo.FileName = CLIENT_NAME;
-                //    wingmanProcess.StartInfo.UseShellExecute = true;
-                //    wingmanProcess.StartInfo.CreateNoWindow = true;                   
-                //    wingmanProcess.Start();
-                //}
-                Process.Start(CLIENT_NAME);
-                _wingmanService = null;
-                while (!WingmanIsRunning())
-                    System.Threading.Thread.Sleep(10);
+                //TODO just warn the user that they could see duplicat e
+                try
+                {
+                    //var wingmanPath = Path.GetFullPath(CLIENT_NAME);
+                    //var tempFile = Environment.ExpandEnvironmentVariables("%TEMP%\\LaunchWingman.bat");
+                    //var command = $"start start start start start start start start start start start start {wingmanPath}";
+                    //File.WriteAllText(tempFile, command);
+                    //Process.Start(tempFile);
+                    //using (Process wingmanProcess = new Process())
+                    //{
+                    //    wingmanProcess.StartInfo.FileName = CLIENT_NAME;
+                    //    wingmanProcess.StartInfo.UseShellExecute = true;
+                    //    wingmanProcess.StartInfo.CreateNoWindow = true;                   
+                    //    wingmanProcess.Start();
+                    //}
+                    Process.Start(CLIENT_NAME);
+                    _wingmanService = null;
+                    System.Threading.Thread.Sleep(50);
+                    if (!WingmanIsRunning())
+                        System.Threading.Thread.Sleep(200);
+
+                }
+                catch (Exception ex)
+                {
+                    Utils.Logging.Logger.Error("Exception in spawning the Wingman process:", ex);
+                }
             }
+
             if (_wingmanService == null)
             {
-                _wingmanService = new WingmanServiceClient();
+                try
+                {
+                    _wingmanService = new WingmanServiceClient();
+                }
+                catch (Exception ex)
+                {
+                    Utils.Logging.Logger.Error("Exception in connecting to the Wingman client:", ex);
+                }
             }
             return _wingmanService;
         }

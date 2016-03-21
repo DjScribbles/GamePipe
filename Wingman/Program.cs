@@ -34,8 +34,8 @@ namespace Wingman
 
         static void Main(string[] args)
         {
-            Console.WriteLine("Starting...");
-            var minimumEndTime = DateTime.UtcNow.AddSeconds(30);
+            Console.WriteLine("Starting service...");
+            var minimumEndTime = DateTime.UtcNow.AddSeconds(3);
             using (ServiceHost host = new ServiceHost(typeof(WingmanService)))
             {
                 host.Open();
@@ -62,6 +62,5 @@ namespace Wingman
             if (WingmanService.GetRestartRequested())
                 Process.Start(@"steam://open/games");
         }
-
     }
 }
