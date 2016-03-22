@@ -19,6 +19,7 @@ namespace GamePipe.ViewModel
             _updateTimer.Enabled = true;
         }
 
+
         private void _updateTimer_Elapsed(object sender, ElapsedEventArgs e)
         {
             UpdateProgress();
@@ -93,10 +94,60 @@ namespace GamePipe.ViewModel
             {
                 if (_State != value)
                 {
+                    var prevValue = _State;
                     _State = value;
-                    GamePipeLib.Model.Steam.SteamBase.UiDispatcher.BeginInvoke((Action)(() => NotifyPropertyChanged("State")));
+                    GamePipeLib.Model.Steam.SteamBase.UiDispatcher.BeginInvoke((Action)(() =>
+                    {
+                        NotifyPropertyChanged("State");
+                        if (prevValue == TaskbarItemProgressState.Normal && _State == TaskbarItemProgressState.None)
+                        {
+                            OnTransfersComplete();
+                        }
+                    }
+                    ));
                 }
             }
+        }
+
+        private void OnTransfersComplete()
+        {
+            System.Media.SystemSounds.Hand.Play();
+
+            //Originally planned on using windows toasting, but after looking deeper it seems that that may cause compatability issues on win7, as it involves bringing in winrt libs.
+            //ToastContent content = new ToastContent()
+            //{
+            //    Launch = "na",
+
+            //    Visual = new ToastVisual()
+            //    {
+            //        TitleText = new ToastText()
+            //        {
+            //            Text = "Game Pipe"
+            //        },
+
+            //        BodyTextLine1 = new ToastText()
+            //        {
+            //            Text = "All transfers completed"
+            //        },
+
+            //        AppLogoOverride = new ToastAppLogo()
+            //        {
+            //            Source = new ToastImageSource("pack://application:,,,/Resources/GamePipe.ico")
+            //        }
+            //    },
+
+
+            //    Audio = new ToastAudio()
+            //    {
+            //        Src = new Uri("ms-winsoundevent:Notification.Default")
+            //    }
+            //};
+
+            //string doc = content.GetContent();
+
+
+            //// Generate WinRT notification
+            //new ToastNotification(doc);
         }
 
         private void UpdateProgress()

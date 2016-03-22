@@ -8,6 +8,7 @@ using System.Text;
 using System.Windows;
 using System.Diagnostics;
 using System.Windows.Input;
+using System;
 
 namespace GamePipe
 {
@@ -77,7 +78,34 @@ namespace GamePipe
                 }
             }
 
-            if ((e.Cancel == false) && (GamePipeLib.Model.Steam.SteamRoot.Instance.SteamRestartRequired) && GamePipeLib.Utils.SteamDirParsingUtils.IsSteamOpen())
+            if ((e.Cancel == false) && manager.AcfFileWatchList.Any())
+            {
+                if (GamePipeLib.Utils.SteamDirParsingUtils.IsSteamOpen())
+                {
+                    var result = System.Windows.MessageBox.Show("Due to an issue connecting with the Wingman app, you must close Steam before closing Game Pipe.\n\nClose Steam now?", "Close Steam?", System.Windows.MessageBoxButton.YesNo, System.Windows.MessageBoxImage.Exclamation, System.Windows.MessageBoxResult.No);
+                    if (result == MessageBoxResult.Yes)
+                    {
+                        GamePipeLib.Utils.SteamDirParsingUtils.CloseSteam();
+
+                        while (GamePipeLib.Utils.SteamDirParsingUtils.IsSteamOpen())
+                            System.Threading.Thread.Sleep(100);
+
+                        foreach (var file in manager.AcfFileWatchList)
+                        {
+                            try
+                            {
+                                System.IO.File.Delete(file);
+                            }
+                            catch (Exception) { }
+                        }
+                    }
+                    else
+                    {
+                        e.Cancel = true;
+                    }
+                }
+            }
+            else if ((e.Cancel == false) && (GamePipeLib.Model.Steam.SteamRoot.Instance.SteamRestartRequired) && GamePipeLib.Utils.SteamDirParsingUtils.IsSteamOpen())
             {
                 var result = System.Windows.MessageBox.Show("You moved some steam games, they won't be playable unless you restart Steam.\n\nRestart Steam now?", "Restart Steam?", System.Windows.MessageBoxButton.YesNo, System.Windows.MessageBoxImage.Exclamation, System.Windows.MessageBoxResult.No);
                 if (result == MessageBoxResult.Yes)
@@ -92,7 +120,7 @@ namespace GamePipe
                     GamePipeLib.Utils.Logging.Logger.Info("Skipped Steam restart.");
                 }
             }
-        
+
             if (e.Cancel == false)
             {
                 manager.RequestShutdown();
@@ -137,5 +165,3 @@ namespace GamePipe
         }
     }
 }
-
-//C:\Program Files (x86)\Steam\userdata\33810821\7\remote\sharedconfig.vdf
