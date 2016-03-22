@@ -123,6 +123,11 @@ namespace GamePipeLib.Model.Steam
             return _AppsInBundle.All(x => x.CanCopy());
         }
 
+        public bool CanCopyIfForced()
+        {
+            return _AppsInBundle.All(x => x.CanCopyIfForced());
+        }
+
         public void RefreshFromAcf()
         {
             foreach (var app in _AppsInBundle)

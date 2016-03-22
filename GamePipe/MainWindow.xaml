@@ -145,7 +145,7 @@
                     <!--</ScrollViewer>-->
                 </DockPanel>
             </TabItem>
-            <TabItem Header="Hack Test" Template="{DynamicResource TabItemControlTemplate1}" Visibility="Visible">
+            <TabItem Header="Hack Test" Template="{DynamicResource TabItemControlTemplate1}" Visibility="Collapsed">
                 <DockPanel>
                     <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" HorizontalAlignment="Left">
                         <Button x:Name="CloseSteamButton"  Content="Close Steam" />

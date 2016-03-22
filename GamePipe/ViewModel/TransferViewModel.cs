@@ -34,6 +34,8 @@ namespace GamePipe.ViewModel
 
         public TransferStatus Status { get { return _model.Status; } }
         public bool IsBlocked { get { return _model.Status == TransferStatus.Blocked; } }
+        public bool IsForced { get { return _model.ForceTransfer; } }
+        public bool IsNotForced { get { return !_model.ForceTransfer; } }//TODO This is really lazy...
         public double Progress { get { return _model.Progress; } }
         public string TransferType { get { return _model.TransferType; } }
         public string ImageUrl { get { return _model.Application?.ImageUrl; } }
@@ -123,6 +125,28 @@ namespace GamePipe.ViewModel
             Manager.ShuffleTransfers(transfers);
         }
         #endregion //MoveDownCommand
+        #region "ForceTransferCommand"
+        private RelayCommand _ForceTransferCommand = null;
+        public RelayCommand ForceTransferCommand
+        {
+            get
+            {
+                if (_ForceTransferCommand == null)
+                {
+                    _ForceTransferCommand = new RelayCommand(x => ForceTransfer());
+
+                }
+                return _ForceTransferCommand;
+            }
+        }
+
+        public void ForceTransfer()
+        {
+            Model.ForceTransfer = true;
+            NotifyPropertyChanged("IsNotForced");
+            NotifyPropertyChanged("IsForced");
+        }
+        #endregion //ForceTransferCommand
         #endregion //Commands
     }
 }

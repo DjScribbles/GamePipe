@@ -105,6 +105,15 @@ namespace GamePipeService
             return gameInfo.CanCopy();
         }
 
+        public bool CanCopyIfForced(string appId)
+        {
+            var gameInfo = _rootSteam.GetGame(appId);
+            if (gameInfo == null)
+                return false;
+
+            return gameInfo.CanCopyIfForced();
+        }
+
         public long GetMeasuredGameSize(string appId)
         {
             var gameInfo = _rootSteam.GetGame(appId);

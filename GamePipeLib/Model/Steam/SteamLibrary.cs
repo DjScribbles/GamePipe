@@ -293,6 +293,14 @@ namespace GamePipeLib.Model.Steam
             return game.CanCopy();
         }
 
+        public bool CanCopyIfForced(string appId)
+        {
+            var game = GetGameById(appId);
+            if (game == null) throw new ArgumentException(string.Format("App ID {0} not found in {1}", appId, SteamDirectory));
+
+            return game.CanCopyIfForced();
+        }
+
         Stream IAppProvider.GetFileStream(string appId, string file, bool acceptCompressedFiles)
         {
             return GetReadFileStream(appId, file, acceptCompressedFiles);
