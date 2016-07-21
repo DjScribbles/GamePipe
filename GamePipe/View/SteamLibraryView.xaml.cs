@@ -70,13 +70,13 @@ namespace GamePipe.View
                         DisplayList.SelectedItems.Remove(item);
                 }
                 if (e.RemovedItems.Contains(_clickedGame))
-                    DisplayList.SelectedItems.Add(_clickedGame); 
+                    DisplayList.SelectedItems.Add(_clickedGame);
             }
         }
         private void DisplayList_PreviewMouseMove(object sender, MouseEventArgs e)
         {
             //if the left mouse button is not pressed, then we can't be dragging anything
-            if (e.LeftButton != MouseButtonState.Pressed || !(sender is ListBox))
+            if (e.LeftButton != MouseButtonState.Pressed || !(sender is ListBox) || (_clickedGame == null))
             {
                 return;
             }

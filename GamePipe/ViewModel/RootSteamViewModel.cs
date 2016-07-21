@@ -321,7 +321,8 @@ namespace GamePipe.ViewModel
                 try
                 {
                     Host.Close();
-                    _hosting = false;
+                    _Host = null;
+                    _hosting = false;                    
                 }
                 catch (Exception ex)
                 {
