@@ -30,6 +30,7 @@
             <Button.ContextMenu>
                 <ContextMenu>
                     <MenuItem Command="{Binding OpenGameDirCommand}" Header="Open Game Dir" Icon="{x:Null}"/>
+                    <MenuItem Command="{Binding ExploreToAcfCommand}" Header="Explore to Acf" Icon="{x:Null}"/>
                     <MenuItem Command="{Binding VerifyGameCommand}" Header="Verify Game Cache"/>
                     <MenuItem Command="{Binding OpenStorePageCommand}" Header="Open Store Page"/>
                     <MenuItem Command="{Binding RunGameCommand}" Header="Run Game"/>

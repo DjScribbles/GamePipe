@@ -89,6 +89,35 @@ namespace GamePipe.ViewModel
 
 
         #endregion //OpenGameDirCommand
+        #region "ExploreToAcfCommand"
+        private RelayCommand _ExploreToAcfCommand = null;
+        public RelayCommand ExploreToAcfCommand
+        {
+            get
+            {
+                if (_ExploreToAcfCommand == null)
+                    _ExploreToAcfCommand = new RelayCommand(x => ExploreToAcf());
+                return _ExploreToAcfCommand;
+            }
+        }
+
+
+        public void ExploreToAcf()
+        {
+            try
+            {
+                if (Model is SteamApp)
+                {
+                    var path = (Model as SteamApp).AcfFile;
+
+                    System.Diagnostics.Process.Start("explorer.exe", "/select,\"" + path + "\"");
+                }
+            }
+            catch (Exception) { }
+        }
+
+
+        #endregion //ExploreToAcfCommand
         #region "DeleteGameCommand"
         private RelayCommand _DeleteGameCommand = null;
         public RelayCommand DeleteGameCommand
@@ -172,7 +201,7 @@ namespace GamePipe.ViewModel
             get
             {
                 if (_ScanWithDefenderCommand == null)
-                    _ScanWithDefenderCommand = new RelayCommand(x => ScanWithDefender(),x=> SteamRoot.Instance.IsDefenderPresent);
+                    _ScanWithDefenderCommand = new RelayCommand(x => ScanWithDefender(), x => SteamRoot.Instance.IsDefenderPresent);
                 return _ScanWithDefenderCommand;
             }
         }
