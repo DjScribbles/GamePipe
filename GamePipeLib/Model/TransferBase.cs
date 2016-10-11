@@ -86,7 +86,7 @@ namespace GamePipeLib.Model
             //{
 
             //}
-            else if (_target.HasGameDir(Application.InstallDir))
+            else if (_target.HasGameDir(Application.InstallDir) && _actualDiskSize > 0)
             {
                 Task.Run(() =>
                 {
@@ -180,10 +180,23 @@ namespace GamePipeLib.Model
                 string appId = Application.AppId;
                 (Application as SteamApp)?.MeasureDiskSize();
                 //Create the directory structure
-                _target.BackupExistingDir(Application.InstallDir);
-                _target.CreateDirectories(_source.GetDirectoriesForApp(appId));
-                bool acceptCompressedFiles = ((_target is SteamArchive) && ((SteamArchive)_target).CompressNewGames);
-                _workQueue = new Queue<string>(_source.GetFilesForApp(appId, acceptCompressedFiles));
+                try
+                {
+                    var directories = _source.GetDirectoriesForApp(appId);
+                    bool acceptCompressedFiles = ((_target is SteamArchive) && ((SteamArchive)_target).CompressNewGames);
+                    _workQueue = new Queue<string>(_source.GetFilesForApp(appId, acceptCompressedFiles));
+
+                    if (_workQueue.Any())
+                    {
+                        _target.BackupExistingDir(Application.InstallDir);
+                    }
+                    _target.CreateDirectories(directories);
+                }
+                catch (System.IO.DirectoryNotFoundException)
+                {
+                    _workQueue = new Queue<string>();
+                }    //If the directory isn't present then allow the acf to move
+
                 _fileCount = _workQueue.Count;
                 DoPreProcess();
                 _preProcessComplete = true;
