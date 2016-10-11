@@ -41,6 +41,8 @@ Source: "..\GamePipe\bin\Release\GamePipe.exe"; DestDir: "{app}"; Flags: ignorev
 Source: "..\GamePipe\bin\Release\GamePipe.exe.config"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\GamePipe\bin\Release\Wingman.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\GamePipe\bin\Release\Wingman.exe.config"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\License.txt"; DestDir: "{app}"; Flags: ignoreversion
+
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Dirs]
