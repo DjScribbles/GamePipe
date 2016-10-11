@@ -10,6 +10,7 @@ using GamePipeLib.Model.Steam;
 using System.Collections.Specialized;
 using System.Linq;
 using System.ServiceModel;
+using System.Threading;
 
 namespace GamePipe.ViewModel
 {
@@ -82,16 +83,35 @@ namespace GamePipe.ViewModel
         public string NewFriendIp { get; set; }
         public ushort NewFriendPort { get; set; }
 
+        private static Thread _hostThread = new Thread(StartHosting) { IsBackground = true };
+        private static object _hostLock = new object();
+        private static void StartHosting()
+        {
+            lock (_hostLock)
+            {
+                Uri baseAddress = new Uri("net.tcp://localhost:41650/gamepipe");
+                _Host = new ServiceHost(typeof(GamePipeService.GameProviderService), baseAddress);
+            }
+        }
         private static ServiceHost _Host = null;
         private ServiceHost Host
         {
             get
             {
-                if (_Host == null)
+                bool waitForHost = false;
+                lock (_hostLock)
                 {
-                    Uri baseAddress = new Uri("net.tcp://localhost:41650/gamepipe");
-                    _Host = new ServiceHost(typeof(GamePipeService.GameProviderService), baseAddress);
+                    if (_Host == null)
+                    {
+                        _hostThread.Start();
+                        waitForHost = true;
+                    }
                 }
+                while (waitForHost && _Host == null && _hostThread.IsAlive)
+                {
+                    Thread.Sleep(10);
+                }
+
                 return _Host;
             }
         }
@@ -322,7 +342,9 @@ namespace GamePipe.ViewModel
                 {
                     Host.Close();
                     _Host = null;
-                    _hosting = false;                    
+                    _hostThread.Abort();
+                    _hostThread = new Thread(StartHosting) { IsBackground = true };
+                    _hosting = false;
                 }
                 catch (Exception ex)
                 {

@@ -15,9 +15,10 @@ namespace GamePipeLib.Model.Steam
 {
     public class SteamRoot : NotifyPropertyChangedBase
     {
+        private object _rootLock = new object();
+
         private SteamRoot()
         {
-
         }
 
         private static SteamRoot _instance = null;
@@ -39,15 +40,21 @@ namespace GamePipeLib.Model.Steam
         {
             get
             {
-                return  Properties.Settings.Default.ScanAfterNetworkCopy && IsDefenderPresent;
+                lock (_rootLock)
+                {
+                    return Properties.Settings.Default.ScanAfterNetworkCopy && IsDefenderPresent;
+                }
             }
             set
             {
-                if (Properties.Settings.Default.ScanAfterNetworkCopy != value)
+                lock (_rootLock)
                 {
-                    Properties.Settings.Default.ScanAfterNetworkCopy = value;
-                    NotifyPropertyChanged("ScanAfterNetworkCopy");
-                    Properties.Settings.Default.Save();
+                    if (Properties.Settings.Default.ScanAfterNetworkCopy != value)
+                    {
+                        Properties.Settings.Default.ScanAfterNetworkCopy = value;
+                        NotifyPropertyChanged("ScanAfterNetworkCopy");
+                        Properties.Settings.Default.Save();
+                    }
                 }
             }
         }
@@ -56,15 +63,21 @@ namespace GamePipeLib.Model.Steam
         {
             get
             {
-                return Properties.Settings.Default.OpenDirAfterNetworkCopy;
+                lock (_rootLock)
+                {
+                    return Properties.Settings.Default.OpenDirAfterNetworkCopy;
+                }
             }
             set
             {
-                if (Properties.Settings.Default.OpenDirAfterNetworkCopy != value)
+                lock (_rootLock)
                 {
-                    Properties.Settings.Default.OpenDirAfterNetworkCopy = value;
-                    NotifyPropertyChanged("OpenDirAfterNetworkCopy");
-                    Properties.Settings.Default.Save();
+                    if (Properties.Settings.Default.OpenDirAfterNetworkCopy != value)
+                    {
+                        Properties.Settings.Default.OpenDirAfterNetworkCopy = value;
+                        NotifyPropertyChanged("OpenDirAfterNetworkCopy");
+                        Properties.Settings.Default.Save();
+                    }
                 }
             }
         }
@@ -74,11 +87,14 @@ namespace GamePipeLib.Model.Steam
         {
             get
             {
-                if (_Libraries == null)
+                lock (_rootLock)
                 {
-                    _Libraries = new ObservableCollection<SteamLibrary>(DiscoverLibraries());
+                    if (_Libraries == null)
+                    {
+                        _Libraries = new ObservableCollection<SteamLibrary>(DiscoverLibraries());
+                    }
+                    return _Libraries;
                 }
-                return _Libraries;
             }
         }
 
@@ -112,117 +128,142 @@ namespace GamePipeLib.Model.Steam
                 }
             }
 
-            if (Properties.Settings.Default.Archives == null)
-                Properties.Settings.Default.Archives = new StringCollection();
-
-            foreach (var item in Properties.Settings.Default.Archives)
+            lock (_rootLock)
             {
-                if (Directory.Exists(item))
+                if (Properties.Settings.Default.Archives == null)
+                    Properties.Settings.Default.Archives = new StringCollection();
+
+                foreach (var item in Properties.Settings.Default.Archives)
                 {
-                    result.Add(new SteamArchive(item));
+                    if (Directory.Exists(item))
+                    {
+                        result.Add(new SteamArchive(item));
+                    }
                 }
             }
-
             return result;
         }
 
 
         public ILocalSteamApplication GetGame(string appId)
         {
-            foreach (var lib in Libraries)
+            lock (_rootLock)
             {
-                var game = lib.GetGameOrBundleById(appId);
-                if (game != null)
-                    return game;
+                foreach (var lib in Libraries)
+                {
+                    var game = lib.GetGameOrBundleById(appId);
+                    if (game != null)
+                        return game;
+                }
             }
             return null;
         }
 
         public SteamLibrary GetLibraryForGame(string appId)
         {
-            foreach (var lib in Libraries)
+            lock (_rootLock)
             {
-                var game = lib.GetGameOrBundleById(appId);
-                if (game != null)
-                    return lib;
+                foreach (var lib in Libraries)
+                {
+                    var game = lib.GetGameOrBundleById(appId);
+                    if (game != null)
+                        return lib;
+                }
             }
             return null;
         }
 
         public IEnumerable<ILocalSteamApplication> GetAllGames()
         {
-            return Libraries.SelectMany(x => x.Games);
+            lock (_rootLock)
+            {
+                return Libraries.SelectMany(x => x.Games).ToArray();
+            }
         }
 
         public void AddArchive(string path)
         {
-
-            if (Directory.Exists(path) && !Properties.Settings.Default.Archives.Contains(path))
+            lock (_rootLock)
             {
-                _Libraries.Add(new SteamArchive(path));
-                Properties.Settings.Default.Archives.Add(path);
-                Properties.Settings.Default.Save();
+                if (Directory.Exists(path) && !Properties.Settings.Default.Archives.Contains(path))
+                {
+                    _Libraries.Add(new SteamArchive(path));
+                    Properties.Settings.Default.Archives.Add(path);
+                    Properties.Settings.Default.Save();
+                }
             }
         }
 
         public void RemoveArchive(SteamArchive archive)
         {
-            Properties.Settings.Default.Archives.Remove(archive.SteamDirectory);
-            Properties.Settings.Default.Save();
-            _Libraries.Remove(archive);
+            lock (_rootLock)
+            {
+                Properties.Settings.Default.Archives.Remove(archive.SteamDirectory);
+                Properties.Settings.Default.Save();
+                _Libraries.Remove(archive);
+            }
         }
         public void AddLibrary(string path)
         {
-            if (Directory.Exists(path) && !Properties.Settings.Default.Archives.Contains(path))
+            lock (_rootLock)
             {
-                GamePipeLib.Utils.SteamDirParsingUtils.SetupNewSteamLibrary(path);
-                SteamRestartRequired = true;
-                var libraryDirectory = Path.Combine(path, "SteamApps");
-                if (!Directory.Exists(libraryDirectory)) Directory.CreateDirectory(libraryDirectory);
-                _Libraries.Add(new SteamLibrary(libraryDirectory));
-                NotifyPropertyChanged("Libraries");
+                if (Directory.Exists(path) && !Properties.Settings.Default.Archives.Contains(path))
+                {
+                    GamePipeLib.Utils.SteamDirParsingUtils.SetupNewSteamLibrary(path);
+                    SteamRestartRequired = true;
+                    var libraryDirectory = Path.Combine(path, "SteamApps");
+                    if (!Directory.Exists(libraryDirectory)) Directory.CreateDirectory(libraryDirectory);
+                    _Libraries.Add(new SteamLibrary(libraryDirectory));
+                    NotifyPropertyChanged("Libraries");
+                }
             }
         }
         public void RemoveLibrary(SteamLibrary archive)
         {
-            _Libraries.Remove(archive);
-            var path = archive.SteamDirectory;
-            if (path.EndsWith(@"\SteamApps", StringComparison.OrdinalIgnoreCase))
-                path = path.Substring(0, path.Length - @"\SteamApps".Length);
-            GamePipeLib.Utils.SteamDirParsingUtils.RemoveSteamLibrary(path);
+            lock (_rootLock)
+            {
+                _Libraries.Remove(archive);
+                var path = archive.SteamDirectory;
+                if (path.EndsWith(@"\SteamApps", StringComparison.OrdinalIgnoreCase))
+                    path = path.Substring(0, path.Length - @"\SteamApps".Length);
+                GamePipeLib.Utils.SteamDirParsingUtils.RemoveSteamLibrary(path);
+            }
         }
 
         public void ScanWithDefender(string gameDir, string appId)
         {
-            if (appId.Contains(","))
-                appId = appId.Split(new char[1] { ',' })[0];
-
-            if (gameDir == null)
-                throw new ArgumentNullException("gameDir");
-            if (!Directory.Exists(gameDir))
-                throw new ArgumentException("gameDir doesn't exist: " + gameDir);
-            string tempFile;
-            int i = 0;
-            do
+            lock (_rootLock)
             {
-                tempFile = Environment.ExpandEnvironmentVariables(string.Format("%TEMP%\\scan_{0}_{1}.bat", appId, (i == 0 ? "" : i.ToString())));
-                i++;
-            } while (File.Exists(tempFile));
+                if (appId.Contains(","))
+                    appId = appId.Split(new char[1] { ',' })[0];
 
-            var command = Environment.ExpandEnvironmentVariables("%comspec%");
-            var args = "/K " + Path.GetFullPath(tempFile) + " & del " + tempFile;
-            try
-            {
-                File.WriteAllText(tempFile, "echo Press Ctrl+C to cancel the scan...\n" + Environment.ExpandEnvironmentVariables(Properties.Settings.Default.DefaultScanner).Replace("{game}", gameDir));
+                if (gameDir == null)
+                    throw new ArgumentNullException("gameDir");
+                if (!Directory.Exists(gameDir))
+                    throw new ArgumentException("gameDir doesn't exist: " + gameDir);
+                string tempFile;
+                int i = 0;
+                do
+                {
+                    tempFile = Environment.ExpandEnvironmentVariables(string.Format("%TEMP%\\scan_{0}_{1}.bat", appId, (i == 0 ? "" : i.ToString())));
+                    i++;
+                } while (File.Exists(tempFile));
 
-                var proc = System.Diagnostics.Process.Start(command, args);
-            }
-            catch (Exception ex)
-            {
-                Utils.Logging.Logger.Error(string.Format("Virus Scan failed due to exception: {0} {1}.", command, args), ex);
-                System.Windows.MessageBox.Show("Virus Scan failed due to exception:\n" + ex.Message, "", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Exclamation, System.Windows.MessageBoxResult.OK);
-                if (File.Exists(tempFile))
-                    File.Delete(tempFile);
+                var command = Environment.ExpandEnvironmentVariables("%comspec%");
+                var args = "/K " + Path.GetFullPath(tempFile) + " & del " + tempFile;
+                try
+                {
+                    File.WriteAllText(tempFile, "echo Press Ctrl+C to cancel the scan...\n" + Environment.ExpandEnvironmentVariables(Properties.Settings.Default.DefaultScanner).Replace("{game}", gameDir));
+
+                    var proc = System.Diagnostics.Process.Start(command, args);
+                }
+                catch (Exception ex)
+                {
+                    Utils.Logging.Logger.Error(string.Format("Virus Scan failed due to exception: {0} {1}.", command, args), ex);
+                    System.Windows.MessageBox.Show("Virus Scan failed due to exception:\n" + ex.Message, "", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Exclamation, System.Windows.MessageBoxResult.OK);
+                    if (File.Exists(tempFile))
+                        File.Delete(tempFile);
+                }
             }
         }
 
@@ -231,10 +272,12 @@ namespace GamePipeLib.Model.Steam
         {
             get
             {
-                if (_isDefenderPresent == null)
-                    _isDefenderPresent = File.Exists(Environment.ExpandEnvironmentVariables("%ProgramW6432%\\Windows Defender\\MpCmdRun.exe"));
-                return (bool)_isDefenderPresent;
-
+                lock (_rootLock)
+                {
+                    if (_isDefenderPresent == null)
+                        _isDefenderPresent = File.Exists(Environment.ExpandEnvironmentVariables("%ProgramW6432%\\Windows Defender\\MpCmdRun.exe"));
+                    return (bool)_isDefenderPresent;
+                }
             }
         }
     }
