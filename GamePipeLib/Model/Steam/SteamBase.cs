@@ -10,8 +10,14 @@ namespace GamePipeLib.Model.Steam
         private static System.Windows.Threading.Dispatcher _UiDispatcher;
         public static System.Windows.Threading.Dispatcher UiDispatcher
         {
-            get { return _UiDispatcher; }
-            set { _UiDispatcher = value; }
+            get
+            {
+                if (_UiDispatcher == null)
+                {
+                    _UiDispatcher = System.Windows.Application.Current.Dispatcher;
+                }
+                return _UiDispatcher;
+            }
         }
 
     }

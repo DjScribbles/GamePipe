@@ -18,14 +18,12 @@ namespace GamePipe.ViewModel
     {
 
         private static bool _hosting = false;
-        private SteamRoot _root;
 
         public RootSteamViewModel()
         {
-            _root = SteamRoot.Instance;
-            NewFriendIp = "192.168.1.101";
+            NewFriendIp = "192.168.1.";
             NewFriendPort = 41650;
-            _root.Libraries.CollectionChanged += Libraries_CollectionChanged;
+            SteamRoot.Instance.Libraries.CollectionChanged += Libraries_CollectionChanged;
 
             if (GamePipe.Properties.Settings.Default.Friends != null)
             {
@@ -77,7 +75,7 @@ namespace GamePipe.ViewModel
                 }
             }
         }
-        public SteamRoot Model { get { return _root; } }
+        public SteamRoot Model { get { return SteamRoot.Instance; } }
 
 
         public string NewFriendIp { get; set; }
@@ -126,7 +124,7 @@ namespace GamePipe.ViewModel
             {
                 if (_Libraries == null)
                 {
-                    _Libraries = new ObservableCollection<SteamLibraryViewModel>(_root.Libraries.Select(x => (x is SteamArchive)
+                    _Libraries = new ObservableCollection<SteamLibraryViewModel>(SteamRoot.Instance.Libraries.Select(x => (x is SteamArchive)
                                                                                                               ? new SteamArchiveViewModel(x as SteamArchive)
                                                                                                               : new SteamLibraryViewModel(x)));
                 }
@@ -207,7 +205,7 @@ namespace GamePipe.ViewModel
                 var path = Path.GetFullPath(dialog.SelectedPath);
                 try
                 {
-                    _root.AddArchive(path);
+                    SteamRoot.Instance.AddArchive(path);
                 }
                 catch (Exception ex)
                 {
@@ -250,7 +248,7 @@ namespace GamePipe.ViewModel
                 var path = Path.GetFullPath(dialog.SelectedPath);
                 try
                 {
-                    _root.AddLibrary(path);
+                    SteamRoot.Instance.AddLibrary(path);
                 }
                 catch (Exception ex)
                 {
@@ -343,6 +341,7 @@ namespace GamePipe.ViewModel
                     Host.Close();
                     _Host = null;
                     _hostThread.Abort();
+                    SteamRoot.DropInstanceForThreadId(_hostThread.ManagedThreadId);
                     _hostThread = new Thread(StartHosting) { IsBackground = true };
                     _hosting = false;
                 }

@@ -20,16 +20,15 @@ namespace GamePipeService
     {
         private static Dictionary<string, uint> _validationCache = new Dictionary<string, uint>();
 
-        SteamRoot _rootSteam;
+
         public GameProviderService()
         {
-            _rootSteam = SteamRoot.Instance;
         }
 
         const int fileBufferSize = 16384;
         public Stream GetFileStream(string appId, string file, bool acceptCompressedFiles)
         {
-            var library = _rootSteam.GetLibraryForGame(appId);
+            var library = SteamRoot.Instance.GetLibraryForGame(appId);
             if (library == null)
                 throw new ArgumentException("library for appId not found");
 
@@ -64,7 +63,7 @@ namespace GamePipeService
 
         public string GetAcfFileContent(string appId)
         {
-            var library = _rootSteam.GetLibraryForGame(appId);
+            var library = SteamRoot.Instance.GetLibraryForGame(appId);
             if (library == null)
                 throw new ArgumentException("library for appId not found");
 
@@ -73,14 +72,14 @@ namespace GamePipeService
 
         public IEnumerable<BasicSteamApp> GetAvailableIds()
         {
-            IEnumerable<BasicSteamApp> originalList = _rootSteam.GetAllGames().Select(x => new BasicSteamApp(x)).OrderBy(x=>x.GameName);
+            IEnumerable<BasicSteamApp> originalList = SteamRoot.Instance.GetAllGames().Select(x => new BasicSteamApp(x)).OrderBy(x=>x.GameName);
             //IEnumerable<SteamApp> filteredList = originalList.GroupBy(x => x.AppId).Select(group => group.First());
             return originalList.ToArray();
         }
 
         public IEnumerable<string> GetDirectoriesForApp(string appId)
         {
-            var library = _rootSteam.GetLibraryForGame(appId);
+            var library = SteamRoot.Instance.GetLibraryForGame(appId);
             if (library == null)
                 throw new ArgumentException("library for appId not found");
 
@@ -89,7 +88,7 @@ namespace GamePipeService
 
         public IEnumerable<string> GetFilesForApp(string appId, bool acceptCompressedFiles)
         {
-            var library = _rootSteam.GetLibraryForGame(appId);
+            var library = SteamRoot.Instance.GetLibraryForGame(appId);
             if (library == null)
                 throw new ArgumentException("library for appId not found");
 
@@ -98,7 +97,7 @@ namespace GamePipeService
 
         public bool CanCopy(string appId)
         {
-            var gameInfo = _rootSteam.GetGame(appId);
+            var gameInfo = SteamRoot.Instance.GetGame(appId);
             if (gameInfo == null)
                 return false;
 
@@ -107,7 +106,7 @@ namespace GamePipeService
 
         public bool CanCopyIfForced(string appId)
         {
-            var gameInfo = _rootSteam.GetGame(appId);
+            var gameInfo = SteamRoot.Instance.GetGame(appId);
             if (gameInfo == null)
                 return false;
 
@@ -116,7 +115,7 @@ namespace GamePipeService
 
         public long GetMeasuredGameSize(string appId)
         {
-            var gameInfo = _rootSteam.GetGame(appId);
+            var gameInfo = SteamRoot.Instance.GetGame(appId);
             if (gameInfo == null)
                 throw new ArgumentException("appId not found");
             gameInfo.MeasureDiskSize();

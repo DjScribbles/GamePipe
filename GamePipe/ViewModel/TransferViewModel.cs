@@ -23,7 +23,14 @@ namespace GamePipe.ViewModel
         private void _model_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             if (e.PropertyName == "Progress")
+            {
                 NotifyPropertyChanged("Progress");
+                NotifyPropertyChanged("TotalTransferred");
+                NotifyPropertyChanged("ProgressText");
+            }
+
+            if (e.PropertyName == "TransferRateBytesPerSecond")
+                NotifyPropertyChanged("TransferRate");
 
             if (e.PropertyName == "Status")
             {
@@ -37,9 +44,13 @@ namespace GamePipe.ViewModel
         public bool IsForced { get { return _model.ForceTransfer; } }
         public bool IsNotForced { get { return !_model.ForceTransfer; } }//TODO This is really lazy...
         public double Progress { get { return _model.Progress; } }
+        public string TotalTransferred { get { return GamePipeLib.Utils.FileUtils.GetReadableFileSizeFixed(_model.TotalTransferred); } }
+        public string ActualSize { get { return GamePipeLib.Utils.FileUtils.GetReadableFileSize(_model.ActualDiskSize); } }
+        public string ProgressText { get { return $"{TotalTransferred} / {ActualSize}"; } }
         public string TransferType { get { return _model.TransferType; } }
         public string ImageUrl { get { return _model.Application?.ImageUrl; } }
         public string GameName { get { return _model.Application?.GameName; } }
+        public string TransferRate { get { return $"({GamePipeLib.Utils.FileUtils.GetReadableFileSizeFixed(_model.TransferRateBytesPerSecond)}/s)"; } }
 
         private TransferManager Manager { get { return TransferManager.Instance; } }
 

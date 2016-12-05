@@ -163,7 +163,27 @@ namespace GamePipeLib.Model
                 }
             }
         }
+        private long _TransferRateBytesPerSecond;
+        public long TransferRateBytesPerSecond
+        {
+            get { return _TransferRateBytesPerSecond; }
+            private set
+            {
+                if (_TransferRateBytesPerSecond != value)
+                {
+                    double old = System.Threading.Interlocked.Exchange(ref _TransferRateBytesPerSecond, value);
+                    if ((old != value))
+                    {
+                        Steam.SteamBase.UiDispatcher.BeginInvoke((Action)(() => NotifyPropertyChanged("TransferRateBytesPerSecond")));
+                    }
+                }
+            }
+        }
 
+        public long TotalTransferred
+        {
+            get { return _lastReportedBytesTransferred; }
+        }
         //string SourceName { get { return _source.Name; } }
         //string DestinationName { get { return _target.Name; } }
         #endregion //IGameTransfer Implementation
@@ -415,10 +435,29 @@ namespace GamePipeLib.Model
             }
         }
 
+
+        private DateTime _lastTransferUpdateTime = DateTime.MinValue;
+        private DateTime _nextTransferUpdateTime = DateTime.MinValue;
+        private long _lastTransferUpdateSize = 0;
         private void IterrimUpdateMethod(long bytesCopied)
         {
+            var time = DateTime.UtcNow;
             _lastReportedBytesTransferred = _validatedBytesTransferred + bytesCopied;
             Progress = Convert.ToDouble(_lastReportedBytesTransferred) / Convert.ToDouble(_actualDiskSize);
+
+            if (time > _nextTransferUpdateTime)
+            {
+                var duration = time.Subtract(_lastTransferUpdateTime).TotalSeconds;
+                var bytesTransferred = Convert.ToDouble(_lastReportedBytesTransferred - _lastTransferUpdateSize);
+                var transferRate = Convert.ToInt64(bytesTransferred / duration);
+                TransferRateBytesPerSecond = transferRate;
+
+                _lastTransferUpdateTime = time;
+                _nextTransferUpdateTime = time.AddSeconds(1);
+                _lastTransferUpdateSize = _lastReportedBytesTransferred;
+
+            }
         }
+
     }
 }

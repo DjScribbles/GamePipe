@@ -41,6 +41,7 @@ namespace GamePipe.ViewModel
                 }
                 throw new ArgumentException(string.Format("Unable to connect to {0}:{1}, ensure the address is correct and that they are hosting in GamePipe.", ip.ToString(), port));
             }
+            Refresh(quiet:true);
         }
 
         public string Ip { get; private set; }
@@ -133,7 +134,7 @@ namespace GamePipe.ViewModel
             }
         }
 
-        public void Refresh()
+        public void Refresh(bool quiet = false)
         {
             //if (_client._provider.CanCopy("31419"))
             //    Console.WriteLine("Success");
@@ -151,9 +152,11 @@ namespace GamePipe.ViewModel
                 }
                 catch (Exception ex)
                 {
-                    GamePipeLib.Utils.Logging.Logger.Error(string.Format("Refresh exception on {0}", FriendName), ex);
-                    System.Windows.MessageBox.Show("Refresh exception:\n" + ex.Message, "", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Exclamation, System.Windows.MessageBoxResult.OK);
-
+                    if (!quiet)
+                    {
+                        GamePipeLib.Utils.Logging.Logger.Error(string.Format("Refresh exception on {0}", FriendName), ex);
+                        System.Windows.MessageBox.Show("Refresh exception:\n" + ex.Message, "", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Exclamation, System.Windows.MessageBoxResult.OK);
+                    }
                 }
 
             });

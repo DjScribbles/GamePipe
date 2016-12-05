@@ -272,7 +272,11 @@
                     <Path StrokeThickness="8" StrokeEndLineCap="Flat" StrokeStartLineCap="Flat" Stroke="{StaticResource TextColor}"
                       Data="M 4,4 l 20,20 M 24,4 l -20,20"/>
                 </Button>
-                <ProgressBar Grid.Row="2" Grid.Column="2" Grid.ColumnSpan="4"  Maximum="1.0" Minimum="-0.05"  Value="{Binding Progress,Mode=OneWay}" Style="{StaticResource TransferBar}"/>
+                <DockPanel Grid.Row="2" Grid.Column="2" Grid.ColumnSpan="4">
+                    <TextBlock DockPanel.Dock="Right" Text="{Binding TransferRate}"  HorizontalAlignment="Right"/>
+                    <TextBlock DockPanel.Dock="Right" Text="{Binding ProgressText}" MinWidth="100" HorizontalAlignment="Right"/>
+                    <ProgressBar Maximum="1.0" Minimum="-0.05"  Value="{Binding Progress,Mode=OneWay}" Style="{StaticResource TransferBar}"/>
+                </DockPanel>
                 <!--<StackPanel Grid.Row="0"  Grid.Column="5" Grid.RowSpan="2" Orientation="Horizontal">
                     <Button Content="PauseImage" Command="{Binding PauseCommand}" />
                     <Button Content="ResumeImage" Command="{Binding ResumeCommand}" />

@@ -269,8 +269,22 @@ namespace GamePipeLib.Model
                                 //If there is an abort request, dispose of our active streams and bail out. The fact that we dispose here and nowhere else is a little dirty...
                                 if (abortStream)
                                 {
-                                    sourceStream.Dispose();
-                                    destStream.Dispose();
+                                    try
+                                    {
+                                        sourceStream.Dispose();
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        Utils.Logging.Logger.Error("An exception occurred while aborting the current file source stream:", ex);
+                                    }
+                                    try
+                                    {
+                                        destStream.Dispose();
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        Utils.Logging.Logger.Error("An exception occurred while aborting the current file destination stream:", ex);
+                                    }
                                     return;
                                 }
                                 else if (pauseStream)

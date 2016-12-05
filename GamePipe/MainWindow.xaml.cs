@@ -26,7 +26,6 @@ namespace GamePipe
             this.Closing += MainWindow_Closing;
             NetworkTab.PreviewKeyDown += NetworkTab_PreviewKeyDown;
             LocalLibsTab.PreviewKeyDown += LocalLibsTab_PreviewKeyDown;
-            GamePipeLib.Model.Steam.SteamBase.UiDispatcher = this.Dispatcher;
             var version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
             Title = $"Game Pipe {version}";
         }
