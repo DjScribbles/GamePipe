@@ -250,6 +250,11 @@ namespace GamePipeLib.Model.Steam
             }
         }
 
+        public void DeleteManifest()
+        {
+            File.Delete(AcfFile);
+        }
+
         private void DeleteDirectoryTree(string dirPath, bool deleteFiles = false)
         {
             if (Directory.Exists(dirPath))

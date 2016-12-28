@@ -118,6 +118,11 @@ namespace GamePipeLib.Model.Steam
                 app.DeleteGameData();
         }
 
+        public void DeleteManifest()
+        {
+            foreach (var app in _AppsInBundle)
+                app.DeleteManifest();
+        }
         public bool CanCopy()
         {
             return _AppsInBundle.All(x => x.CanCopy());

@@ -14,15 +14,21 @@ namespace GamePipe
     /// </summary>
     public partial class App : Application
     {
-
+        Version _version;
         public App() : base()
         {
             this.DispatcherUnhandledException += App_DispatcherUnhandledException;
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
             this.Exit += App_Exit;
-            var version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
-            GamePipeLib.Utils.Logging.Logger.InfoFormat("-----------------------GamePipe started {0}-----------", version.ToString());
-            CheckForUpdates(version);
+            this.Startup += App_Startup;
+            _version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
+            GamePipeLib.Utils.Logging.Logger.InfoFormat("-----------------------GamePipe started {0}-----------", _version.ToString());
+
+        }
+
+        private void App_Startup(object sender, StartupEventArgs e)
+        {
+            CheckForUpdates(_version);
         }
 
         private void App_Exit(object sender, ExitEventArgs e)

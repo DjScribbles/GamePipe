@@ -9,5 +9,6 @@
         bool CanCopy();
         bool CanCopyIfForced();
         void RefreshFromAcf();
+        void DeleteManifest();
     }
 }

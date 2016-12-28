@@ -56,6 +56,7 @@
     <Compile Include="Model\NotifyPropertyChangedBase.cs" />
     <Compile Include="Interfaces\ISteamApplication.cs" />
     <Compile Include="Model\NetworkCopy.cs" />
+    <Compile Include="Model\Steam\Cleanup\CleanupRoot.cs" />
     <Compile Include="Model\Steam\Root.cs" />
     <Compile Include="Model\Steam\SteamApp.cs" />
     <Compile Include="Model\Steam\SteamArchive.cs" />
