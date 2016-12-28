@@ -21,6 +21,23 @@ namespace GamePipe.View
             this.DragEnter += LibraryCardView_DragEnter;
             this.Drop += LibraryCardView_Drop;
             LibraryMenuButton.Click += LibraryMenuButton_Click;
+            SelectAllButton.Click += SelectAllButton_Click;
+        }
+
+        private void SelectAllButton_Click(object sender, RoutedEventArgs e)
+        {
+            var parent = this.Parent as FrameworkElement;
+            SteamLibraryView libView = null;
+            while (parent != null)
+            {
+                libView = parent as SteamLibraryView;
+                if (libView != null)
+                {
+                    libView.SelectAllGames();
+                    return;
+                }
+                parent = parent.Parent as FrameworkElement;
+            }
         }
 
         private void LibraryMenuButton_Click(object sender, RoutedEventArgs e)

@@ -28,6 +28,12 @@ namespace GamePipe.View
             this.Drop += DisplayList_Drop;
         }
 
+        public void SelectAllGames()
+        {
+            DisplayList.SelectAll();
+            _selItems.Clear();
+            _selItems.AddRange(DisplayList.SelectedItems.Cast<object>());
+        }
 
         public const string DRAG_DATA_NAME = "LocalGame";
         private Point _startPoint;

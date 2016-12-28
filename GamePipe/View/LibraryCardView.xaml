@@ -27,6 +27,7 @@
             <Button.ContextMenu>
                 <ContextMenu>
                     <MenuItem Command="{Binding OpenLibraryCommand}" Header="Open Dir" Icon="{x:Null}"/>
+                    <MenuItem x:Name="SelectAllButton" Header="Select All" Icon="{x:Null}"/>
                     <Separator Background="{StaticResource NormalBorder}" BorderBrush="{StaticResource NormalBorder}" Margin="-30,8,0,8"/>
                     <MenuItem Command="{Binding RemoveCommand}" Header="Remove"/>
                 </ContextMenu>
