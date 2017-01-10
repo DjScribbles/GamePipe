@@ -130,6 +130,9 @@ namespace GamePipeLib.Model.Steam
         public bool CanCopy()
         {
             var ignores = (AppStateFlags.StateFullyInstalled | AppStateFlags.StateEncrypted | AppStateFlags.StateBackupRunning | AppStateFlags.StateCommitting | AppStateFlags.StateUpdateRequired);
+            if ((AppState & ~ignores) == 0)
+                return true;
+
             if (!Utils.SteamDirParsingUtils.IsSteamOpen())
                 ignores |= AppStateFlags.StateAppRunning | AppStateFlags.StateFilesCorrupt | AppStateFlags.StateFilesMissing | AppStateFlags.StateValidating;
 
@@ -138,13 +141,10 @@ namespace GamePipeLib.Model.Steam
 
         public bool CanCopyIfForced()
         {
-            if (!Utils.SteamDirParsingUtils.IsSteamOpen())
-                return true;
             var ignores = (AppStateFlags.StateFullyInstalled | AppStateFlags.StateEncrypted | AppStateFlags.StateBackupRunning | AppStateFlags.StateCommitting | AppStateFlags.StateUpdateRequired);
-
             ignores |= AppStateFlags.StateAppRunning | AppStateFlags.StateFilesCorrupt | AppStateFlags.StateFilesMissing | AppStateFlags.StateValidating;
 
-            return (0 == (AppState & ~ignores));
+            return ((0 == (AppState & ~ignores)) || !Utils.SteamDirParsingUtils.IsSteamOpen());
         }
 
         public void InitializeFromAcf()
