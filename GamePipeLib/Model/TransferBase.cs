@@ -60,6 +60,8 @@ namespace GamePipeLib.Model
             }
         }
 
+        public abstract bool GetIsValidated();
+
         private bool _lastCanCopyCheckResult=false;
         private DateTime _nextCanCopyCheck = DateTime.MinValue;
         public bool GetCanCopyCached()
@@ -385,9 +387,9 @@ namespace GamePipeLib.Model
                     try
                     {
                         bool acceptCompressedFiles = ((_target is SteamArchive) && ((SteamArchive)_target).CompressNewGames);
-                        srcStrm = _source.GetFileStream(appId, file, acceptCompressedFiles);
+                        srcStrm = _source.GetFileStream(appId, file, acceptCompressedFiles, GetIsValidated());
 
-                        dstStrm = _target.GetFileStream(Application.InstallDir, file);
+                        dstStrm = _target.GetFileStream(Application.InstallDir, file, GetIsValidated());
                         source = srcStrm;
                         target = dstStrm;
                         _retriedList.RemoveAll(x => theFile == x);

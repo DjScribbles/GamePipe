@@ -20,6 +20,11 @@ namespace GamePipeLib.Model
             //Nothing to do
         }
 
+        public override bool GetIsValidated()
+        {
+            return true;
+        }
+
         protected override void DoPostProcess()
         {
             string appId = Application.AppId;

@@ -81,24 +81,40 @@ namespace GamePipeLib.Utils
 
 
         const int DEFAULT_BUFFER_SIZE = 16384;
-        public static CrcStream OpenReadStream(string filePath, int bufferSize = DEFAULT_BUFFER_SIZE)
+        public static Stream OpenReadStream(string filePath, bool validation, int bufferSize = DEFAULT_BUFFER_SIZE)
         {
-            return new CrcStream(new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.None, bufferSize, FileOptions.Asynchronous | FileOptions.SequentialScan));
+            var strm = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.None, bufferSize, FileOptions.Asynchronous | FileOptions.SequentialScan);
+            if (validation)
+                return new CrcStream(strm);
+
+            return strm;
         }
 
-        public static CrcStream OpenWriteStream(string filePath, int bufferSize = DEFAULT_BUFFER_SIZE)
+        public static Stream OpenWriteStream(string filePath, bool validation, int bufferSize = DEFAULT_BUFFER_SIZE)
         {
-            return new CrcStream(new FileStream(filePath, FileMode.OpenOrCreate, FileAccess.Write, FileShare.None, bufferSize, FileOptions.Asynchronous | FileOptions.SequentialScan));
+            var strm = new FileStream(filePath, FileMode.OpenOrCreate, FileAccess.Write, FileShare.None, bufferSize, FileOptions.Asynchronous | FileOptions.SequentialScan);
+            if (validation)
+                return new CrcStream(strm);
+
+            return strm;
         }
 
-        public static CrcStream OpenCompressedReadStream(string filePath, int bufferSize = DEFAULT_BUFFER_SIZE)
+        public static Stream OpenCompressedReadStream(string filePath, bool validation, int bufferSize = DEFAULT_BUFFER_SIZE)
         {
-            return new CrcStream(new DeflateStream(new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.None, bufferSize, FileOptions.Asynchronous | FileOptions.SequentialScan), CompressionMode.Decompress));
+            var strm = new DeflateStream(new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.None, bufferSize, FileOptions.Asynchronous | FileOptions.SequentialScan), CompressionMode.Decompress);
+            if (validation)
+                return new CrcStream(strm);
+
+            return strm;
         }
 
-        public static CrcStream OpenCompressedWriteStream(string filePath, int bufferSize = DEFAULT_BUFFER_SIZE, CompressionLevel compression = CompressionLevel.Optimal)
+        public static Stream OpenCompressedWriteStream(string filePath, bool validation, int bufferSize = DEFAULT_BUFFER_SIZE, CompressionLevel compression = CompressionLevel.Optimal)
         {
-            return new CrcStream(new DeflateStream(new FileStream(filePath, FileMode.OpenOrCreate, FileAccess.Write, FileShare.None, bufferSize, FileOptions.Asynchronous | FileOptions.SequentialScan), compression));
+            var strm = new DeflateStream(new FileStream(filePath, FileMode.OpenOrCreate, FileAccess.Write, FileShare.None, bufferSize, FileOptions.Asynchronous | FileOptions.SequentialScan), compression);
+            if (validation)
+                return new CrcStream(strm);
+
+            return strm;
         }
     }
 }

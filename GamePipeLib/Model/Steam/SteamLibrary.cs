@@ -301,9 +301,9 @@ namespace GamePipeLib.Model.Steam
             return game.CanCopyIfForced();
         }
 
-        Stream IAppProvider.GetFileStream(string appId, string file, bool acceptCompressedFiles)
+        Stream IAppProvider.GetFileStream(string appId, string file, bool acceptCompressedFiles, bool validation)
         {
-            return GetReadFileStream(appId, file, acceptCompressedFiles);
+            return GetReadFileStream(appId, file, acceptCompressedFiles, validation);
         }
 
 
@@ -322,10 +322,10 @@ namespace GamePipeLib.Model.Steam
             return null;
         }
 
-        CrcStream ITransferTarget.GetFileStream(string installDir, string file)
+        Stream ITransferTarget.GetFileStream(string installDir, string file, bool validation)
         {
             string path = Path.Combine(SteamDirectory, "common", installDir, file);
-            return GetWriteFileStream(path);
+            return GetWriteFileStream(path, validation);
         }
 
         public void WriteAcfFile(string appId, string contents)
@@ -374,7 +374,7 @@ namespace GamePipeLib.Model.Steam
             }
         }
 
-        public virtual Stream GetReadFileStream(string appId, string file, bool acceptCompressedFiles)
+        public virtual Stream GetReadFileStream(string appId, string file, bool acceptCompressedFiles, bool validation)
         {
             var game = GetGameById(appId);
             if (game == null) throw new ArgumentException(string.Format("App ID {0} not found in {1}", appId, SteamDirectory));
@@ -384,14 +384,14 @@ namespace GamePipeLib.Model.Steam
             if (fullPath.StartsWith(gameDir, StringComparison.OrdinalIgnoreCase) == false)
                 throw new ArgumentException(string.Format("The file request is outside the game directory for {0}. File: {1}", game.GameName, file));
 
-            return FileUtils.OpenReadStream(fullPath);
+            return FileUtils.OpenReadStream(fullPath, validation);
         }
 
-        public virtual CrcStream GetWriteFileStream(string file)
+        public virtual Stream GetWriteFileStream(string file, bool validation)
         {
             var fullPath = Path.GetFullPath(Path.Combine(SteamDirectory, file));
 
-            return FileUtils.OpenWriteStream(fullPath);
+            return FileUtils.OpenWriteStream(fullPath, validation);
         }
 
         public void CreateDirectories(IEnumerable<string> directories)

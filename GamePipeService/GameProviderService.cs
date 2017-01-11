@@ -26,13 +26,13 @@ namespace GamePipeService
         }
 
         const int fileBufferSize = 16384;
-        public Stream GetFileStream(string appId, string file, bool acceptCompressedFiles)
+        public Stream GetFileStream(string appId, string file, bool acceptCompressedFiles, bool validation)
         {
             var library = SteamRoot.Instance.GetLibraryForGame(appId);
             if (library == null)
                 throw new ArgumentException("library for appId not found");
 
-            var stream = library.GetReadFileStream(appId, file, acceptCompressedFiles);
+            var stream = library.GetReadFileStream(appId, file, acceptCompressedFiles, validation);
 
             if (stream != null && stream is CrcStream)
             {
@@ -72,7 +72,7 @@ namespace GamePipeService
 
         public IEnumerable<BasicSteamApp> GetAvailableIds()
         {
-            IEnumerable<BasicSteamApp> originalList = SteamRoot.Instance.GetAllGames().Select(x => new BasicSteamApp(x)).OrderBy(x=>x.GameName);
+            IEnumerable<BasicSteamApp> originalList = SteamRoot.Instance.GetAllGames().Select(x => new BasicSteamApp(x)).OrderBy(x => x.GameName);
             //IEnumerable<SteamApp> filteredList = originalList.GroupBy(x => x.AppId).Select(group => group.First());
             return originalList.ToArray();
         }

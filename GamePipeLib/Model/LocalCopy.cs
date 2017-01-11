@@ -5,6 +5,7 @@
 
 using GamePipeLib.Interfaces;
 using System.IO;
+using System;
 
 namespace GamePipeLib.Model
 {
@@ -13,6 +14,11 @@ namespace GamePipeLib.Model
         public LocalCopy(IAppProvider source, ITransferTarget target, ISteamApplication app) : base(source, target, app) { }
         public override string TransferType { get { return "Local Copy"; } }
         public override bool CanPauseMidStream() { return true; }
+
+        public override bool GetIsValidated()
+        {
+            return false;
+        }
 
         protected override void DoAbortProcess()
         {

@@ -64,7 +64,7 @@ namespace GamePipeLib.Model.Steam
             }
         }
 
-        public override Stream GetReadFileStream(string appId, string file, bool acceptCompressedFiles)
+        public override Stream GetReadFileStream(string appId, string file, bool acceptCompressedFiles, bool validation)
         {
             var game = GetGameById(appId);
             if (game == null) throw new ArgumentException(string.Format("App ID {0} not found in {1}", appId, SteamDirectory));
@@ -77,25 +77,25 @@ namespace GamePipeLib.Model.Steam
                 var compressedPath = fullPath + COMPRESSION_EXTENSION;
                 if (File.Exists(compressedPath))
                 {
-                    return FileUtils.OpenCompressedReadStream(compressedPath);
+                    return FileUtils.OpenCompressedReadStream(compressedPath,validation);
                 }
             }
 
-            return FileUtils.OpenReadStream(fullPath);
+            return FileUtils.OpenReadStream(fullPath,  validation);
         }
 
 
-        public override CrcStream GetWriteFileStream(string file)
+        public override Stream GetWriteFileStream(string file, bool validation)
         {
             //if the incoming file doesn't end with COMPRESSION_EXTENSION, and we're compressing files, then open as a deflate stream.
             if (CompressNewGames && !file.EndsWith(COMPRESSION_EXTENSION, StringComparison.OrdinalIgnoreCase))
             {
                 var fullPath = Path.GetFullPath(Path.Combine(SteamDirectory, file + COMPRESSION_EXTENSION));
-                return FileUtils.OpenCompressedWriteStream(fullPath);
+                return FileUtils.OpenCompressedWriteStream(fullPath,validation);
             }
             else
             {
-                return base.GetWriteFileStream(file);
+                return base.GetWriteFileStream(file, validation);
             }
         }
 

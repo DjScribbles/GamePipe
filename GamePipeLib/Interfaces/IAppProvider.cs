@@ -27,7 +27,7 @@ namespace GamePipeLib.Interfaces
 
 
         [OperationContract]
-        Stream GetFileStream(string appId, string file, bool acceptCompressedFiles);
+        Stream GetFileStream(string appId, string file, bool acceptCompressedFiles, bool validation);
 
         [OperationContract]
         uint GetTransferredCrc(string appId, string file);

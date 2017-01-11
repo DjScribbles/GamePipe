@@ -5,6 +5,7 @@
 
 using System.Collections.Generic;
 using GamePipeLib.Utils;
+using System.IO;
 
 namespace GamePipeLib.Interfaces
 {
@@ -17,7 +18,7 @@ namespace GamePipeLib.Interfaces
 
     public interface ITransferTarget
     {
-        CrcStream GetFileStream(string installDir, string file);
+        Stream GetFileStream(string installDir, string file, bool validation);
         void CreateDirectories(IEnumerable<string> directories);
         void WriteAcfFile(string appId, string contents);
         bool HasApp(string appId);
