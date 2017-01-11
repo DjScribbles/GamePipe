@@ -59,6 +59,20 @@ namespace GamePipeLib.Model
                         : _source.CanCopy(Application.AppId));
             }
         }
+
+        private bool _lastCanCopyCheckResult=false;
+        private DateTime _nextCanCopyCheck = DateTime.MinValue;
+        public bool GetCanCopyCached()
+        {
+            var now = DateTime.UtcNow;
+            if (now > _nextCanCopyCheck)
+            {
+                _nextCanCopyCheck = now.AddSeconds(1);
+                _lastCanCopyCheckResult = CanCopy;
+            }
+            return _lastCanCopyCheckResult;
+        }
+
         protected abstract void DoPostProcess();
         protected abstract void DoAbortProcess();
         protected abstract void DoPreProcess();

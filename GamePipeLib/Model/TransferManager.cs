@@ -230,7 +230,7 @@ namespace GamePipeLib.Model
                                     abortStream = true;
                                 }
                                 //If the streams can be paused, and the manager is being paused or this transfer isn't first anymore, then pause the streams and return.
-                                else if (transfer.CanPauseMidStream() && (_IsPaused || (transfer != GetFirstTransfer(preferCurrentTransfer: !transfer.CanCopy))))    //If this transfer became locked, mark it preferred because we should probably close the streams before pausing
+                                else if (transfer.CanPauseMidStream() && (_IsPaused || (transfer != GetFirstTransfer(preferCurrentTransfer: !transfer.GetCanCopyCached()))))    //If this transfer became locked, mark it preferred because we should probably close the streams before pausing
                                 {
                                     //Flag the stream for pausing
                                     pauseStream = true;
