@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.ServiceModel;
 using System.Runtime.Serialization;
 using System.IO;
+using System;
 
 namespace GamePipeLib.Interfaces
 {
@@ -17,7 +18,7 @@ namespace GamePipeLib.Interfaces
         [OperationContract]
         IEnumerable<BasicSteamApp> GetAvailableIds();
         [OperationContract]
-        IEnumerable<string> GetFilesForApp(string appId, bool acceptCompressedFiles);
+        IEnumerable<Tuple<string, long>> GetFilesForApp(string appId, bool acceptCompressedFiles);
         [OperationContract]
         IEnumerable<string> GetDirectoriesForApp(string appId);
         [OperationContract]
@@ -27,7 +28,7 @@ namespace GamePipeLib.Interfaces
 
 
         [OperationContract]
-        Stream GetFileStream(string appId, string file, bool acceptCompressedFiles, bool validation);
+        Stream GetFileStream(string appId, string file, bool acceptCompressedFiles, bool validation, int bufferSize);
 
         [OperationContract]
         uint GetTransferredCrc(string appId, string file);

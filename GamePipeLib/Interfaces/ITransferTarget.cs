@@ -18,7 +18,7 @@ namespace GamePipeLib.Interfaces
 
     public interface ITransferTarget
     {
-        Stream GetFileStream(string installDir, string file, bool validation);
+        Stream GetFileStream(string installDir, string file, bool validation, int bufferSize);
         void CreateDirectories(IEnumerable<string> directories);
         void WriteAcfFile(string appId, string contents);
         bool HasApp(string appId);

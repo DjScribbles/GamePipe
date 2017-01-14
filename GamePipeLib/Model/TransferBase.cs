@@ -14,6 +14,9 @@ namespace GamePipeLib.Model
 {
     public abstract class TransferBase : GamePipeLib.Model.NotifyPropertyChangedBase, IGameTransfer
     {
+        //const int MAX_BUFFER_SIZE = 16777216; //Max buffer of 16MB, this didn't really improve anything, so I'll stop at 8MB
+        const int MAX_BUFFER_SIZE = 8388608; //Max buffer of 8MB
+        const int FALLBACK_BUFFER_SIZE = 16384;
 
         protected IAppProvider _source;
         protected ITransferTarget _target;
@@ -24,7 +27,8 @@ namespace GamePipeLib.Model
         private long _lastReportedBytesTransferred = 0;
 
 
-        private Queue<string> _workQueue;
+        private Queue<Tuple<string, long>> _workQueue;
+        private Tuple<string, long> _currentWorkItem = null;
         private BackupDisposalProcedure _desiredBackupBehavior = BackupDisposalProcedure.BackupThenOpen;
         private DateTime _startTime = DateTime.MinValue;
         private TimeSpan _timeSoFar = TimeSpan.Zero;
@@ -62,7 +66,7 @@ namespace GamePipeLib.Model
 
         public abstract bool GetIsValidated();
 
-        private bool _lastCanCopyCheckResult=false;
+        private bool _lastCanCopyCheckResult = false;
         private DateTime _nextCanCopyCheck = DateTime.MinValue;
         public bool GetCanCopyCached()
         {
@@ -220,7 +224,7 @@ namespace GamePipeLib.Model
                 {
                     var directories = _source.GetDirectoriesForApp(appId);
                     bool acceptCompressedFiles = ((_target is SteamArchive) && ((SteamArchive)_target).CompressNewGames);
-                    _workQueue = new Queue<string>(_source.GetFilesForApp(appId, acceptCompressedFiles));
+                    _workQueue = new Queue<Tuple<string, long>>(_source.GetFilesForApp(appId, acceptCompressedFiles));
 
                     if (_workQueue.Any())
                     {
@@ -230,7 +234,7 @@ namespace GamePipeLib.Model
                 }
                 catch (System.IO.DirectoryNotFoundException)
                 {
-                    _workQueue = new Queue<string>();
+                    _workQueue = new Queue<Tuple<string, long>>();
                 }    //If the directory isn't present then allow the acf to move
 
                 _fileCount = _workQueue.Count;
@@ -303,9 +307,9 @@ namespace GamePipeLib.Model
                 target.Dispose();
             }
 
-            if (result == false)
+            if (result == false && _currentWorkItem != null)
             {
-                _workQueue.Enqueue(file);
+                _workQueue.Enqueue(_currentWorkItem);
                 IterrimUpdateMethod(0);
             }
             else
@@ -335,9 +339,10 @@ namespace GamePipeLib.Model
             }
         }
 
-        public void GetNextFile(out string file, out Stream source, out Stream target, out Action<string, Stream, Stream> finishMethod, out Action<long> updateMethod, out long totalBytesRead)
+        public void GetNextFile(out string file, out long fileSize, out Stream source, out Stream target, out Action<string, Stream, Stream> finishMethod, out Action<long> updateMethod, out long totalBytesRead)
         {
             file = null;
+            fileSize = 0;
             source = null;
             target = null;
             totalBytesRead = 0;
@@ -378,18 +383,25 @@ namespace GamePipeLib.Model
                 while (source == null || target == null)
                 {
                     file = null;
+                    fileSize = 0;
                     Stream srcStrm = null;
                     Stream dstStrm = null;
                     string appId = Application.AppId;
                     if (_workQueue.Any() == false) return;
-                    file = _workQueue.Dequeue();
+                    _currentWorkItem = _workQueue.Dequeue();
+                    file = _currentWorkItem.Item1;
+                    fileSize = _currentWorkItem.Item2;
                     var theFile = file;
                     try
                     {
                         bool acceptCompressedFiles = ((_target is SteamArchive) && ((SteamArchive)_target).CompressNewGames);
-                        srcStrm = _source.GetFileStream(appId, file, acceptCompressedFiles, GetIsValidated());
+                        int bufferSize = Convert.ToInt32(Math.Min(fileSize, MAX_BUFFER_SIZE));
+                        if (bufferSize <= 0)
+                            bufferSize = FALLBACK_BUFFER_SIZE;
 
-                        dstStrm = _target.GetFileStream(Application.InstallDir, file, GetIsValidated());
+                        srcStrm = _source.GetFileStream(appId, file, acceptCompressedFiles, GetIsValidated(), bufferSize);
+                        dstStrm = _target.GetFileStream(Application.InstallDir, file, GetIsValidated(), bufferSize);
+
                         source = srcStrm;
                         target = dstStrm;
                         _retriedList.RemoveAll(x => theFile == x);
@@ -397,7 +409,7 @@ namespace GamePipeLib.Model
                     catch (Exception ex)
                     {
 
-                        _workQueue.Enqueue(file);
+                        _workQueue.Enqueue(_currentWorkItem);
                         Utils.Logging.Logger.Debug(string.Format("Error open file streams for {0}, retry queued, moving on to another file.", file), ex);
                         //try again later
                         if (_retriedList.Contains(theFile) == false)
@@ -431,6 +443,7 @@ namespace GamePipeLib.Model
 
                                 _workQueue.Clear();
                                 file = null;
+                                fileSize = 0;
                                 srcStrm?.Dispose();
                                 dstStrm?.Dispose();
                                 source = null;
@@ -442,6 +455,7 @@ namespace GamePipeLib.Model
                         }
 
                         file = null;
+                        fileSize = 0;
                         srcStrm?.Dispose();
                         dstStrm?.Dispose();
                         source = null;

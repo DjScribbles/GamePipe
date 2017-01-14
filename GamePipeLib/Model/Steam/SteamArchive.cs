@@ -52,7 +52,7 @@ namespace GamePipeLib.Model.Steam
             }
         }
 
-        public override IEnumerable<string> GetFilesForApp(string appId, bool acceptCompressedFiles)
+        public override IEnumerable<Tuple<string, long>> GetFilesForApp(string appId, bool acceptCompressedFiles)
         {
             if (acceptCompressedFiles)
             {
@@ -60,11 +60,11 @@ namespace GamePipeLib.Model.Steam
             }
             else
             {
-                return base.GetFilesForApp(appId, acceptCompressedFiles).Select(path => StripFileCompressionExtension(path));
+                return base.GetFilesForApp(appId, acceptCompressedFiles).Select(pair => new Tuple<string, long>(StripFileCompressionExtension(pair.Item1), pair.Item2));//This is a little innefficient, but not common and only affects the setup of the transfer.
             }
         }
 
-        public override Stream GetReadFileStream(string appId, string file, bool acceptCompressedFiles, bool validation)
+        public override Stream GetReadFileStream(string appId, string file, bool acceptCompressedFiles, bool validation, int bufferSize)
         {
             var game = GetGameById(appId);
             if (game == null) throw new ArgumentException(string.Format("App ID {0} not found in {1}", appId, SteamDirectory));
@@ -77,25 +77,25 @@ namespace GamePipeLib.Model.Steam
                 var compressedPath = fullPath + COMPRESSION_EXTENSION;
                 if (File.Exists(compressedPath))
                 {
-                    return FileUtils.OpenCompressedReadStream(compressedPath,validation);
+                    return FileUtils.OpenCompressedReadStream(compressedPath, validation, bufferSize);
                 }
             }
 
-            return FileUtils.OpenReadStream(fullPath,  validation);
+            return FileUtils.OpenReadStream(fullPath, validation, bufferSize);
         }
 
 
-        public override Stream GetWriteFileStream(string file, bool validation)
+        public override Stream GetWriteFileStream(string file, bool validation, int bufferSize)
         {
             //if the incoming file doesn't end with COMPRESSION_EXTENSION, and we're compressing files, then open as a deflate stream.
             if (CompressNewGames && !file.EndsWith(COMPRESSION_EXTENSION, StringComparison.OrdinalIgnoreCase))
             {
                 var fullPath = Path.GetFullPath(Path.Combine(SteamDirectory, file + COMPRESSION_EXTENSION));
-                return FileUtils.OpenCompressedWriteStream(fullPath,validation);
+                return FileUtils.OpenCompressedWriteStream(fullPath, validation, bufferSize);
             }
             else
             {
-                return base.GetWriteFileStream(file, validation);
+                return base.GetWriteFileStream(file, validation, bufferSize);
             }
         }
 

@@ -13,45 +13,6 @@ using System.Collections.ObjectModel;
 
 namespace GamePipeLib.Model.Steam
 {
-    //    public abstract class LibraryBase : NotifyPropertyChangedBase, IAppProvider
-    //    {
-    //        public bool CanCopy(string appId)
-    //        {
-    //            return true;
-    //        }
-
-    //        public abstract string GetAcfFileContent(string appId);
-
-    //        public IEnumerable<BasicSteamApp> GetAvailableIds()
-    //        {
-    //            throw new NotImplementedException();
-    //        }
-
-    //        public IEnumerable<string> GetDirectoriesForApp(string appId)
-    //        {
-    //            throw new NotImplementedException();
-    //        }
-
-    //        public IEnumerable<string> GetFilesForApp(string appId, bool acceptCompressedFiles)
-    //        {
-    //            throw new NotImplementedException();
-    //        }
-
-    //        public Stream GetFileStream(string appId, string file, bool acceptCompressedFiles)
-    //        {
-    //            throw new NotImplementedException();
-    //        }
-
-    //        public long GetMeasuredGameSize(string appId)
-    //        {
-
-    //        }
-
-    //        public uint GetTransferredCrc(string appId, string file)
-    //        {
-    //            throw new NotImplementedException();
-    //        }
-    //    }
 
     public class SteamLibrary : NotifyPropertyChangedBase, IAppProvider, ITransferTarget
     {
@@ -260,17 +221,20 @@ namespace GamePipeLib.Model.Steam
             return Games.Select(x => new BasicSteamApp(x));
         }
 
-        public virtual IEnumerable<string> GetFilesForApp(string appId, bool acceptCompressedFiles)
+        public virtual IEnumerable<Tuple<string, long>> GetFilesForApp(string appId, bool acceptCompressedFiles)
         {
             var game = GetGameById(appId);
             if (game == null) throw new ArgumentException(string.Format("App ID {0} not found in {1}", appId, SteamDirectory));
 
             string baseDir = game.GameDir + "\\";
-            return Directory.EnumerateFiles(game.GameDir, "*", SearchOption.AllDirectories).OrderByDescending(x => (new FileInfo(x)).Length)
-                .Select(path => path.StartsWith(baseDir, StringComparison.OrdinalIgnoreCase)
-                                ? path.Substring(baseDir.Length)
-                                : path);
 
+            return (from file in Directory.EnumerateFiles(game.GameDir, "*", SearchOption.AllDirectories)
+                    let info = new FileInfo(file)
+                    let path = (file.StartsWith(baseDir, StringComparison.OrdinalIgnoreCase)
+                           ? file.Substring(baseDir.Length)
+                           : file)
+                    orderby info.Length descending
+                    select new Tuple<string, long>(path, info.Length));
         }
 
         public virtual IEnumerable<string> GetDirectoriesForApp(string appId)
@@ -301,9 +265,9 @@ namespace GamePipeLib.Model.Steam
             return game.CanCopyIfForced();
         }
 
-        Stream IAppProvider.GetFileStream(string appId, string file, bool acceptCompressedFiles, bool validation)
+        Stream IAppProvider.GetFileStream(string appId, string file, bool acceptCompressedFiles, bool validation, int bufferSize)
         {
-            return GetReadFileStream(appId, file, acceptCompressedFiles, validation);
+            return GetReadFileStream(appId, file, acceptCompressedFiles, validation, bufferSize);
         }
 
 
@@ -322,10 +286,10 @@ namespace GamePipeLib.Model.Steam
             return null;
         }
 
-        Stream ITransferTarget.GetFileStream(string installDir, string file, bool validation)
+        Stream ITransferTarget.GetFileStream(string installDir, string file, bool validation, int bufferSize)
         {
             string path = Path.Combine(SteamDirectory, "common", installDir, file);
-            return GetWriteFileStream(path, validation);
+            return GetWriteFileStream(path, validation, bufferSize);
         }
 
         public void WriteAcfFile(string appId, string contents)
@@ -374,7 +338,7 @@ namespace GamePipeLib.Model.Steam
             }
         }
 
-        public virtual Stream GetReadFileStream(string appId, string file, bool acceptCompressedFiles, bool validation)
+        public virtual Stream GetReadFileStream(string appId, string file, bool acceptCompressedFiles, bool validation, int bufferSize)
         {
             var game = GetGameById(appId);
             if (game == null) throw new ArgumentException(string.Format("App ID {0} not found in {1}", appId, SteamDirectory));
@@ -384,14 +348,14 @@ namespace GamePipeLib.Model.Steam
             if (fullPath.StartsWith(gameDir, StringComparison.OrdinalIgnoreCase) == false)
                 throw new ArgumentException(string.Format("The file request is outside the game directory for {0}. File: {1}", game.GameName, file));
 
-            return FileUtils.OpenReadStream(fullPath, validation);
+            return FileUtils.OpenReadStream(fullPath, validation, bufferSize);
         }
 
-        public virtual Stream GetWriteFileStream(string file, bool validation)
+        public virtual Stream GetWriteFileStream(string file, bool validation, int bufferSize)
         {
             var fullPath = Path.GetFullPath(Path.Combine(SteamDirectory, file));
 
-            return FileUtils.OpenWriteStream(fullPath, validation);
+            return FileUtils.OpenWriteStream(fullPath, validation, bufferSize);
         }
 
         public void CreateDirectories(IEnumerable<string> directories)

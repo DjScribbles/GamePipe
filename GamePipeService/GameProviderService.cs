@@ -26,13 +26,13 @@ namespace GamePipeService
         }
 
         const int fileBufferSize = 16384;
-        public Stream GetFileStream(string appId, string file, bool acceptCompressedFiles, bool validation)
+        public Stream GetFileStream(string appId, string file, bool acceptCompressedFiles, bool validation, int bufferSize)
         {
             var library = SteamRoot.Instance.GetLibraryForGame(appId);
             if (library == null)
                 throw new ArgumentException("library for appId not found");
 
-            var stream = library.GetReadFileStream(appId, file, acceptCompressedFiles, validation);
+            var stream = library.GetReadFileStream(appId, file, acceptCompressedFiles, validation, bufferSize);
 
             if (stream != null && stream is CrcStream)
             {
@@ -86,7 +86,7 @@ namespace GamePipeService
             return library.GetDirectoriesForApp(appId);
         }
 
-        public IEnumerable<string> GetFilesForApp(string appId, bool acceptCompressedFiles)
+        public IEnumerable<Tuple<string, long>> GetFilesForApp(string appId, bool acceptCompressedFiles)
         {
             var library = SteamRoot.Instance.GetLibraryForGame(appId);
             if (library == null)

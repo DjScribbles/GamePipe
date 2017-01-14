@@ -173,6 +173,7 @@ namespace GamePipeLib.Model
         private void TransferFiles(TransferBase transfer, long bufferSize = 65535)
         {
             string file = null;
+            long fileSize = 0;
             Stream sourceStream = null;
             Stream destStream = null;
             Action<string, Stream, Stream> finishMethod = null;
@@ -186,7 +187,7 @@ namespace GamePipeLib.Model
             IAsyncResult readState = null;
             do
             {
-                if (!readStarted) transfer.GetNextFile(out file, out sourceStream, out destStream, out finishMethod, out updateMethod, out totalBytesRead);
+                if (!readStarted) transfer.GetNextFile(out file, out fileSize, out sourceStream, out destStream, out finishMethod, out updateMethod, out totalBytesRead);
                 if (file != null)
                 {
                     var thisFile = file;
@@ -247,7 +248,7 @@ namespace GamePipeLib.Model
                             }
                             if (endOfFile && !abortStream && !pauseStream)
                             {
-                                transfer.GetNextFile(out file, out sourceStream, out destStream, out finishMethod, out updateMethod, out totalBytesRead);
+                                transfer.GetNextFile(out file, out fileSize, out sourceStream, out destStream, out finishMethod, out updateMethod, out totalBytesRead);
                                 if (file != null)
                                 {
                                     readState = sourceStream.BeginRead(BackBuffer, 0, BackBuffer.Length, null, null);

@@ -79,7 +79,16 @@ namespace GamePipeLib.Utils
 
         public static bool IsSteamOpen()
         {
-            return System.Diagnostics.Process.GetProcessesByName("SteamService").Any();
+            try
+            {
+                var value = (int)Microsoft.Win32.Registry.GetValue(@"HKEY_CURRENT_USER\SOFTWARE\Valve\Steam\ActiveProcess", "pid", null);
+                return (value != 0);
+            }
+            catch
+            {
+                return System.Diagnostics.Process.GetProcessesByName("SteamService").Any();
+            }
+
         }
 
         public static void CloseSteam()
