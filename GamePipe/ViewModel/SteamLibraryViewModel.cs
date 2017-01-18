@@ -199,6 +199,7 @@ namespace GamePipe.ViewModel
                     foreach (var game in items)
                     {
                         game.Model.DeleteGameData();
+                        GamePipeLib.Utils.Logging.Logger.Info($"Game \"{ game.DisplayName}\" ({game.ReadableDiskSize}) deleted by user request.");
                     }
                 }
             }

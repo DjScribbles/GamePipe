@@ -137,6 +137,8 @@ namespace GamePipe.ViewModel
             if (result == System.Windows.MessageBoxResult.Yes)
             {
                 Model.DeleteGameData();
+                GamePipeLib.Utils.Logging.Logger.Info($"Game \"{ DisplayName}\" ({ReadableDiskSize}) deleted by user request.");
+
             }
         }
 

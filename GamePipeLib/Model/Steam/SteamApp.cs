@@ -230,7 +230,7 @@ namespace GamePipeLib.Model.Steam
 
             File.Delete(AcfFile);
             Utils.WingmanServer.SendSignal_AddAcfFileToHitList(AcfFile);
-
+            SteamRoot.Instance.SteamRestartRequired = true;
             try
             {
                 DeleteDirectoryTree(GameDir, true);
@@ -253,6 +253,7 @@ namespace GamePipeLib.Model.Steam
         public void DeleteManifest()
         {
             File.Delete(AcfFile);
+            SteamRoot.Instance.SteamRestartRequired = true;
         }
 
         private void DeleteDirectoryTree(string dirPath, bool deleteFiles = false)

@@ -145,9 +145,6 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <None Include="DelayedStartSteam.bat">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Include="packages.config" />
     <AppDesigner Include="Properties\" />
     <None Include="Properties\Settings.settings">
