@@ -33,6 +33,11 @@ namespace WingmanLib
         {
             _restartRequested = restartRequested;
         }
+        public static void ClearRestartRequest()
+        {
+            _restartRequested = false;
+        }
+
 
         public bool HitListHasItems()
         {

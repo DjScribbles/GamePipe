@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Wingman")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle("GamePipe_Helper")]
+[assembly: AssemblyDescription("This program automatically restarts Steam while your PC is idle if you've moved games in Game Pipe.")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("Wingman")]
+[assembly: AssemblyCompany("Big Sky Software")]
+[assembly: AssemblyProduct("GamePipe_Helper")]
 [assembly: AssemblyCopyright("Copyright ©  2016")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

@@ -11,7 +11,7 @@
 ; NOTE: The value of AppId uniquely identifies this application.
 ; Do not use the same AppId value in installers for other applications.
 ; (To generate a new GUID, click Tools | Generate GUID inside the IDE.)
-AppId={{160D770F-B51A-443A-B01B-D0E0128A0B31}
+AppId={160D770F-B51A-443A-B01B-D0E0128A0B31}
 AppName={#MyAppName}
 AppVersion={#MyAppVersion}
 ;AppVerName={#MyAppName} {#MyAppVersion}
@@ -29,6 +29,8 @@ Type: files; Name: {app}\CachedImage.dll
 Type: files; Name: {app}\GamePipeLib.dll
 Type: files; Name: {app}\GamePipeService.dll
 Type: files; Name: {app}\log4net.dll
+Type: files; Name: {app}\Wingman.exe
+Type: files; Name: {app}\Wingman.exe.config
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
@@ -39,8 +41,8 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 [Files]        
 Source: "..\GamePipe\bin\Release\GamePipe.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\GamePipe\bin\Release\GamePipe.exe.config"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\GamePipe\bin\Release\Wingman.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\GamePipe\bin\Release\Wingman.exe.config"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\GamePipe\bin\Release\GamePipe_Helper.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\GamePipe\bin\Release\GamePipe_Helper.exe.config"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\License.txt"; DestDir: "{app}"; Flags: ignoreversion
 
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files

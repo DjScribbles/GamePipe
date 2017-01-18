@@ -15,8 +15,8 @@ namespace GamePipeLib.Utils
 
     public static class WingmanServer
     {
-        private const string CLIENT_NAME = "Wingman.exe";
-        private const string CLIENT_PROCESS = "Wingman";
+        private const string CLIENT_NAME = "GamePipe_Helper.exe";
+        private const string CLIENT_PROCESS = "GamePipe_Helper";
 
         public static void SendSignal_AddAcfFileToHitList(string filePath)
         {
@@ -84,7 +84,7 @@ namespace GamePipeLib.Utils
                 }
                 catch (Exception ex)
                 {
-                    Utils.Logging.Logger.Error("Exception in spawning the Wingman process:", ex);
+                    Utils.Logging.Logger.Error($"Exception in spawning the {CLIENT_PROCESS} process:", ex);
                 }
             }
 
@@ -96,7 +96,7 @@ namespace GamePipeLib.Utils
                 }
                 catch (Exception ex)
                 {
-                    Utils.Logging.Logger.Error("Exception in connecting to the Wingman client:", ex);
+                    Utils.Logging.Logger.Error($"Exception in connecting to the {CLIENT_PROCESS} client:", ex);
                 }
             }
             return _wingmanService;

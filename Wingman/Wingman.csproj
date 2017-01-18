@@ -7,8 +7,8 @@
     <ProjectGuid>{C5AFCADF-2E58-4067-951F-B1366C49735B}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Wingman</RootNamespace>
-    <AssemblyName>Wingman</AssemblyName>
+    <RootNamespace>GamePipe_Helper</RootNamespace>
+    <AssemblyName>GamePipe_Helper</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
