@@ -198,30 +198,53 @@ namespace GamePipeLib.Model
 
                     transfer.Status = Interfaces.TransferStatus.TransferingFiles;
                     long fileLength = 0;
-                    if (sourceStream.CanSeek) fileLength = sourceStream.Length;
+                    //Local file streams can check the file length, however network streams cannot, in which case we read until we get a read length of 0
+                    if (sourceStream.CanSeek)
+                        fileLength = sourceStream.Length;
+
+
                     bool endOfFile = false;
+
+                    //If we already started a read while waiting for the final write on the previous file, then skip this block
                     if (!readStarted)
                     {
-                        //start reading asynchronously
-                        readState = sourceStream.BeginRead(ActiveBuffer, 0, ActiveBuffer.Length, null, null);
-                        readStarted = true;
-                    }
-                    do
-                    {
-                        readLength = sourceStream.EndRead(readState);
-                        readStarted = false;
-                        totalBytesRead += readLength;
-
-                        //If we haven't reached the end of the file...
-                        if (readLength != 0)
+                        try
                         {
-                            var thisTotalBytesRead = totalBytesRead;
+                            if (file == "UI_Roster.swf")
+                                throw new IOException("Testing");
+                            //start reading asynchronously
+                            readState = sourceStream.BeginRead(ActiveBuffer, 0, ActiveBuffer.Length, null, null);
+                            readStarted = true;
+                        }
+                        catch (IOException ex)
+                        {
+                            SafeDisposeStream(sourceStream);
+                            SafeDisposeStream(destStream);
+                            readStarted = false;
+                            Utils.Logging.Logger.Error($"Exception reading from {file}: {ex.Message}. A retry will be attempted.");
+                            transfer.RetryFile(file, fileSize);
+                        }
+                    }
+                    if (readStarted)
+                    {
 
-                            bool pauseStream = false;
-                            bool abortStream = false;
-                            //Kick off another read asynchronously while we write. 
-                            try
+                        bool readFailedMidStream = false;
+                        Exception readFailedMidStreamException = null;
+                        long readFailedMidStreamFileSize = 0;
+                        //Loop until we reach the end of file
+                        do
+                        {
+                            readLength = sourceStream.EndRead(readState);
+                            readStarted = false;
+                            totalBytesRead += readLength;
+
+                            //If we haven't reached the end of the file...
+                            if (readLength != 0)
                             {
+                                var thisTotalBytesRead = totalBytesRead;
+                                readFailedMidStream = false;
+                                bool pauseStream = false;
+                                bool abortStream = false;
                                 if (fileLength > 0 && sourceStream.Position >= fileLength)
                                 {
                                     endOfFile = true;
@@ -238,68 +261,89 @@ namespace GamePipeLib.Model
                                 }
                                 else
                                 {
-                                    readState = sourceStream.BeginRead(BackBuffer, 0, BackBuffer.Length, null, null);
-                                    readStarted = true;
-                                }
-                            }
-                            catch (IOException)
-                            {
-                                endOfFile = true;
-                            }
-                            if (endOfFile && !abortStream && !pauseStream)
-                            {
-                                transfer.GetNextFile(out file, out fileSize, out sourceStream, out destStream, out finishMethod, out updateMethod, out totalBytesRead);
-                                if (file != null)
-                                {
-                                    readState = sourceStream.BeginRead(BackBuffer, 0, BackBuffer.Length, null, null);
-                                    readStarted = true;
-                                }
-                                else
-                                {
-                                    file = thisFile;
-                                    sourceStream = thisSourceStream;
-                                    destStream = thisDestStream;
-                                }
-                            }
-                            //Write the active buffer to the destination, update progress, and do a buffer swap. 
-                            thisDestStream.Write(ActiveBuffer, 0, readLength);
-                            thisUpdateMethod(thisTotalBytesRead);
-                            BackBuffer = Interlocked.Exchange(ref ActiveBuffer, BackBuffer);
-                            if (endOfFile == false)
-                            {
-                                //If there is an abort request, dispose of our active streams and bail out. The fact that we dispose here and nowhere else is a little dirty...
-                                if (abortStream)
-                                {
+                                    //Kick off another read to run asynchronously while we write. 
                                     try
                                     {
-                                        sourceStream.Dispose();
+                                        if (file == @"Adobe AIR\Versions\1.0\Adobe AIR.dll")
+                                            throw new IOException("Testing");
+                                        readState = sourceStream.BeginRead(BackBuffer, 0, BackBuffer.Length, null, null);
+                                        readStarted = true;
                                     }
-                                    catch (Exception ex)
+                                    catch (IOException ex)
                                     {
-                                        Utils.Logging.Logger.Error("An exception occurred while aborting the current file source stream:", ex);
+                                        endOfFile = true;
+                                        readFailedMidStream = true;
+                                        readFailedMidStreamException = ex;
+                                        readFailedMidStreamFileSize = fileSize;
                                     }
-                                    try
-                                    {
-                                        destStream.Dispose();
-                                    }
-                                    catch (Exception ex)
-                                    {
-                                        Utils.Logging.Logger.Error("An exception occurred while aborting the current file destination stream:", ex);
-                                    }
-                                    return;
                                 }
-                                else if (pauseStream)
+
+                                if (endOfFile && !abortStream && !pauseStream)
                                 {
-                                    transfer.PauseStreaming(thisFile, sourceStream, destStream, thisTotalBytesRead);
-                                    return;
+                                    bool tryAgain = false;
+                                    do
+                                    {
+                                        transfer.GetNextFile(out file, out fileSize, out sourceStream, out destStream, out finishMethod, out updateMethod, out totalBytesRead);
+                                        if (file != null)
+                                        {
+                                            try
+                                            {
+                                                readState = sourceStream.BeginRead(BackBuffer, 0, BackBuffer.Length, null, null);
+                                                readStarted = true;
+                                                tryAgain = false;
+                                            }
+                                            catch (IOException ex)
+                                            {
+                                                SafeDisposeStream(sourceStream);
+                                                SafeDisposeStream(destStream);
+                                                readStarted = false;
+                                                Utils.Logging.Logger.Error($"Exception reading from {file}: {ex.Message}. A retry will be attempted.");
+                                                transfer.RetryFile(file, fileSize);
+                                                tryAgain = true;
+                                            }
+                                        }
+                                        else
+                                        {
+                                            file = thisFile;
+                                            sourceStream = thisSourceStream;
+                                            destStream = thisDestStream;
+                                            tryAgain = false;
+                                        }
+                                    } while (tryAgain);
+                                }
+
+                                //Write the active buffer to the destination, update progress, and do a buffer swap. 
+                                thisDestStream.Write(ActiveBuffer, 0, readLength);
+                                thisUpdateMethod(thisTotalBytesRead);
+                                BackBuffer = Interlocked.Exchange(ref ActiveBuffer, BackBuffer);
+                                if (endOfFile == false)
+                                {
+                                    //If there is an abort request, dispose of our active streams and bail out. The fact that we dispose here and nowhere else is a little dirty...
+                                    if (abortStream)
+                                    {
+                                        SafeDisposeStream(sourceStream);
+                                        SafeDisposeStream(destStream);
+                                        return;
+                                    }
+                                    else if (pauseStream)
+                                    {
+                                        transfer.PauseStreaming(thisFile, sourceStream, destStream, thisTotalBytesRead);
+                                        return;
+                                    }
                                 }
                             }
                         }
-                    }
-                    while ((readLength != 0) && (endOfFile == false));    //Break out once there is no more to read
+                        while ((readLength != 0) && (endOfFile == false));    //Break out once there is no more to read
 
-                    if (thisFinishMethod != null)
-                        thisFinishMethod(thisFile, thisSourceStream, thisDestStream); //Callback to the finish method,
+                        if (readFailedMidStream)
+                        {
+                            SafeDisposeStream(thisSourceStream);
+                            SafeDisposeStream(thisDestStream);
+                            Utils.Logging.Logger.Error($"Exception reading from {thisFile}: {readFailedMidStreamException?.Message}. A retry will be attempted.");
+                            transfer.RetryFile(thisFile, readFailedMidStreamFileSize);
+                        }
+                        else thisFinishMethod?.Invoke(thisFile, thisSourceStream, thisDestStream); //Callback to the finish method,
+                    }
                 }
 
                 if (_IsPaused || (transfer != GetFirstTransfer()))
@@ -374,6 +418,18 @@ namespace GamePipeLib.Model
 
             //Represent progress as remaining bytes to tranfer from the largest observed size of all transfers. This should better reflect % complete with a large queue, and prevent jumping as items are finished
             return Convert.ToDouble(_totalTransferSize - bytesToTransfer) / Convert.ToDouble(_totalTransferSize);
+        }
+
+        private void SafeDisposeStream(Stream theStream)
+        {
+            try
+            {
+                theStream.Dispose();
+            }
+            catch (Exception ex)
+            {
+                Utils.Logging.Logger.Error("An exception occurred while aborting a file stream:", ex);
+            }
         }
     }
 }

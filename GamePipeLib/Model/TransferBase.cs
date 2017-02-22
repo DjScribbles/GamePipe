@@ -296,6 +296,7 @@ namespace GamePipeLib.Model
 
         private void ValidateAndCloseFile(string file, Stream source, Stream target)
         {
+
             bool result = false;
             try
             {
@@ -315,6 +316,7 @@ namespace GamePipeLib.Model
             else
             {
                 //Latch the copied bytes into the validated bytes
+                _retriedList.RemoveAll(x => file == x);
                 _validatedBytesTransferred = _lastReportedBytesTransferred;
             }
         }
@@ -404,55 +406,11 @@ namespace GamePipeLib.Model
 
                         source = srcStrm;
                         target = dstStrm;
-                        _retriedList.RemoveAll(x => theFile == x);
                     }
                     catch (Exception ex)
                     {
-
-                        _workQueue.Enqueue(_currentWorkItem);
-                        Utils.Logging.Logger.Debug(string.Format("Error open file streams for {0}, retry queued, moving on to another file.", file), ex);
-                        //try again later
-                        if (_retriedList.Contains(theFile) == false)
-                        {
-                            _retriedList.Add(theFile);
-                        }
-                        else if (_retriedList.First() == theFile)
-                        {
-                            //If we get to the first file, and the list size is the same time as the last time we got here, clear the work queue, and give up
-                            if (_lastRetriedListLength == _retriedList.Count)
-                            {
-
-
-                                if (Progress < 0.9f)
-                                {
-                                    Utils.Logging.Logger.Error("Two times through the retry list and no progress, less than 90% complete, so just aborting.", ex);
-                                    Status = TransferStatus.Aborting;
-                                    Task.Run(() =>
-                                    {
-                                        System.Windows.MessageBox.Show(string.Format("{0} files failed to transfer for {1}.\nFile transfer aborted.", _lastRetriedListLength, Application.GameName), "Transfer failed", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Exclamation, System.Windows.MessageBoxResult.OK);
-                                    });
-                                }
-                                else
-                                {
-                                    Utils.Logging.Logger.Error(string.Format("Two times through the retry list and no progress, giving up on the transfer, but almost done, so finishing normally with a warning.", file), ex);
-                                    Task.Run(() =>
-                                    {
-                                        System.Windows.MessageBox.Show(string.Format("{0} files failed to transfer for {1}.\nYou will need to validate the game after restarting Steam.", _lastRetriedListLength, Application.GameName), "Transfer Incomplete", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Exclamation, System.Windows.MessageBoxResult.OK);
-                                    });
-                                }
-
-                                _workQueue.Clear();
-                                file = null;
-                                fileSize = 0;
-                                srcStrm?.Dispose();
-                                dstStrm?.Dispose();
-                                source = null;
-                                target = null;
-                                return;
-                            }
-
-                            _lastRetriedListLength = _retriedList.Count;
-                        }
+                        Utils.Logging.Logger.Debug(string.Format("Error openning file streams for {0}.", file), ex);
+                        var retry = RetryFile(_currentWorkItem);
 
                         file = null;
                         fileSize = 0;
@@ -460,11 +418,64 @@ namespace GamePipeLib.Model
                         dstStrm?.Dispose();
                         source = null;
                         target = null;
+
+                        //If the retry failed, then give up
+                        if (!retry)
+                            return;
                     }
                 }
             }
         }
 
+        public bool RetryFile(string filePath, long fileSize)
+        {
+            return RetryFile(new Tuple<string, long>(filePath, fileSize));
+        }
+
+        public bool RetryFile(Tuple<string, long> entry)
+        {
+            _workQueue.Enqueue(entry);
+            var theFile = entry.Item1;
+
+            //try again later
+            if (_retriedList.Contains(theFile) == false)
+            {
+                _retriedList.Add(theFile);
+            }
+            else if (_retriedList.First() == theFile)
+            {
+                //If we get to the first file, and the list size is the same time as the last time we got here, clear the work queue, and give up
+                if (_lastRetriedListLength == _retriedList.Count)
+                {
+
+
+                    if (Progress < 0.9f)
+                    {
+                        Utils.Logging.Logger.Error("Two times through the retry list and no progress, less than 90% complete, so just aborting.");
+                        Status = TransferStatus.Aborting;
+                        Task.Run(() =>
+                        {
+                            System.Windows.MessageBox.Show(string.Format("{0} files failed to transfer for {1}.\nFile transfer aborted.", _lastRetriedListLength, Application.GameName), "Transfer failed", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Exclamation, System.Windows.MessageBoxResult.OK);
+                        });
+                    }
+                    else
+                    {
+                        Utils.Logging.Logger.Error(string.Format("Two times through the retry list and no progress, giving up on the transfer, but almost done, so finishing normally with a warning.", theFile));
+                        Utils.Logging.Logger.Warn($"The game files for {Application.GameName} shoule be validated, some files failed to transfer");
+                        Task.Run(() =>
+                        {
+                            System.Windows.MessageBox.Show(string.Format("{0} files failed to transfer for {1}.\nYou will need to validate the game after restarting Steam.", _lastRetriedListLength, Application.GameName), "Transfer Incomplete", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Exclamation, System.Windows.MessageBoxResult.OK);
+                        });
+                    }
+
+                    _workQueue.Clear();
+                    return false;
+                }
+
+                _lastRetriedListLength = _retriedList.Count;
+            }
+            return true;
+        }
 
         private DateTime _lastTransferUpdateTime = DateTime.MinValue;
         private DateTime _nextTransferUpdateTime = DateTime.MinValue;

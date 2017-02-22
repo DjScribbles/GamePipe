@@ -14,7 +14,7 @@ namespace GamePipeLib.Model.Steam
             {
                 if (_UiDispatcher == null)
                 {
-                    _UiDispatcher = System.Windows.Application.Current.Dispatcher;
+                    _UiDispatcher = System.Windows.Application.Current?.Dispatcher;
                 }
                 return _UiDispatcher;
             }
