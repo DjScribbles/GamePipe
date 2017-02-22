@@ -3,7 +3,7 @@
 
 For now, you can support Game Pipe via Paypal donation (note: I am not a non-profit, your donation is used to support and encourage future development). In the near future, Game Pipe will be purchasable on Amazon, Itch.io, and Windows Store for $5.
 
-Sadly, Game Pipe will probably never be available on Steam, because of Valve's backwards attitudes towards software.
+Sadly, __Game Pipe will probably never be available on Steam__, because of Valve's backwards attitudes towards software (even with the upcoming Steam-Direct changes, they have indicated they will not allow utility software like Game Pipe). However, if by some miracle Valve changes their policies, I will do my best to provide Steam key's to anyone who has donated via paypal or purchased Game Pipe on other platforms.
 
 # About Game Pipe
 Game Pipe is an open-source game library management tool for Windows that allows you to move your Steam games around your PC and network with ease.
