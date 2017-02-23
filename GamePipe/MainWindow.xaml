@@ -28,7 +28,6 @@
             <Label DockPanel.Dock="Right" HorizontalAlignment="Right" HorizontalContentAlignment="Right">
                 <Hyperlink Click="CloseUpdateButton_Click" >Ignore</Hyperlink>
             </Label>
-
         </DockPanel>
         <TabControl Grid.Row="1">
             <TabItem x:Name="LocalLibsTab" Header="Local Libraries" Template="{DynamicResource TabItemControlTemplate1}">
