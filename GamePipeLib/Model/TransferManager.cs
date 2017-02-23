@@ -210,8 +210,6 @@ namespace GamePipeLib.Model
                     {
                         try
                         {
-                            if (file == "UI_Roster.swf")
-                                throw new IOException("Testing");
                             //start reading asynchronously
                             readState = sourceStream.BeginRead(ActiveBuffer, 0, ActiveBuffer.Length, null, null);
                             readStarted = true;
@@ -264,8 +262,6 @@ namespace GamePipeLib.Model
                                     //Kick off another read to run asynchronously while we write. 
                                     try
                                     {
-                                        if (file == @"Adobe AIR\Versions\1.0\Adobe AIR.dll")
-                                            throw new IOException("Testing");
                                         readState = sourceStream.BeginRead(BackBuffer, 0, BackBuffer.Length, null, null);
                                         readStarted = true;
                                     }

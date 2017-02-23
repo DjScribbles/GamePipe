@@ -127,11 +127,13 @@ namespace GamePipeLib.Model.Steam.Cleanup
          * 
          * 
          * 
+         * Dead Shortcut - Check the desktop for shortcuts to games that are no longer installed anywhere
          * 
          * Astranged ACF - An acf file in one library while the game dir is found in another - Action - Move ACF         
+         * Empty ACF w/ Backup - ACF File related to a GPBackup directory, but no game dir. - Restore, Delete All.
          * GP Backup - A folder begins with gpBackup_{name} and an associated game dir is found - Action - Merge, Delete
-         * Orphan Backup - Folder begins gpBackup_{name} and no associated {name} in any location - Action - Delete, Ignore
-         * Dangling Folder - A folder with no assciated ACF in any library - Action - Delete, Install                                 
+         * Orphan Backup - Folder begins gpBackup_{name} and no associated {name} or acf file in any location - Action - Delete, Restore
+         * Dangling Folder - A folder with no assciated ACF in any library - Action - Delete, Install                       
          * Empyt Games - ACF File with no associated game data
          * Duplicate Games (one or more games, with one or more manifests) Ask which to delete (show size difference between biggest and the rest), relocate acf if needed
          */
@@ -145,8 +147,6 @@ namespace GamePipeLib.Model.Steam.Cleanup
             ILocalSteamApplication TargetApp;
             string TargetDirectory;
             Action<ILocalSteamApplication, string> CleanupTask;
-
-
         }
     }
 }

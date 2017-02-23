@@ -19,6 +19,7 @@ namespace GamePipe
     {
         public MainWindow()
         {
+            UpdateVm = new UpdateViewModel();
             InitializeComponent();
             CloseSteamButton.Click += CloseSteamButton_Click;
             ListGamesInAccountButton.Click += ListGamesInAccountButton_Click;
@@ -59,6 +60,7 @@ namespace GamePipe
         private static readonly ViewModel.TransferManagerViewModel _transferVm = new ViewModel.TransferManagerViewModel();
         public static ViewModel.TransferManagerViewModel TransferVM { get { return _transferVm; } }
 
+        public UpdateViewModel UpdateVm { get; private set; }
 
 
         private void MainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
@@ -161,6 +163,48 @@ namespace GamePipe
                 sb.AppendLine(proc.ProcessName);
             }
             TestOutput.Text = sb.ToString();
+        }
+
+        private void NewVersionHyperlink_Click(object sender, RoutedEventArgs e)
+        {
+            var link = sender as System.Windows.Documents.Hyperlink;
+            if (link != null && link.NavigateUri != null)
+                Process.Start(link.NavigateUri.ToString());
+        }
+
+        void CloseUpdateButton_Click(object sender, RoutedEventArgs e)
+        {
+            UpdateVm.IsNewVersionAvailable = false;
+        }
+    }
+
+    public class UpdateViewModel : ViewModel.ViewModelBase
+    {
+        private bool _IsNewVersionAvailable;
+        public bool IsNewVersionAvailable
+        {
+            get
+            {
+                return _IsNewVersionAvailable;
+            }
+            set
+            {
+                _IsNewVersionAvailable = value;
+                NotifyPropertyChanged("IsNewVersionAvailable");
+            }
+        }
+        private string _NewVersionUrl;
+        public string NewVersionUrl
+        {
+            get
+            {
+                return _NewVersionUrl;
+            }
+            set
+            {
+                _NewVersionUrl = value;
+                NotifyPropertyChanged("NewVersionUrl");
+            }
         }
     }
 }

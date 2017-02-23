@@ -29,6 +29,7 @@ namespace GamePipe
         private void App_Startup(object sender, StartupEventArgs e)
         {
             CheckForUpdates(_version);
+            //GamePipeLib.Model.Steam.Cleanup.CleanupRoot.StartupScan();
         }
 
         private void App_Exit(object sender, ExitEventArgs e)
@@ -50,7 +51,7 @@ namespace GamePipe
 
 
 
-        public static async void CheckForUpdates(Version currentVersion)
+        public async void CheckForUpdates(Version currentVersion)
         {
             try
             {
@@ -76,11 +77,17 @@ namespace GamePipe
 
                 if ((currentVersion.CompareTo(latestVersion) < 0) && (latestRelease != null))
                 {
-                    var result = MessageBox.Show("A new version of Game Pipe is available, do you want to take a look?", "New Version Available", MessageBoxButton.YesNo, MessageBoxImage.Question);
-                    if (result == MessageBoxResult.Yes)
+                    var mw = (MainWindow as MainWindow);
+                    if (mw != null)
                     {
-                        System.Diagnostics.Process.Start(latestRelease.HtmlUrl);
+                        mw.UpdateVm.IsNewVersionAvailable = true;
+                        mw.UpdateVm.NewVersionUrl = latestRelease.HtmlUrl;
                     }
+                    //var result = MessageBox.Show("A new version of Game Pipe is available, do you want to take a look?", "New Version Available", MessageBoxButton.YesNo, MessageBoxImage.Question);
+                    //if (result == MessageBoxResult.Yes)
+                    //{
+                    //    System.Diagnostics.Process.Start(latestRelease.HtmlUrl);
+                    //}
                 }
             }
             catch (Exception ex)

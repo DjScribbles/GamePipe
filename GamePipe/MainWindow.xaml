@@ -14,12 +14,23 @@
     </Window.TaskbarItemInfo>
     <Grid DataContext="{Binding SteamVM, ElementName=GamePipe_MainWindow}">
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="5"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
+        <DockPanel Visibility="{Binding ElementName=GamePipe_MainWindow, Path=UpdateVm.IsNewVersionAvailable, Converter={StaticResource BooleanToVisibilityConverter},UpdateSourceTrigger=PropertyChanged}" Background="LightGreen" >
+            <TextBlock Text="A new version of Game Pipe is available!" Foreground="Black" DockPanel.Dock="Left"/>
+            <Label DockPanel.Dock="Left">
+                <Hyperlink NavigateUri="{Binding ElementName=GamePipe_MainWindow, Path=UpdateVm.NewVersionUrl}" Click="NewVersionHyperlink_Click" >Click here to take a look.</Hyperlink>
+            </Label>
+            
+            <Label DockPanel.Dock="Right" HorizontalAlignment="Right" HorizontalContentAlignment="Right">
+                <Hyperlink Click="CloseUpdateButton_Click" >Ignore</Hyperlink>
+            </Label>
 
-        <TabControl Grid.Row="0">
+        </DockPanel>
+        <TabControl Grid.Row="1">
             <TabItem x:Name="LocalLibsTab" Header="Local Libraries" Template="{DynamicResource TabItemControlTemplate1}">
                 <DockPanel Grid.IsSharedSizeScope="True">
                     <Grid DockPanel.Dock="Top" >
@@ -44,12 +55,12 @@
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
                         <Label Content="Sort:" VerticalAlignment="Center"/>
-                        <RadioButton Grid.Column="1" Command="{Binding SetSortModeCommand}" CommandParameter="{x:Static vm:GameSortMode.AtoZ}" HorizontalAlignment="Stretch"
-                                     Content="A to Z" VerticalAlignment="Center" IsChecked="True" Style="{StaticResource SimpleTextRadioButtonStyle}"/>
+                        <RadioButton Grid.Column="1" Command="{Binding SetSortModeCommand}" IsChecked="True" CommandParameter="{x:Static vm:GameSortMode.AtoZ}" HorizontalAlignment="Stretch"
+                                     Content="A to Z" VerticalAlignment="Center"  Style="{StaticResource SimpleTextRadioButtonStyle}"/>
                         <RadioButton Grid.Column="2" Command="{Binding SetSortModeCommand}" CommandParameter="{x:Static vm:GameSortMode.ZtoA}" HorizontalAlignment="Stretch"
                                      Content="Z to A" VerticalAlignment="Center"  Style="{StaticResource SimpleTextRadioButtonStyle}"/>
                         <RadioButton Grid.Column="3" Command="{Binding SetSortModeCommand}" CommandParameter="{x:Static vm:GameSortMode.BiggestToSmallest}" HorizontalAlignment="Stretch"
-                                     Content="Big to Small" VerticalAlignment="Center"  Style="{StaticResource SimpleTextRadioButtonStyle}"/>
+                                     Content="Big to Small" VerticalAlignment="Center" Style="{StaticResource SimpleTextRadioButtonStyle}"/>
                         <RadioButton Grid.Column="4" Command="{Binding SetSortModeCommand}" CommandParameter="{x:Static vm:GameSortMode.SmallestToBiggest}" HorizontalAlignment="Stretch"
                                      Content="Small to Big" VerticalAlignment="Center" Style="{StaticResource SimpleTextRadioButtonStyle}"/>
                     </Grid>
@@ -162,8 +173,8 @@
             <local:SteamParseView />
         </TabItem>-->
         </TabControl>
-        <GridSplitter Grid.Row="1" HorizontalAlignment="Stretch" Height="5"/>
-        <Grid Grid.Row="2" DataContext="{Binding TransferVM, ElementName=GamePipe_MainWindow}">
+        <GridSplitter Grid.Row="2" HorizontalAlignment="Stretch" Height="5"/>
+        <Grid Grid.Row="3" DataContext="{Binding TransferVM, ElementName=GamePipe_MainWindow}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
