@@ -180,6 +180,8 @@ namespace Wingman
                     {
                         return;
                     }
+#else
+                    //TODO check to see if Game Pipe is still flagged as running in registry while the actual process is stopped. If so we'll need to close so Steam can close.
 #endif
                     Thread.Sleep(500);
                 }

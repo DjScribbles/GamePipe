@@ -29,6 +29,7 @@ namespace GamePipe
         private void App_Startup(object sender, StartupEventArgs e)
         {
             CheckForUpdates(_version);
+            GamePipeLib.Utils.WingmanServer.KickoffWingmanProcess();
             //GamePipeLib.Model.Steam.Cleanup.CleanupRoot.StartupScan();
         }
 

@@ -24,8 +24,9 @@ namespace GamePipeLib.Utils
             {
                 GetService().AddAcfFileToHitList(filePath);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Utils.Logging.Logger.Error($"Failed to add to hit list due to exception:", ex);
                 filePath = Path.GetFullPath(filePath).ToLower();
                 TransferManager.Instance.AcfFileWatchList.Add(filePath);
             }
@@ -37,7 +38,10 @@ namespace GamePipeLib.Utils
             {
                 GetService().SetRestartSteamOnExit(restartRequested);
             }
-            catch (Exception) { }
+            catch (Exception ex)
+            {
+                Utils.Logging.Logger.Error($"Failed to flag a restart due to exception:", ex);
+            }
         }
 
         public static void SendSignal_RemoveAcfFileFromHitList(string filePath)
@@ -48,14 +52,15 @@ namespace GamePipeLib.Utils
                 filePath = Path.GetFullPath(filePath).ToLower();
                 TransferManager.Instance.AcfFileWatchList.Remove(filePath);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Utils.Logging.Logger.Error($"Failed to remove from hit list due to exception:", ex);
                 filePath = Path.GetFullPath(filePath).ToLower();
                 TransferManager.Instance.AcfFileWatchList.Remove(filePath);
             }
         }
 
-        private static IWingmanService _wingmanService;
+        private static IWingmanService _wingmanService = null;
         private static IWingmanService GetService()
         {
             if (!WingmanIsRunning())
@@ -81,6 +86,10 @@ namespace GamePipeLib.Utils
                     if (!WingmanIsRunning())
                         System.Threading.Thread.Sleep(200);
 
+                    //This is lazy, but should never happen since I've added KickoffWingmanProcess to startup
+                    //I've found that trying to connect to the service immediately after startup causes it to get into a fouled state where it will never work.
+                    System.Threading.Thread.Sleep(3000);
+
                 }
                 catch (Exception ex)
                 {
@@ -105,6 +114,15 @@ namespace GamePipeLib.Utils
         private static bool WingmanIsRunning()
         {
             return System.Diagnostics.Process.GetProcessesByName(CLIENT_PROCESS).Any();
+        }
+
+        public static void KickoffWingmanProcess()
+        {
+            if (!WingmanIsRunning())
+            {
+                Process.Start(CLIENT_NAME);
+                _wingmanService = null;
+            }
         }
     }
 }
