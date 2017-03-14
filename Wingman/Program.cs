@@ -77,17 +77,26 @@ namespace Wingman
 
             return ((uint)Environment.TickCount - lastInPut.dwTime);
         }
-        #endregion
 
         public static bool IsSystemIdle()
         {
             return GetIdleTime() > IDLE_TICKS;
         }
+        
+        #endregion
+
+
+        //[System.Runtime.InteropServices.DllImport("user32.dll")]
+        //static extern int GetMessage(out System.Windows.Interop.MSG lpMsg, IntPtr hWnd, uint wMsgFilterMin, uint wMsgFilterMax);
 
 
 
         public static bool IsAnySteamAppRunning()
         {
+            //System.Windows.Interop.MSG msg;
+            //GetMessage(out msg, IntPtr.Zero, 0, 0); //Poke this to make WinExec from GamePipe happy (it didn't work)
+
+
             //This call is pretty expensive, only run every 10-30 seconds or so, and only when all other conditions are met
             using (var steamAppsKey = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\Valve\Steam\Apps"))
             {
@@ -175,14 +184,10 @@ namespace Wingman
                             }
                         }
                     }
-#if !STEAM
                     else if (DateTime.UtcNow > minimumEndTime && !IsGamePipeRunning())
                     {
                         return;
                     }
-#else
-                    //TODO check to see if Game Pipe is still flagged as running in registry while the actual process is stopped. If so we'll need to close so Steam can close.
-#endif
                     Thread.Sleep(500);
                 }
             }
@@ -222,4 +227,5 @@ namespace Wingman
         }
 
     }
+
 }

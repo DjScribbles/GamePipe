@@ -116,13 +116,31 @@ namespace GamePipeLib.Utils
             return System.Diagnostics.Process.GetProcessesByName(CLIENT_PROCESS).Any();
         }
 
+
+        //Note: WinExec blocks for 30s since it's looking for a window to come to life (which helper doesn't have), so this needs to be called from a separate thread
         public static void KickoffWingmanProcess()
         {
             if (!WingmanIsRunning())
             {
-                Process.Start(CLIENT_NAME);
-                _wingmanService = null;
+                try
+                {
+                    var path = Path.GetFullPath(CLIENT_NAME);
+                    uint result = WinExec($"\"{path}\"", 0);
+
+                    // If the function succeeds, the return value is greater than 31
+                    if (result > 31)
+                    {
+                        return;
+                    }
+                }
+                catch { }
+                GamePipeLib.Utils.Logging.Logger.Warn($"Kickoff of {CLIENT_NAME} failed.");
             }
         }
+
+
+        [System.Runtime.InteropServices.DllImport("kernel32.dll")]
+        public static extern uint WinExec(string lpCmdLine, uint uCmdShow);
+
     }
 }
