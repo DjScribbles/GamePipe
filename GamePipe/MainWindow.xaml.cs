@@ -83,7 +83,7 @@ namespace GamePipe
             {
                 if (GamePipeLib.Utils.SteamDirParsingUtils.IsSteamOpen())
                 {
-                    var result = System.Windows.MessageBox.Show("Due to an issue connecting with the Wingman app, you must close Steam before closing Game Pipe.\n\nClose Steam now?", "Close Steam?", System.Windows.MessageBoxButton.YesNo, System.Windows.MessageBoxImage.Exclamation, System.Windows.MessageBoxResult.No);
+                    var result = System.Windows.MessageBox.Show("Due to an issue connecting with the GamePipe_Helper app, you must close Steam before closing Game Pipe.\n\nClose Steam now?", "Close Steam?", System.Windows.MessageBoxButton.YesNo, System.Windows.MessageBoxImage.Exclamation, System.Windows.MessageBoxResult.No);
                     if (result == MessageBoxResult.Yes)
                     {
                         GamePipeLib.Utils.SteamDirParsingUtils.CloseSteam();
@@ -106,7 +106,7 @@ namespace GamePipe
                     }
                 }
             }
-            else if ((e.Cancel == false) && (GamePipeLib.Model.Steam.SteamRoot.Instance.SteamRestartRequired) && GamePipeLib.Utils.SteamDirParsingUtils.IsSteamOpen())
+            else if ((e.Cancel == false) && GamePipeLib.Utils.WingmanServer.SteamRestartNeeded())
             {
                 var result = System.Windows.MessageBox.Show("You moved (or deleted) some steam games, they won't be playable unless you restart Steam.\n\nRestart Steam now?", "Restart Steam?", System.Windows.MessageBoxButton.YesNo, System.Windows.MessageBoxImage.Exclamation, System.Windows.MessageBoxResult.No);
                 if (result == MessageBoxResult.Yes)

@@ -116,6 +116,15 @@ namespace GamePipeLib.Utils
             return System.Diagnostics.Process.GetProcessesByName(CLIENT_PROCESS).Any();
         }
 
+        public static bool SteamRestartNeeded()
+        {
+            if (WingmanIsRunning() == true)
+            {
+                return GetService().HitListHasItems();
+
+            }
+            return false;
+        }
 
         //Note: WinExec blocks for 30s since it's looking for a window to come to life (which helper doesn't have), so this needs to be called from a separate thread
         public static void KickoffWingmanProcess()
