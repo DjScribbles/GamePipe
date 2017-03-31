@@ -164,6 +164,27 @@ namespace GamePipe.ViewModel
 
         #endregion //RefreshCommand
 
+        #region "ForgetCommand"
+        private RelayCommand _ForgetCommand = null;
+        public RelayCommand ForgetCommand
+        {
+            get
+            {
+                if (_ForgetCommand == null)
+                {
+                    _ForgetCommand = new RelayCommand(x => Forget());
+
+                }
+                return _ForgetCommand;
+            }
+        }
+
+        public void Forget()
+        {
+            Remembered = false;
+        }
+
+        #endregion //ForgetCommand
         //RefreshAppsCommand
         //CopyTo(app,drive) via drag and drop
 

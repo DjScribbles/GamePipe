@@ -24,7 +24,7 @@
             <Label DockPanel.Dock="Left">
                 <Hyperlink NavigateUri="{Binding ElementName=GamePipe_MainWindow, Path=UpdateVm.NewVersionUrl}" Click="NewVersionHyperlink_Click" >Click here to take a look.</Hyperlink>
             </Label>
-            
+
             <Label DockPanel.Dock="Right" HorizontalAlignment="Right" HorizontalContentAlignment="Right">
                 <Hyperlink Click="CloseUpdateButton_Click" >Ignore</Hyperlink>
             </Label>
@@ -79,14 +79,27 @@
             </TabItem>
             <TabItem x:Name="NetworkTab" Header="LAN Libraries" Template="{DynamicResource TabItemControlTemplate1}">
                 <DockPanel>
-                    <Grid DockPanel.Dock="Top" >
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-                        <Label  Content="Game Search:"/>
-                        <TextBox x:Name="NetworkSearchTextBox" Grid.Column="1" Text="{Binding LanListFilter, UpdateSourceTrigger=PropertyChanged}"/>
-                    </Grid>
+
+                    <GroupBox Header="Hosting" DockPanel.Dock="Top" HorizontalAlignment="Stretch">
+
+                        <Grid >
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Button Grid.Column="0" Command="{Binding OpenHostCommand}"  Content="Start Hosting" Visibility="{Binding IsEnabled, RelativeSource={RelativeSource Self}, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                ToolTip="Host a GamePipe service so other computers can connect to you and copy games from you. This is not neccessarily secure yet, should be fine for use, but don't leave it open 24/7." Margin="32,4,4,4"/>
+                            <Button Grid.Column="0" Command="{Binding CloseHostCommand}"  Content="Stop Hosting" Visibility="{Binding IsEnabled, RelativeSource={RelativeSource Self}, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                ToolTip="Closes the network service. Anyone transferring games from you will be interrupted." Margin="32,4,4,4"/>
+                            <TextBlock Grid.Column="1" Text="Your IP Addresses:"/>
+                            <TextBlock Grid.Column="2" MaxWidth="150" MaxHeight="28" TextWrapping="WrapWithOverflow" Text="{Binding AvailableIpAddresses}" ToolTip="{Binding AvailableIpAddresses}"/>
+
+                        </Grid>
+                    </GroupBox>
+
+
                     <Grid DockPanel.Dock="Top" HorizontalAlignment="Stretch">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>
@@ -103,26 +116,16 @@
                         <CheckBox Grid.Row="1" Grid.Column="1" Content="Scan with Windows Defender after network copy" IsChecked="{Binding Path=Model.ScanAfterNetworkCopy}" VerticalContentAlignment="Center" IsEnabled="{Binding Model.IsDefenderPresent}"/>
                         <CheckBox Grid.Row="1" Grid.Column="3" Content="Open the directory so I can scan manually" IsChecked="{Binding Path=Model.OpenDirAfterNetworkCopy}" VerticalContentAlignment="Center"/>
                     </Grid>
+
                     <Grid DockPanel.Dock="Top" >
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
-                        <Label Content="IP Address:" ToolTip="The IP address of another computer Hosting with GamePipe"/>
-                        <TextBox Grid.Column="1" x:Name="IP_TextBox" Text="{Binding NewFriendIp, UpdateSourceTrigger=PropertyChanged}" MinWidth="80" ToolTip="The IP address of another computer Hosting with GamePipe"/>
-                        <Label Grid.Column="2" Content="Port:" ToolTip="The port should be 41650, it can't be changed right now."/>
-                        <TextBox Grid.Column="3" x:Name="Port_TextBox" Text="{Binding NewFriendPort, UpdateSourceTrigger=PropertyChanged}" MinWidth="40" ToolTip="The port should be 41650, it can't be changed right now." IsReadOnly="True"/>
-                        <Button Grid.Column="4" Command="{Binding AddFriendCommand}" Content="Connect to Host" ToolTip="Connect to another computer that is hosting a Game Pipe session at the specified IP and port. This connection will be remembered."/>
-                        <Button Grid.Column="5" Command="{Binding OpenHostCommand}"  Content="Start Hosting" Visibility="{Binding IsEnabled, RelativeSource={RelativeSource Self}, Converter={StaticResource BooleanToVisibilityConverter}}"
-                                ToolTip="Host a GamePipe service so other computers can connect to you and copy games from you. This is not neccessarily secure yet, should be fine for use, but don't leave it open 24/7." Margin="32,4,4,4"/>
-                        <Button Grid.Column="6" Command="{Binding CloseHostCommand}"  Content="Stop Hosting" Visibility="{Binding IsEnabled, RelativeSource={RelativeSource Self}, Converter={StaticResource BooleanToVisibilityConverter}}"
-                                ToolTip="Closes the network service. Anyone transferring games from you will be interrupted." Margin="32,4,4,4"/>
+                        <Label  Content="Game Search:"/>
+                        <TextBox x:Name="NetworkSearchTextBox" Grid.Column="1" Text="{Binding LanListFilter, UpdateSourceTrigger=PropertyChanged}"/>
                     </Grid>
+
                     <ScrollViewer DockPanel.Dock="Left" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
                         <ItemsControl ItemsSource="{Binding Libraries}" DockPanel.Dock="Left" >
                             <ItemsControl.ItemsPanel>
@@ -139,20 +142,49 @@
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
                     </ScrollViewer>
-                    <!--<ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">-->
-                    <ItemsControl ItemsSource="{Binding Friends}" >
-                        <ItemsControl.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <StackPanel Orientation="Horizontal"/>
-                            </ItemsPanelTemplate>
-                        </ItemsControl.ItemsPanel>
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <vw:FriendView DataContext="{Binding}"/>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-                    <!--</ScrollViewer>-->
+
+
+                    <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
+                    <Grid HorizontalAlignment="Left">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <ItemsControl ItemsSource="{Binding Friends}" HorizontalAlignment="Left" >
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <StackPanel Orientation="Horizontal"/>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <vw:FriendView DataContext="{Binding}" Visibility="{Binding Remembered, Converter={StaticResource BooleanToVisibilityConverter}}" MaxWidth="400"/>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                        <GroupBox Grid.Column="1" Header="Connect to a host:" VerticalAlignment="Top" Margin="4">
+
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <Label Content="IP Address:" ToolTip="The IP address of another computer Hosting with GamePipe"/>
+                                <TextBox Grid.Row="0" Grid.Column="1" x:Name="IP_TextBox" Text="{Binding NewFriendIp, UpdateSourceTrigger=PropertyChanged}" MinWidth="80" ToolTip="The IP address of another computer Hosting with GamePipe"/>
+                                <Label Grid.Row="1" Content="Port:" ToolTip="The port should be 41650, it can't be changed right now."/>
+                                <TextBox Grid.Row="1" Grid.Column="1" x:Name="Port_TextBox" Text="{Binding NewFriendPort, UpdateSourceTrigger=PropertyChanged}" MinWidth="40" ToolTip="The port should be 41650, it can't be changed right now." IsReadOnly="True" HorizontalAlignment="Left"/>
+                                <Button Grid.Row="2" Grid.ColumnSpan="2" Command="{Binding AddFriendCommand}" Content="Connect" HorizontalAlignment="Center" ToolTip="Connect to another computer that is hosting a Game Pipe session at the specified IP and port. This connection will be remembered."/>
+
+                            </Grid>
+                        </GroupBox>
+
+                    </Grid>
+                    </ScrollViewer>
                 </DockPanel>
             </TabItem>
             <TabItem Header="Hack Test" Template="{DynamicResource TabItemControlTemplate1}" Visibility="Collapsed">
@@ -182,34 +214,34 @@
             <ListView ItemsSource="{Binding Path=Manager.Transfers}"  MaxHeight="350" HorizontalContentAlignment="Stretch"/>
             <!--<Button Grid.Column="1" Template="{DynamicResource PauseButtonControlTemplate1}"/>-->
             <Button Grid.Column="1" Command="{Binding PauseCommand}" Visibility="{Binding  Path=IsEnabled, RelativeSource={RelativeSource Self}, Converter={StaticResource BooleanToVisibilityConverter}}" VerticalAlignment="Top"  >
-                <Path StrokeThickness="8" StrokeEndLineCap="Round" StrokeStartLineCap="Round" Stroke="{StaticResource TextColor}" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
+                <Path StrokeThickness="8" StrokeEndLineCap="Round" StrokeStartLineCap="Round" Stroke="{StaticResource ButtonTextColor}" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
                       Data="M4,4 V 20 M 16,4 V 20"/>
             </Button>
             <Button Grid.Column="1" Command="{Binding ResumeCommand}" Visibility="{Binding  Path=IsEnabled, RelativeSource={RelativeSource Self}, Converter={StaticResource BooleanToVisibilityConverter}}" VerticalAlignment="Top">
-                <Path StrokeThickness="1" Stroke="{StaticResource TextColor}" Fill="{StaticResource TextColor}" StrokeStartLineCap="Triangle" StrokeEndLineCap="Triangle"
+                <Path StrokeThickness="1" Stroke="{StaticResource TextColor}" Fill="{StaticResource ButtonTextColor}" StrokeStartLineCap="Triangle" StrokeEndLineCap="Triangle"
                       Data="M 0,0 v 24 l 20,-12 l -20,-12"/>
             </Button>
             <!--<Button Grid.Column="2">
-                <Path StrokeThickness="1" Stroke="{StaticResource TextColor}" Fill="{StaticResource TextColor}" StrokeStartLineCap="Triangle" StrokeEndLineCap="Triangle"
+                <Path StrokeThickness="1" Stroke="{StaticResource ButtonTextColor}" Fill="{StaticResource TextColor}" StrokeStartLineCap="Triangle" StrokeEndLineCap="Triangle"
                       Data="M 0,0 h 24 l -12,20 l -12,-20"/>
             </Button>
             <Button Grid.Column="4">
-                <Path StrokeThickness="1" Stroke="{StaticResource TextColor}" Fill="{StaticResource TextColor}" StrokeStartLineCap="Triangle" StrokeEndLineCap="Triangle"
+                <Path StrokeThickness="1" Stroke="{StaticResource ButtonTextColor}" Fill="{StaticResource TextColor}" StrokeStartLineCap="Triangle" StrokeEndLineCap="Triangle"
                       Data="M 0,20 h 24 l -12,-20 l -12,20"/>
             </Button>
             <StackPanel  Grid.Column="5" Orientation="Vertical">
 
                 <Button Grid.Column="5">
-                    <Path StrokeThickness="3" Stroke="{StaticResource TextColor}"
+                    <Path StrokeThickness="3" Stroke="{StaticResource ButtonTextColor}"
                       Data="M 0,8 l 8,-8 8,8 M 8,0 v 12"/>
                 </Button>
                 <Button Grid.Column="6">
-                    <Path StrokeThickness="3" Stroke="{StaticResource TextColor}" 
+                    <Path StrokeThickness="3" Stroke="{StaticResource ButtonTextColor}" 
                       Data="M 0,4 l 8,8 8,-8 M 8,0 v 12"/>
                 </Button>
             </StackPanel>
             <Button Grid.Column="6">
-                <Path StrokeThickness="8" StrokeEndLineCap="Flat" StrokeStartLineCap="Flat" Stroke="{StaticResource TextColor}"
+                <Path StrokeThickness="8" StrokeEndLineCap="Flat" StrokeStartLineCap="Flat" Stroke="{StaticResource ButtonTextColor}"
                       Data="M 4,4 l 20,20 M 24,4 l -20,20"/>
             </Button>-->
         </Grid>

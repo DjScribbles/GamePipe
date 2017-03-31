@@ -25,7 +25,7 @@
         <Button x:Name="GameMenuButton" Grid.Column="2" Grid.RowSpan="2" Background="{StaticResource Background}" BorderBrush="{StaticResource FeintBorder}" MinWidth="24" 
                         ContextMenuService.Placement="Left" Tag="{Binding RelativeSource={RelativeSource AncestorType=ListView, Mode=FindAncestor}}">
             <!--Store a reference to the list view in Tag, so it can be used in the context menu-->
-            <Path StrokeThickness="4" Stroke="{StaticResource TextColor}"  StrokeStartLineCap="Round" StrokeEndLineCap="Round"
+            <Path StrokeThickness="4" Stroke="{StaticResource ButtonTextColor}"  StrokeStartLineCap="Round" StrokeEndLineCap="Round"
                       Data="M 2,4 l 0,0 m 0,6 l 0,0 m 0,6 l 0,0"/>
             <Button.ContextMenu>
                 <ContextMenu>

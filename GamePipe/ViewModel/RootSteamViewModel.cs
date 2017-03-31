@@ -11,6 +11,8 @@ using System.Collections.Specialized;
 using System.Linq;
 using System.ServiceModel;
 using System.Threading;
+using System.Text;
+using System.Net.NetworkInformation;
 
 namespace GamePipe.ViewModel
 {
@@ -401,7 +403,14 @@ namespace GamePipe.ViewModel
 
         public void AddFriend(string ip, ushort port)
         {
-            FriendViewModel friend = null;
+            FriendViewModel friend = Friends.Where(x => x.Ip == ip && x.Port == port).FirstOrDefault();
+            if (friend != null)
+            {
+                friend.UpdateFilter(LanListFilter);
+                friend.Remembered = true;
+                return;
+            }
+
             try
             {
                 friend = new FriendViewModel(ip, port);
@@ -419,8 +428,32 @@ namespace GamePipe.ViewModel
             }
         }
 
+        public string AvailableIpAddresses
+        {
+            get
+            {
+                StringBuilder sb = new StringBuilder();
+                bool first = true;
+                foreach (NetworkInterface netInterface in NetworkInterface.GetAllNetworkInterfaces())
+                {
+                    IPInterfaceProperties ipProps = netInterface.GetIPProperties();
 
+                    foreach (UnicastIPAddressInformation addr in ipProps.UnicastAddresses)
+                    {
+                        if (addr.IsDnsEligible && addr.IPv4Mask != System.Net.IPAddress.Any)
+                        {
+                            if (first)
+                                first = false;
+                            else
+                                sb.Append(", ");
 
+                            sb.Append(addr.Address.ToString());
+                        }
+                    }
+                }
+                return sb.ToString();
+            }
+        }
 
         //public string SteamDirectory { get { return SteamBase.SteamDirectory; } }
 

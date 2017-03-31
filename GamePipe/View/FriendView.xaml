@@ -20,8 +20,15 @@
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
             <TextBlock Text="{Binding FriendName}"/>
-            <CheckBox Grid.Column="1" IsChecked="{Binding Remembered}" Content="Remember" VerticalAlignment="Center" VerticalContentAlignment="Center" Margin="4"/>
-            <Button Grid.Column="2" Command="{Binding RefreshCommand}" Content="Refresh"/>
+            <!--<CheckBox Grid.Column="1" IsChecked="{Binding Remembered}" Content="Remember" VerticalAlignment="Center" VerticalContentAlignment="Center" Margin="4"/>-->
+            <Button Grid.Column="1" Command="{Binding RefreshCommand}" Content="Refresh" Foreground="{StaticResource ButtonTextColor}"/>
+            <Viewbox  Grid.Column="3" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="4" MaxHeight="28" MaxWidth="28" >
+
+                <Button Command="{Binding ForgetCommand}" Margin="0">
+                    <Path StrokeThickness="8" StrokeEndLineCap="Flat" StrokeStartLineCap="Flat" Stroke="{StaticResource ButtonTextColor}"
+                      Data="M 4,4 l 20,20 M 24,4 l -20,20"/>
+                </Button>
+            </Viewbox>
         </Grid>
 
         <ListView x:Name="DisplayList" ItemsSource="{Binding FilteredGames}" 
