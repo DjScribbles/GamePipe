@@ -8,8 +8,6 @@
              xmlns:conv="clr-namespace:GamePipe.Converters"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-        <!--<SolidColorBrush x:Key="SteamControlBorderColor" Color="#666666ff"/>
-        <SolidColorBrush x:Key="SteamDarkBlue" Color="#276482ff"/>-->
         <SolidColorBrush x:Key="WindowBackground" Color="#ff1e1e1e"/>
         <SolidColorBrush x:Key="Background" Color="#001e1e1e"/>
         <SolidColorBrush x:Key="TextColor" Color="#ffa8a8a8"/>

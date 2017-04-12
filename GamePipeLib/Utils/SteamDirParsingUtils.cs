@@ -58,12 +58,24 @@ namespace GamePipeLib.Utils
                             Filter = "Executables (*.exe;*.lnk)|*.exe;*.lnk|All files (*.*)|*.*",
                             Title = "Find Steam.exe"
                         };
-                        dialog.ShowDialog();
-                        _SteamDirectory = Path.GetDirectoryName(dialog.FileName);
-                        dialog.Dispose();
+                        try
+                        {
+                            dialog.ShowDialog();
+                            if (!string.IsNullOrWhiteSpace(dialog.FileName))
+                                _SteamDirectory = Path.GetDirectoryName(dialog.FileName);
+                        }
+                        catch { _SteamDirectory = null; }
+                        finally
+                        {
+                            dialog.Dispose();
+                        }
+
                         if (string.IsNullOrWhiteSpace(_SteamDirectory) || Directory.Exists(_SteamDirectory) == false || File.Exists(Path.Combine(_SteamDirectory, "steam.exe")) == false)
                         {
-                            _SteamDirectory = Environment.ExpandEnvironmentVariables(@"%ProgramFiles%\Steam");  //If the user goofed, just set the directory to something to prevent issues
+                            System.Windows.MessageBox.Show("The Steam desktop client is required for Game Pipe to function.\n\nGame Pipe will open the download page for Steam, please restart Game Pipe once Steam is installed.");
+                            System.Diagnostics.Process.Start(@"http://store.steampowered.com/about/");
+                            System.Windows.Application.Current.Shutdown();
+                            //_SteamDirectory = Environment.ExpandEnvironmentVariables(@"%ProgramFiles%\Steam");  //If the user goofed, just set the directory to something to prevent issues
                         }
                         else
                         {
@@ -160,7 +172,7 @@ namespace GamePipeLib.Utils
             if (File.Exists(libraryVdfPath))
             {
                 var lines = File.ReadAllLines(libraryVdfPath).ToList();
-                string searchString = string.Format("\"{0}\"", path).Replace(@"\",@"\\");
+                string searchString = string.Format("\"{0}\"", path).Replace(@"\", @"\\");
                 foreach (string line in lines.ToArray())
                 {
                     if (line.TrimEnd().EndsWith(searchString, StringComparison.OrdinalIgnoreCase))
