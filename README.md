@@ -1,7 +1,16 @@
 # Support Game Pipe
-[![paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=FCH86TKH6V35A)
+<a href="https://www.amazon.com/Game-Pipe-Steam-Games-Download/dp/B06Y1MV197">
+<img src="https://s3.amazonaws.com/isitcrap/amazon-Button.png" height="47" alt="Buy on Amazon"/>
+</a>
+<a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=FCH86TKH6V35A">
+<img src="https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif" height="47" alt="Donate with PayPal"/>
+</a>
+<a href="https://djscribbles.itch.io/game-pipe">
+<img src="https://camo.githubusercontent.com/78918e0c766fa2e731c8e7f807ae9199bc387410/687474703a2f2f692e696d6775722e636f6d2f6579317863594d2e706e67" height="47" alt="Buy on Itch.io"/>
+</a>
 
-For now, you can support Game Pipe via Paypal donation (note: I am not a non-profit, your donation is used to support and encourage future development). In the near future, Game Pipe will be purchasable on Amazon, Itch.io, and Windows Store for $5.
+You can now purchase Game Pipe (for $5 US) on Amazon, Itch.io, or support Game Pipe via Paypal donation (note: I am not a non-profit, your donation is used to support and encourage future development). If you can't afford to purchase Game Pipe, leaving an honest review on Amazon or Itch.io is a great way to help out.
+
 
 Sadly, __Game Pipe will probably never be available on Steam__, because of Valve's backwards attitudes towards software (even with the upcoming Steam-Direct changes, they have indicated they will not allow utility software like Game Pipe). However, if by some miracle Valve changes their policies, I will do my best to provide Steam key's to anyone who has donated via paypal or purchased Game Pipe on other platforms.
 
