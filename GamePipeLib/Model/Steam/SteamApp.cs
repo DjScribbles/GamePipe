@@ -44,7 +44,14 @@ namespace GamePipeLib.Model.Steam
         public SteamApp(string acfFilePath)
         {
             _AcfFile = acfFilePath;
-            InitializeFromAcf();
+            try
+            {
+                InitializeFromAcf();
+            }
+            catch (Exception ex)
+            {
+                Utils.Logging.Logger.Error($"Failed to initialize new SteamApp object from ACF File: {acfFilePath}", ex);
+            }
             //_watcher = new FileSystemWatcher(_AcfFile);
             //_watcher.Changed += _watcher_Changed;
             //_watcher.Deleted += _watcher_Deleted;
@@ -183,8 +190,15 @@ namespace GamePipeLib.Model.Steam
                         var commonFolder = Path.Combine(Path.GetDirectoryName(AcfFile), "common");
                         var installDir = pair.Item2.Replace("\\\\", "\\").Trim();//Convert "\\" to "\", double slashes for escape charcters
                         string[] splitString = { "\\" };
-                        InstallDir = installDir.Split(splitString, StringSplitOptions.RemoveEmptyEntries).Last();
-                        GameDir = Path.Combine(commonFolder, InstallDir);
+                        InstallDir = installDir.Split(splitString, StringSplitOptions.RemoveEmptyEntries).LastOrDefault();
+                        if (string.IsNullOrWhiteSpace(InstallDir))
+                        {
+                            Utils.Logging.Logger.Error($"Failed to identify Game Directory for ACF File: {AcfFile} {GameName}");
+                        }
+                        else
+                        {
+                            GameDir = Path.Combine(commonFolder, InstallDir);
+                        }
                         count++;
                         break;
 

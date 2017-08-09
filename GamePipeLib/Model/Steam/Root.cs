@@ -94,6 +94,7 @@ namespace GamePipeLib.Model.Steam
                 if (_Libraries == null)
                 {
                     _Libraries = new ObservableCollection<SteamLibrary>(DiscoverLibraries());
+                    Utils.Logging.Logger.Info($"Found {_Libraries.Count} libraries!");
                 }
                 return _Libraries;
             }
@@ -109,11 +110,14 @@ namespace GamePipeLib.Model.Steam
             var libraryFile = Path.Combine(steamApps, "libraryfolders.vdf");
             List<SteamLibrary> result = new List<SteamLibrary>();
 
-            if (Directory.Exists(steamApps) == false)
+            if (Directory.Exists(steamApps))
             {
-                return result;
+                result.Add(new SteamLibrary(steamApps));
             }
-            result.Add(new SteamLibrary(steamApps));
+            else
+            {
+                Utils.Logging.Logger.Warn($"Steamapps folder not found at {steamApps}");
+            }
 
             if (File.Exists(libraryFile))
             {
@@ -126,7 +130,16 @@ namespace GamePipeLib.Model.Steam
                     {
                         result.Add(new SteamLibrary(path));
                     }
+                    else
+                    {
+                        Utils.Logging.Logger.Warn($"Steam library directory not found at {path}");
+
+                    }
                 }
+            }
+            else
+            {
+                Utils.Logging.Logger.Warn($"Steam Libraries file not found at {libraryFile}");
             }
 
             if (Properties.Settings.Default.Archives == null)
@@ -137,6 +150,10 @@ namespace GamePipeLib.Model.Steam
                 if (Directory.Exists(item))
                 {
                     result.Add(new SteamArchive(item));
+                }
+                else
+                {
+                    Utils.Logging.Logger.Warn($"Archive directory not found at {libraryFile}");
                 }
             }
             return result;
@@ -190,6 +207,7 @@ namespace GamePipeLib.Model.Steam
         {
             if (Directory.Exists(path) && !Properties.Settings.Default.Archives.Contains(path))
             {
+                Utils.Logging.Logger.Info($"Adding library: {path}");
                 GamePipeLib.Utils.SteamDirParsingUtils.SetupNewSteamLibrary(path);
                 SteamRestartRequired = true;
                 var libraryDirectory = Path.Combine(path, "SteamApps");

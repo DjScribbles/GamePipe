@@ -127,10 +127,15 @@ namespace GamePipeLib.Model.Steam
                 {
                     return;
                 }
+                if (string.IsNullOrWhiteSpace(newGame.GameName) || string.IsNullOrWhiteSpace(newGame.AppId) || string.IsNullOrWhiteSpace(newGame.InstallDir))
+                {
+                    return;
+                }
+
                 if (GetGameById(newGame.AppId) == null)
                 {
                     var matches = (from game in _Games
-                                   where game.InstallDir.ToLower() == newGame.InstallDir.ToLower()
+                                   where game?.InstallDir?.ToLower() == newGame?.InstallDir?.ToLower()
                                    select game).ToList();
 
                     if (matches.Any())
@@ -189,6 +194,7 @@ namespace GamePipeLib.Model.Steam
                         let game = (ILocalSteamApplication)new SteamApp(file)
                         where string.IsNullOrWhiteSpace(game.GameName) == false
                         where string.IsNullOrWhiteSpace(game.AppId) == false
+                        where string.IsNullOrWhiteSpace(game.InstallDir) == false
                         orderby game.GameName
                         group game by game.InstallDir.ToLower() into groups
                         select (groups.Count() > 1

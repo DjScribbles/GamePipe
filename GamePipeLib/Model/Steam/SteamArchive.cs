@@ -19,7 +19,14 @@ namespace GamePipeLib.Model.Steam
         private const string COMPRESSION_EXTENSION = ".gpdeflate";
         public SteamArchive(string libraryDirectory) : base(libraryDirectory, true)
         {
-            InitializeArchiveOptions();
+            try
+            {
+                InitializeArchiveOptions();
+            }
+            catch (Exception ex)
+            {
+                Utils.Logging.Logger.Warn($"Error initializing archive options for {libraryDirectory}", ex);
+            }
         }
 
         private bool _CompressNewGames;

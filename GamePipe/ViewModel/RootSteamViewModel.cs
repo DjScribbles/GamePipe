@@ -39,7 +39,6 @@ namespace GamePipe.ViewModel
                     catch (Exception ex)
                     {
                         GamePipeLib.Utils.Logging.Logger.Error("Failed to restore friend: " + friend, ex);
-
                     }
                 }
             }
@@ -56,6 +55,7 @@ namespace GamePipe.ViewModel
                                 : new SteamLibraryViewModel(addition);
                     newLib.UpdateFilter(LocalListFilter);
                     Libraries.Add(newLib);
+
                 }
             }
 
@@ -73,7 +73,9 @@ namespace GamePipe.ViewModel
                         }
                     }
                     if (itemToRemove != null)
+                    {
                         Libraries.Remove(itemToRemove);
+                    }
                 }
             }
         }
@@ -126,9 +128,23 @@ namespace GamePipe.ViewModel
             {
                 if (_Libraries == null)
                 {
-                    _Libraries = new ObservableCollection<SteamLibraryViewModel>(SteamRoot.Instance.Libraries.Select(x => (x is SteamArchive)
-                                                                                                              ? new SteamArchiveViewModel(x as SteamArchive)
-                                                                                                              : new SteamLibraryViewModel(x)));
+
+                    _Libraries = new ObservableCollection<SteamLibraryViewModel>(SteamRoot.Instance.Libraries.Select(x =>
+                    {
+                        try
+                        {
+                            return (x is SteamArchive)
+                           ? new SteamArchiveViewModel(x as SteamArchive)
+                           : new SteamLibraryViewModel(x);
+                        }
+                        catch (Exception ex)
+                        {
+                            GamePipeLib.Utils.Logging.Logger.Warn($"Failed to creat Library/Archive view model for {x.SteamDirectory}", ex);
+                            return null;
+                        }
+                    }).Where(x => x != null));
+
+
                 }
                 return _Libraries;
             }
@@ -212,7 +228,7 @@ namespace GamePipe.ViewModel
                 catch (Exception ex)
                 {
                     GamePipeLib.Utils.Logging.Logger.Error("Archive Addition failed due to exception:", ex);
-                    System.Windows.MessageBox.Show("Archive Addition failed due to exception:\n" + ex.Message, "", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Exclamation, System.Windows.MessageBoxResult.OK);
+                    System.Windows.MessageBox.Show($"Archive Addition failed for {path} due to exception:\n" + ex.Message, "", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Exclamation, System.Windows.MessageBoxResult.OK);
                 }
             }
         }

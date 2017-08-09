@@ -83,6 +83,8 @@ namespace GamePipeLib.Utils
                             GamePipeLib.Properties.Settings.Default.Save();
                         }
                     }
+                    if (_SteamDirectory != null)
+                        Utils.Logging.Logger.Info($"Steam located at {_SteamDirectory}");
                 }
                 return _SteamDirectory;
             }

@@ -20,10 +20,13 @@ namespace GamePipe.ViewModel
         private SteamLibrary _model;
         public SteamLibraryViewModel(SteamLibrary model)
         {
+
+
             _model = model;
             UpdateDriveInfo();
             model.Games.CollectionChanged += Games_CollectionChanged;
             Refresh();
+
         }
 
         private void Games_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -39,14 +42,22 @@ namespace GamePipe.ViewModel
 
         private void UpdateDriveInfo()
         {
-            if (Drive != null)
+            try
             {
-                DrivePercentFull = 100.0 * Convert.ToDouble(Drive.TotalSize - Drive.AvailableFreeSpace) / Convert.ToDouble(Drive.TotalSize);
-                NotifyPropertyChanged("DrivePercentFull");
-                DriveAvailableSpace = FileUtils.GetReadableFileSize(Drive.AvailableFreeSpace);
-                NotifyPropertyChanged("DriveAvailableSpace");
-                DriveTotalSpace = FileUtils.GetReadableFileSize(Drive.TotalSize);
-                NotifyPropertyChanged("DriveTotalSpace");
+                if (Drive != null)
+                {
+
+                    DrivePercentFull = 100.0 * Convert.ToDouble(Drive.TotalSize - Drive.AvailableFreeSpace) / Convert.ToDouble(Drive.TotalSize);
+                    NotifyPropertyChanged("DrivePercentFull");
+                    DriveAvailableSpace = FileUtils.GetReadableFileSize(Drive.AvailableFreeSpace);
+                    NotifyPropertyChanged("DriveAvailableSpace");
+                    DriveTotalSpace = FileUtils.GetReadableFileSize(Drive.TotalSize);
+                    NotifyPropertyChanged("DriveTotalSpace");
+                }
+            }
+            catch (Exception ex)
+            {
+                GamePipeLib.Utils.Logging.Logger.Warn($"Failed to update drive info due to exception", ex);
             }
         }
 
@@ -106,13 +117,21 @@ namespace GamePipe.ViewModel
         {
             _gamesByName = _model.Games.OrderBy(x => x.GameName).Select(x =>
             {
-                if (x is SteamBundle)
-                    return new BundleViewModel((SteamBundle)x);
-                else
-                    return new GameViewModel((SteamApp)x);
+                try
+                {
+                    if (x is SteamBundle)
+                        return new BundleViewModel((SteamBundle)x);
+                    else
+                        return new GameViewModel((SteamApp)x);
+                }
+                catch (Exception ex)
+                {
+                    GamePipeLib.Utils.Logging.Logger.Warn($"Failed to creat Game/Bundle view model for {x?.GameName} ({x?.AppId})", ex);
+                    return null;
+                }
             }
-            ).ToArray();
-            _gamesBySize = _gamesByName.OrderBy(x => x.DiskSize).ToArray();
+            ).Where(x => x != null).ToArray();
+            _gamesBySize = _gamesByName.OrderBy(x => x?.DiskSize).ToArray();
             NotifyPropertyChanged("FilteredGames");
         }
 
