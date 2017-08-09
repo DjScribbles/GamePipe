@@ -93,6 +93,7 @@ namespace GamePipeLib.Model.Steam
             {
                 if (_Libraries == null)
                 {
+                    Utils.Logging.Logger.Debug("Discovering Libraries....");
                     _Libraries = new ObservableCollection<SteamLibrary>(DiscoverLibraries());
                     Utils.Logging.Logger.Info($"Found {_Libraries.Count} libraries!");
                 }

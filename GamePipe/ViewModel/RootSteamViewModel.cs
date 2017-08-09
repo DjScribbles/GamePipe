@@ -42,6 +42,7 @@ namespace GamePipe.ViewModel
                     }
                 }
             }
+            GamePipeLib.Utils.Logging.Logger.Debug("Root VM initialized");
         }
 
         private void Libraries_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -55,6 +56,7 @@ namespace GamePipe.ViewModel
                                 : new SteamLibraryViewModel(addition);
                     newLib.UpdateFilter(LocalListFilter);
                     Libraries.Add(newLib);
+                    GamePipeLib.Utils.Logging.Logger.Debug($"Adding library vm {newLib.Model.SteamDirectory}");
 
                 }
             }
@@ -75,6 +77,7 @@ namespace GamePipe.ViewModel
                     if (itemToRemove != null)
                     {
                         Libraries.Remove(itemToRemove);
+                        GamePipeLib.Utils.Logging.Logger.Debug($"Removing library vm {itemToRemove.Model.SteamDirectory}");
                     }
                 }
             }
@@ -128,6 +131,7 @@ namespace GamePipe.ViewModel
             {
                 if (_Libraries == null)
                 {
+                    GamePipeLib.Utils.Logging.Logger.Debug($"Initializing library vms with {SteamRoot.Instance.Libraries.Count} models");
 
                     _Libraries = new ObservableCollection<SteamLibraryViewModel>(SteamRoot.Instance.Libraries.Select(x =>
                     {
@@ -143,6 +147,7 @@ namespace GamePipe.ViewModel
                             return null;
                         }
                     }).Where(x => x != null));
+                    GamePipeLib.Utils.Logging.Logger.Debug($"{_Libraries.Count} Library vms were created.");
 
 
                 }
