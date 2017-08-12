@@ -309,7 +309,33 @@ namespace GamePipeLib.Model
                                 }
 
                                 //Write the active buffer to the destination, update progress, and do a buffer swap. 
-                                thisDestStream.Write(ActiveBuffer, 0, readLength);
+                                try
+                                {
+                                    thisDestStream.Write(ActiveBuffer, 0, readLength);
+                                }
+                                catch (IOException ex)
+                                {
+                                    Utils.Logging.Logger.Error($"IOException writing to {thisFile}. Promting retry or cancel.", ex);
+
+                                    string message = $"An exception occurred while writing {file}. Resolve the issue if possible and click OK to resume. Click cancel to abort the transfer.\r\n{ex.Message}";
+                                    if (ex.Message.Contains("not enough space"))
+                                    {
+                                        message = $"Insufficient disk space, please free up some space and click Ok to continue. Otherwise, click cancel to abort.";
+                                    }
+                                    var result = System.Windows.MessageBox.Show(message, "IO Error", System.Windows.MessageBoxButton.OKCancel);
+                                    if (result == System.Windows.MessageBoxResult.Cancel)
+                                    {
+                                        AbortTransfer(transfer);
+                                    }
+                                    else
+                                    {
+                                        SafeDisposeStream(thisSourceStream);
+                                        SafeDisposeStream(thisDestStream);
+                                        transfer.RetryFile(thisFile, readFailedMidStreamFileSize);
+                                        return;
+                                    }
+
+                                }
                                 thisUpdateMethod(thisTotalBytesRead);
                                 BackBuffer = Interlocked.Exchange(ref ActiveBuffer, BackBuffer);
                                 if (endOfFile == false)
@@ -338,7 +364,38 @@ namespace GamePipeLib.Model
                             Utils.Logging.Logger.Error($"Exception reading from {thisFile}: {readFailedMidStreamException?.Message}. A retry will be attempted.");
                             transfer.RetryFile(thisFile, readFailedMidStreamFileSize);
                         }
-                        else thisFinishMethod?.Invoke(thisFile, thisSourceStream, thisDestStream); //Callback to the finish method,
+                        else
+                        {
+                            try
+                            {
+                                thisFinishMethod?.Invoke(thisFile, thisSourceStream, thisDestStream); //Callback to the finish method,
+                            }
+                            catch (IOException ex)
+                            {
+                                Utils.Logging.Logger.Error($"Exception closing {thisFile}",ex);
+
+                                string message = $"An exception occurred while writing {file}. Resolve the issue if possible and click OK to resume. Click cancel to abort the transfer.\r\n{ex.Message}";
+                                if (ex.Message.Contains("not enough space"))
+                                {
+                                    message = $"Insufficient disk space, please free up some space and click Ok to continue. Otherwise, click cancel to abort.";
+                                }
+                                var result = System.Windows.MessageBox.Show(message, "IO Error", System.Windows.MessageBoxButton.OKCancel);
+                                if (result == System.Windows.MessageBoxResult.Cancel)
+                                {
+                                    AbortTransfer(transfer);
+                                    SafeDisposeStream(thisSourceStream);
+                                    SafeDisposeStream(thisDestStream);
+                                    return;
+                                }
+                                else
+                                {
+                                    SafeDisposeStream(thisSourceStream);
+                                    SafeDisposeStream(thisDestStream);
+                                    transfer.RetryFile(thisFile, readFailedMidStreamFileSize);
+                                    return;
+                                }
+                            }
+                        }
                     }
                 }
 
