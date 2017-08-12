@@ -1,4 +1,9 @@
-﻿using GamePipeLib.Interfaces;
+﻿/**
+* Copyright (c) 2017 Joseph Shaw & Big Sky Software LLC
+* Distributed under the GNU GPL v2. For full terms see the file LICENSE.txt
+*/
+
+using GamePipeLib.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.IO;
