@@ -34,17 +34,6 @@ Game Pipe is great for:
 
 Game Pipe will remain an open source project, freely available through GitHub. If you enjoy using Game Pipe, support it on [Greenlight](http://steamcommunity.com/sharedfiles/filedetails/?id=630526624) and consider purchasing Game Pipe when it becomes available.
 
-# How Game Pipe Works
-When you start up, Game Pipe automatically finds your Steam installation using the Windows Registry (or asking you to find it if it can't). From there, it searches for a few specific config files in the Steam directory to find the locations of your game libraries.
-
-Within each game library, Game Pipe searches for all of the ".acf" files, which are used by Steam to store information about each of your games. Game Pipe uses these ".acf" files to quickly create a listing of all of your games, including the title and estimated size of the game.
-
-To move a game between libraries in Game Pipe you simply need to drag the game to the desired location to start the move. Behind the scenes Game Pipe will first copy the game directory to it's new location, then it will move the corresponding "appmanifest_<appid>.acf" file to the new library, finally it deletes the game from the original location along with the old ".acf" file. 
-
-Game Pipe also allows you to host your games on your local network, allowing you to connect using another Game Pipe client and copy your games to another computer using your LAN connection (Peer-to-Peer) rather than downloading over the internet. (Note: Game Pipe does not circumvent copy protection in any way. You must still own a game to play it.)
-
-Once you've sufficiently shuffled your library, you'll need to restart Steam. This step is necessary as Steam only reads the ".acf" files from the disk at startup, so it won't find the game in it's new location until you restart. 
-
 #What could possibly go wrong...
 Unfortunately, if you attempt to start a moved game without restarting Steam, it adds another minor complication, Steam will actually restore the original ".acf" file at the old location, and depending on the order your libraries appear, it may prefer this old ".acf" which points to the old location of the game (which was deleted) over the new ".acf" file which actually points to an existing directory. 
 
