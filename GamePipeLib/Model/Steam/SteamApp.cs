@@ -187,8 +187,11 @@ namespace GamePipeLib.Model.Steam
                         count++;
                         break;
                     case "installdir":
-                        var commonFolder = Path.Combine(Path.GetDirectoryName(AcfFile), "common");
+                        var subFolders = new string[] { "common", "music" };
+                        var folders = subFolders.Select(f => Path.Combine(Path.GetDirectoryName(AcfFile), f)).ToArray();
+                        var commonFolder = folders.First();
                         var installDir = pair.Item2.Replace("\\\\", "\\").Trim();//Convert "\\" to "\", double slashes for escape charcters
+
                         string[] splitString = { "\\" };
                         InstallDir = installDir.Split(splitString, StringSplitOptions.RemoveEmptyEntries).LastOrDefault();
                         if (string.IsNullOrWhiteSpace(InstallDir))
@@ -197,7 +200,7 @@ namespace GamePipeLib.Model.Steam
                         }
                         else
                         {
-                            GameDir = Path.Combine(commonFolder, InstallDir);
+                            GameDir = folders.Select(f => Path.Combine(f, InstallDir)).Where(f => Directory.Exists(f)).FirstOrDefault() ?? Path.Combine(commonFolder, InstallDir);
                         }
                         count++;
                         break;
