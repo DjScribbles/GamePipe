@@ -23,6 +23,7 @@ namespace GamePipeLib.Model
 
         protected override void DoAbortProcess()
         {
+            _target?.DeleteDirectory(Application.InstallDir);
         }
 
         protected override void DoPostProcess()

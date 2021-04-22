@@ -15,7 +15,7 @@ using System.ServiceModel;
 //https://msdn.microsoft.com/en-us/library/ms751515%28v=vs.110%29.aspx
 namespace GamePipeService
 {
-
+    //[ServiceBehavior(InstanceContextMode = InstanceContextMode.Single, ConcurrencyMode = ConcurrencyMode.Single, UseSynchronizationContext = true)]
     public class GameProviderService : IAppProvider
     {
         private static Dictionary<string, uint> _validationCache = new Dictionary<string, uint>();

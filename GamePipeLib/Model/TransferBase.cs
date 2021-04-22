@@ -252,8 +252,8 @@ namespace GamePipeLib.Model
                     Utils.Logging.Logger.InfoFormat("Aborted {0} of {1}.",
                                                     this.TransferType.ToLower(),
                                                     Application.GameName);
-                    _target.RestoreBackupToDir(Application.InstallDir);
                     DoAbortProcess();
+                    _target.RestoreBackupToDir(Application.InstallDir);
                     Status = TransferStatus.Aborted;
                 }
                 else

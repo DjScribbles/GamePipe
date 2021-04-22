@@ -18,7 +18,7 @@ namespace GamePipeLib.Model
 
         protected override void DoAbortProcess()
         {
-            //Nothing to do
+            this._target?.DeleteDirectory(Application.InstallDir);
         }
 
         public override bool GetIsValidated()

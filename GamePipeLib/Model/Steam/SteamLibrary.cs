@@ -294,7 +294,7 @@ namespace GamePipeLib.Model.Steam
 
         Stream ITransferTarget.GetFileStream(string installDir, string file, bool validation, int bufferSize)
         {
-            string path = Path.Combine(SteamDirectory, "common", installDir, file);
+            string path = Path.Combine(GetPathForGameDir(installDir), file);
             return GetWriteFileStream(path, validation, bufferSize);
         }
 
@@ -317,7 +317,7 @@ namespace GamePipeLib.Model.Steam
 
         public bool HasGameDir(string installDir)
         {
-            string path = Path.Combine(SteamDirectory, "common", installDir);
+            string path = GetPathForGameDir(installDir);
             return (Directory.Exists(path));
         }
 
@@ -325,7 +325,7 @@ namespace GamePipeLib.Model.Steam
         {
             if (openInstallDir)
             {
-                string path = Path.Combine(SteamDirectory, "common", installDir);
+                string path = GetPathForGameDir(installDir);
                 try
                 {
                     if (Directory.Exists(path)) System.Diagnostics.Process.Start(path);
@@ -335,7 +335,7 @@ namespace GamePipeLib.Model.Steam
             if (openBackupDirToo)
             {
                 string backupDir = string.Format("_gpbackup_{0}", installDir);
-                string backupPath = Path.Combine(SteamDirectory, "common", backupDir);
+                string backupPath = GetPathForGameDir(backupDir);
                 try
                 {
                     if (Directory.Exists(backupPath)) System.Diagnostics.Process.Start(backupPath);
@@ -385,11 +385,11 @@ namespace GamePipeLib.Model.Steam
 
         public void BackupExistingDir(string installDir)
         {
-            string path = Path.Combine(SteamDirectory, "common", installDir);
+            string path = GetPathForGameDir(installDir);
             if (Directory.Exists(path))
             {
                 string backupDir = string.Format("_gpbackup_{0}", installDir);
-                string backupPath = Path.Combine(SteamDirectory, "common", backupDir);
+                string backupPath = GetPathForGameDir(backupDir);
 
                 if (Directory.Exists(backupPath))
                     Directory.Delete(backupPath, true);
@@ -401,9 +401,9 @@ namespace GamePipeLib.Model.Steam
 
         public void RestoreBackupToDir(string installDir)
         {
-            string path = Path.Combine(SteamDirectory, "common", installDir);
+            string path = GetPathForGameDir(installDir);
             string backupDir = string.Format("_gpbackup_{0}", installDir);
-            string backupPath = Path.Combine(SteamDirectory, "common", backupDir);
+            string backupPath = GetPathForGameDir(backupDir);
             if (Directory.Exists(backupPath))
             {
                 try
@@ -455,7 +455,7 @@ namespace GamePipeLib.Model.Steam
                     throw new NotImplementedException("Not yet implemented");
                     break;
                 case BackupDisposalProcedure.BackupThenOpen:
-                    string backupPath = Path.Combine(SteamDirectory, "common", backupDir);
+                    string backupPath = GetPathForGameDir(backupDir);
                     if (Directory.Exists(backupPath))
                         OpenGameDir(installDir, true, true);
                     break;
@@ -465,7 +465,7 @@ namespace GamePipeLib.Model.Steam
         public void DeleteBackupDir(string installDir)
         {
             string backupDir = string.Format("_gpbackup_{0}", installDir);
-            string backupPath = Path.Combine(SteamDirectory, "common", backupDir);
+            string backupPath = GetPathForGameDir(backupDir);
             if (Directory.Exists(backupPath))
                 Directory.Delete(backupPath, true);
 
@@ -476,10 +476,10 @@ namespace GamePipeLib.Model.Steam
         //public void MergeBackupDir(string installDir)
         //{
         //    string backupDir = string.Format("_gpbackup_{0}", installDir);
-        //    string backupPath = Path.Combine(SteamDirectory, "common", backupDir);
+        //    string backupPath = GetPathForGameDir( backupDir);
         //    if (Directory.Exists(backupPath))
         //    {
-        //        string path = Path.Combine(SteamDirectory, "common", installDir);
+        //        string path = GetPathForGameDir( installDir);
         //        var filesInBackupDir = Directory.EnumerateFiles(backupPath, "*", SearchOption.AllDirectories).Select(p => p.Replace(backupPath, ".\\").ToLower());
         //        var filesInInstallDir = Directory.EnumerateFiles(path, "*", SearchOption.AllDirectories).Select(p => p.Replace(path, ".\\").ToLower());
         //        var filesToCopyFromBackup = filesInBackupDir.Except(filesInInstallDir);            
@@ -543,9 +543,37 @@ namespace GamePipeLib.Model.Steam
         {
             if (SteamRoot.Instance.IsDefenderPresent)
             {
-                string path = Path.Combine(SteamDirectory, "common", installDir);
+                string path = GetPathForGameDir(installDir);
                 SteamRoot.Instance.ScanWithDefender(path, appId);
             }
+        }
+
+        public void DeleteDirectory(string installDir)
+        {
+            string path = GetPathForGameDir(installDir);
+            if (Directory.Exists(path))
+                try
+                {
+                    Directory.Delete(path, true);
+
+                }
+                catch (Exception ex)
+                {
+                    Logging.Logger.Warn($"Failed to delete aborted transfer target at: {path}");
+                    System.Windows.MessageBox.Show("Failed to delete aborted transfer target. Press Ok to open in file explorer for manual deletion");
+                    if (Directory.Exists(path)) System.Diagnostics.Process.Start(path);
+                }
+        }
+
+
+
+        public string GetPathForGameDir(string gameDir)
+        {
+            var subFolders = new string[] { "common", "music" };
+            var folders = subFolders.Select(f => Path.Combine(SteamDirectory, f, gameDir)).ToArray();
+            var commonFolder = folders.First();
+
+            return folders.Where(f => Directory.Exists(f)).FirstOrDefault() ?? Path.Combine(commonFolder, gameDir);
         }
     }
 }

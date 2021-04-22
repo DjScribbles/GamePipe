@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("Game Pipe")]
 [assembly: AssemblyDescription("Game Pipe")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Joseph Shaw")]
+[assembly: AssemblyCompany("Big Sky Software")]
 [assembly: AssemblyProduct("GamePipe")]
 [assembly: AssemblyCopyright("Copyright ©  2016")]
 [assembly: AssemblyTrademark("")]
