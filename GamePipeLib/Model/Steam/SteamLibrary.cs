@@ -573,7 +573,7 @@ namespace GamePipeLib.Model.Steam
             var folders = subFolders.Select(f => Path.Combine(SteamDirectory, f, gameDir)).ToArray();
             var commonFolder = folders.First();
 
-            return folders.Where(f => Directory.Exists(f)).FirstOrDefault() ?? Path.Combine(commonFolder, gameDir);
+            return folders.Where(f => Directory.Exists(f)).FirstOrDefault() ?? commonFolder;
         }
     }
 }
