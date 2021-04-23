@@ -3,7 +3,7 @@
 #include <idp.iss>
 
 #define MyAppName "Game Pipe"
-#define MyAppVersion "1.0.2"
+#define MyAppVersion "1.0.3"
 #define MyAppPublisher "Joe Shaw"
 #define MyAppExeName "GamePipe.exe"
 
@@ -19,7 +19,7 @@ AppPublisher={#MyAppPublisher}
 DefaultDirName={pf}\GamePipe
 DisableProgramGroupPage=yes
 LicenseFile=..\LICENSE.txt
-OutputBaseFilename=GamePipe_Installer
+OutputBaseFilename=GamePipe_Installer_{#MyAppVersion}
 SetupIconFile=..\GamePipe\Resources\GamePipe.ico
 Compression=lzma
 SolidCompression=yes

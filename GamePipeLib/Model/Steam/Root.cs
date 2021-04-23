@@ -106,7 +106,7 @@ namespace GamePipeLib.Model.Steam
         private IEnumerable<SteamLibrary> DiscoverLibraries()
         {
 
-            var steamApps = Path.Combine(SteamDirectory, "SteamApps");
+            var steamApps = Path.Combine(SteamDirectory, "steamapps");
             Regex libraryRegex = new Regex("^\\s*\"\\d+\"\\s*\"(?'path'.*)\"\\s*$", RegexOptions.Multiline);
             var libraryFile = Path.Combine(steamApps, "libraryfolders.vdf");
             List<SteamLibrary> result = new List<SteamLibrary>();
@@ -126,7 +126,7 @@ namespace GamePipeLib.Model.Steam
                 var matches = libraryRegex.Matches(contents);
                 foreach (Match match in matches)
                 {
-                    dynamic path = Path.Combine(match.Groups["path"].Value.Replace("\\\\", "\\"), "SteamApps");
+                    dynamic path = Path.Combine(match.Groups["path"].Value.Replace("\\\\", "\\"), "steamapps");
                     if (Directory.Exists(path))
                     {
                         result.Add(new SteamLibrary(path));
@@ -211,7 +211,7 @@ namespace GamePipeLib.Model.Steam
                 Utils.Logging.Logger.Info($"Adding library: {path}");
                 GamePipeLib.Utils.SteamDirParsingUtils.SetupNewSteamLibrary(path);
                 SteamRestartRequired = true;
-                var libraryDirectory = Path.Combine(path, "SteamApps");
+                var libraryDirectory = Path.Combine(path, "steamapps");
                 if (!Directory.Exists(libraryDirectory)) Directory.CreateDirectory(libraryDirectory);
                 _Libraries.Add(new SteamLibrary(libraryDirectory));
                 NotifyPropertyChanged("Libraries");
@@ -221,8 +221,8 @@ namespace GamePipeLib.Model.Steam
         {
             _Libraries.Remove(archive);
             var path = archive.SteamDirectory;
-            if (path.EndsWith(@"\SteamApps", StringComparison.OrdinalIgnoreCase))
-                path = path.Substring(0, path.Length - @"\SteamApps".Length);
+            if (path.EndsWith(@"\steamapps", StringComparison.OrdinalIgnoreCase))
+                path = path.Substring(0, path.Length - @"\steamapps".Length);
             GamePipeLib.Utils.SteamDirParsingUtils.RemoveSteamLibrary(path);
         }
 
