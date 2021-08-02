@@ -107,7 +107,7 @@ namespace GamePipeLib.Model.Steam
         {
 
             var steamApps = Path.Combine(SteamDirectory, "steamapps");
-            Regex libraryRegex = new Regex("^\\s*\"\\d+\"\\s*\"(?'path'.*)\"\\s*$", RegexOptions.Multiline);
+            Regex libraryRegex = new Regex("^\\s*\"(\\d+|path)\"\\s*\"(?'path'.*)\"\\s*$", RegexOptions.Multiline);
             var libraryFile = Path.Combine(steamApps, "libraryfolders.vdf");
             List<SteamLibrary> result = new List<SteamLibrary>();
 
