@@ -204,27 +204,27 @@ namespace GamePipeLib.Model.Steam
             Properties.Settings.Default.Save();
             _Libraries.Remove(archive);
         }
-        public void AddLibrary(string path)
-        {
-            if (Directory.Exists(path) && !Properties.Settings.Default.Archives.Contains(path))
-            {
-                Utils.Logging.Logger.Info($"Adding library: {path}");
-                GamePipeLib.Utils.SteamDirParsingUtils.SetupNewSteamLibrary(path);
-                SteamRestartRequired = true;
-                var libraryDirectory = Path.Combine(path, "steamapps");
-                if (!Directory.Exists(libraryDirectory)) Directory.CreateDirectory(libraryDirectory);
-                _Libraries.Add(new SteamLibrary(libraryDirectory));
-                NotifyPropertyChanged("Libraries");
-            }
-        }
-        public void RemoveLibrary(SteamLibrary archive)
-        {
-            _Libraries.Remove(archive);
-            var path = archive.SteamDirectory;
-            if (path.EndsWith(@"\steamapps", StringComparison.OrdinalIgnoreCase))
-                path = path.Substring(0, path.Length - @"\steamapps".Length);
-            GamePipeLib.Utils.SteamDirParsingUtils.RemoveSteamLibrary(path);
-        }
+        //public void AddLibrary(string path)
+        //{
+        //    if (Directory.Exists(path) && !Properties.Settings.Default.Archives.Contains(path))
+        //    {
+        //        Utils.Logging.Logger.Info($"Adding library: {path}");
+        //        GamePipeLib.Utils.SteamDirParsingUtils.SetupNewSteamLibrary(path);
+        //        SteamRestartRequired = true;
+        //        var libraryDirectory = Path.Combine(path, "steamapps");
+        //        if (!Directory.Exists(libraryDirectory)) Directory.CreateDirectory(libraryDirectory);
+        //        _Libraries.Add(new SteamLibrary(libraryDirectory));
+        //        NotifyPropertyChanged("Libraries");
+        //    }
+        //}
+        //public void RemoveLibrary(SteamLibrary archive)
+        //{
+        //    _Libraries.Remove(archive);
+        //    var path = archive.SteamDirectory;
+        //    if (path.EndsWith(@"\steamapps", StringComparison.OrdinalIgnoreCase))
+        //        path = path.Substring(0, path.Length - @"\steamapps".Length);
+        //    GamePipeLib.Utils.SteamDirParsingUtils.RemoveSteamLibrary(path);
+        //}
 
         public void ScanWithDefender(string gameDir, string appId)
         {

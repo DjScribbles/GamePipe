@@ -257,28 +257,29 @@ namespace GamePipe.ViewModel
 
         public void AddLibrary()
         {
-            while (GamePipeLib.Utils.SteamDirParsingUtils.IsSteamOpen())
-            {
-                var msgBoxResult = System.Windows.MessageBox.Show("Please close Steam to continue.", "", System.Windows.MessageBoxButton.OKCancel, System.Windows.MessageBoxImage.Exclamation, System.Windows.MessageBoxResult.OK);
-                if (msgBoxResult != System.Windows.MessageBoxResult.OK)
-                    return;
-            }
+            System.Windows.MessageBox.Show("This feature is currently disabled as Steam format has gotten more complex. Within Steam, open the Steam->Settings menu from the top left, select the Downloads category, and click the 'Steam Library Folders' button to manage your libraries.");
+            //while (GamePipeLib.Utils.SteamDirParsingUtils.IsSteamOpen())
+            //{
+            //    var msgBoxResult = System.Windows.MessageBox.Show("Please close Steam to continue.", "", System.Windows.MessageBoxButton.OKCancel, System.Windows.MessageBoxImage.Exclamation, System.Windows.MessageBoxResult.OK);
+            //    if (msgBoxResult != System.Windows.MessageBoxResult.OK)
+            //        return;
+            //}
 
-            var dialog = new System.Windows.Forms.FolderBrowserDialog();
-            System.Windows.Forms.DialogResult result = dialog.ShowDialog();
-            if (result == System.Windows.Forms.DialogResult.OK)
-            {
-                var path = Path.GetFullPath(dialog.SelectedPath);
-                try
-                {
-                    SteamRoot.Instance.AddLibrary(path);
-                }
-                catch (Exception ex)
-                {
-                    GamePipeLib.Utils.Logging.Logger.Error("Library Addition failed due to exception:", ex);
-                    System.Windows.MessageBox.Show("Library Addition failed due to exception:\n" + ex.Message, "", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Exclamation, System.Windows.MessageBoxResult.OK);
-                }
-            }
+            //var dialog = new System.Windows.Forms.FolderBrowserDialog();
+            //System.Windows.Forms.DialogResult result = dialog.ShowDialog();
+            //if (result == System.Windows.Forms.DialogResult.OK)
+            //{
+            //    var path = Path.GetFullPath(dialog.SelectedPath);
+            //    try
+            //    {
+            //        SteamRoot.Instance.AddLibrary(path);
+            //    }
+            //    catch (Exception ex)
+            //    {
+            //        GamePipeLib.Utils.Logging.Logger.Error("Library Addition failed due to exception:", ex);
+            //        System.Windows.MessageBox.Show("Library Addition failed due to exception:\n" + ex.Message, "", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Exclamation, System.Windows.MessageBoxResult.OK);
+            //    }
+            //}
         }
         #endregion //AddLibraryCommand
 

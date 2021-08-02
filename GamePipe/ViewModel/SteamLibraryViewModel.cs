@@ -249,6 +249,7 @@ namespace GamePipe.ViewModel
 
         public void Remove()
         {
+
             try
             {
                 if (Model is SteamArchive)
@@ -261,11 +262,13 @@ namespace GamePipe.ViewModel
                 }
                 else
                 {
-                    var result = System.Windows.MessageBox.Show("Are you sure you want to remove this library from Game Pipe and Steam?\n\nNo files will be deleted, but any games it contains will no longer be playable.", "Remove Library?", System.Windows.MessageBoxButton.YesNo, System.Windows.MessageBoxImage.Exclamation, System.Windows.MessageBoxResult.No);
-                    if (result == System.Windows.MessageBoxResult.Yes)
-                    {
-                        SteamRoot.Instance.RemoveLibrary(Model);
-                    }
+                    System.Windows.MessageBox.Show("This feature is currently disabled for non-Archive folders, as Steam format has gotten more complex. Within Steam, open the Steam->Settings menu from the top left, select the Downloads category, and click the 'Steam Library Folders' button to manage your libraries.");
+
+                    //var result = System.Windows.MessageBox.Show("Are you sure you want to remove this library from Game Pipe and Steam?\n\nNo files will be deleted, but any games it contains will no longer be playable.", "Remove Library?", System.Windows.MessageBoxButton.YesNo, System.Windows.MessageBoxImage.Exclamation, System.Windows.MessageBoxResult.No);
+                    //if (result == System.Windows.MessageBoxResult.Yes)
+                    //{
+                    //    SteamRoot.Instance.RemoveLibrary(Model);
+                    //}
                 }
             }
             catch (Exception ex)
