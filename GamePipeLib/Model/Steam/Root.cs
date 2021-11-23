@@ -127,7 +127,7 @@ namespace GamePipeLib.Model.Steam
                 foreach (Match match in matches)
                 {
                     dynamic path = Path.Combine(match.Groups["path"].Value.Replace("\\\\", "\\"), "steamapps");
-                    if (Directory.Exists(path))
+                    if (Directory.Exists(path) && !result.Any(i => i.SteamDirectory == path))
                     {
                         result.Add(new SteamLibrary(path));
                     }
